@@ -29,7 +29,7 @@ protected:
 private slots:
 
 
-    void startCountdown();
+
     void updateCountdown();
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
@@ -48,6 +48,8 @@ private slots:
     // void on_openDeepen1Btn_clicked();
     // void on_openDeepen2Btn_clicked();
     // void on_openDeepen3Btn_clicked();
+
+    void on_startTimerBtn_clicked();
 
 private:
     Ui::MainWindow *ui;

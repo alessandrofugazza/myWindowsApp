@@ -54,8 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    connect(ui->startTimerBtn, &QPushButton::clicked,
-            this, &MainWindow::startCountdown);
+
 
     connect(&timer, &QTimer::timeout,
             this, &MainWindow::updateCountdown);
@@ -218,12 +217,7 @@ void MainWindow::on_activateRfcBtn_clicked()
 //     handleWindowButton(ui->openRfcBtn, "Deepen 3");
 // }
 
-void MainWindow::startCountdown()
-{
-    remainingTime = 5;
-    ui->timeLeftLabel->setText(QString::number(remainingTime));
-    timer.start(1000); // 1 second
-}
+
 
 void MainWindow::updateCountdown()
 {
@@ -243,5 +237,13 @@ void MainWindow::updateCountdown()
 
     }
 
+}
+
+
+void MainWindow::on_startTimerBtn_clicked()
+{
+    remainingTime = 5;
+    ui->timeLeftLabel->setText(QString::number(remainingTime));
+    timer.start(1000); // 1 second
 }
 
