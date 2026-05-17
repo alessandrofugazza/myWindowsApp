@@ -8,7 +8,6 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
-#include <QMap>
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QSettings>
@@ -65,8 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *mainLayout = new QHBoxLayout(ui->developWidget);
     ui->developWidget->setLayout(mainLayout);
 
-    QMap<int, QVBoxLayout*> priorityLayouts;
-
     for (const StudyButton &button : buttons)
     {
         if (!priorityLayouts.contains(button.priority))
@@ -100,6 +97,22 @@ MainWindow::MainWindow(QWidget *parent)
                     btn->setProperty("lastClicked", now);
 
                     updateButtonColor(btn, now);
+
+                    int priority = btn->property("priority").toInt();
+
+                    QVBoxLayout *columnLayout = priorityLayouts.value(priority, nullptr);
+
+                    if (columnLayout != nullptr)
+                    {
+                        columnLayout->removeWidget(btn);
+
+                        int insertIndex = columnLayout->count() - 1;
+
+                        if (insertIndex < 0)
+                            insertIndex = 0;
+
+                        columnLayout->insertWidget(insertIndex, btn);
+                    }
 
                     QString appTitle = btn->property("appTitle").toString();
 
