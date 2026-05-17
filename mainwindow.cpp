@@ -15,6 +15,8 @@
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
 #include <utility>
+#include <QSet>
+#include <algorithm>
 
 #include <windows.h>
 
@@ -54,35 +56,83 @@ MainWindow::MainWindow(QWidget *parent)
 
     QList<StudyButton> buttons =
         {
-            {"Task A", 1, "main"},
-            {"Task B", 1, "left"},
-            {"Task C", 2, "right"},
-            {"Task D", 2, ""},
-            {"Task E", 3, "webtest"}
+            {"AHK", 4, "Chrome"},
+            {"Anki", 3, "Chrome"},
+            {"Artificial Intelligence", 6, "Chrome"},
+            {"Automotive", 2, "Chrome"},
+            {"C++", 4, "Chrome"},
+            {"CB125R", 1, ""},
+            {"CRI", 5, "Chrome"},
+            {"Canophilia", 2, "Chrome"},
+            {"Chrome Extensions Development", 2, "Chrome"},
+            {"CompTIA", 1, "Chrome"},
+            {"Data Science", 6, "Chrome"},
+            {"Deepen 1", 4, "Chrome"},
+            {"Deepen 2", 5, "Chrome"},
+            {"Deepen 3", 6, "Chrome"},
+            {"Doblo", 2, ""},
+            {"Excel", 3, "Chrome"},
+            {"FTO", 1, "Chrome"},
+            {"Finance", 1, "Chrome"},
+            {"Flipper", 7, "Chrome"},
+            {"GitHub Copilot", 1, "Chrome"},
+            {"JavaScript", 4, "Chrome"},
+            {"Law", 3, ""},
+            {"Learn", 2, "Chrome"},
+            {"Markdown", 1, "Chrome"},
+            {"Obsidian", 1, "Chrome"},
+            {"PLC", 5, "Chrome"},
+            {"Power User", 5, "Chrome"},
+            {"Project Serena", 3, "Chrome"},
+            {"Prompt Engineering", 9, "Chrome"},
+            {"Python", 4, "Chrome"},
+            {"Swift", 4, "Chrome"},
+            {"Tools 1", 3, "Chrome"},
+            {"Tools 2", 4, "Chrome"},
+            {"Tools 3", 5, "Chrome"},
+            {"Web Development", 3, "Chrome"},
+            {"Windows Development", 2, "Chrome"},
+            {"Word", 6, "Chrome"},
+            {"iOS Development", 2, "Chrome"}
         };
 
     QHBoxLayout *mainLayout = new QHBoxLayout(ui->developWidget);
     ui->developWidget->setLayout(mainLayout);
 
+    QSet<int> priorities;
+
     for (const StudyButton &button : buttons)
     {
-        if (!priorityLayouts.contains(button.priority))
-        {
-            QVBoxLayout *columnLayout = new QVBoxLayout();
+        priorities.insert(button.priority);
+    }
 
-            QLabel *title = new QLabel(
-                QString("Priority %1").arg(button.priority),
-                ui->developWidget
-                );
+    QList<int> sortedPriorities = priorities.values();
 
-            title->setAlignment(Qt::AlignCenter);
-            columnLayout->addWidget(title);
+    std::sort(sortedPriorities.begin(), sortedPriorities.end());
 
-            priorityLayouts.insert(button.priority, columnLayout);
-            mainLayout->addLayout(columnLayout);
-        }
+    for (int priority : sortedPriorities)
+    {
+        QVBoxLayout *columnLayout = new QVBoxLayout();
 
+        QLabel *title = new QLabel(
+            QString("Priority %1").arg(priority),
+            ui->developWidget
+            );
+
+        title->setAlignment(Qt::AlignCenter);
+
+        columnLayout->addWidget(title);
+
+        priorityLayouts.insert(priority, columnLayout);
+
+        mainLayout->addLayout(columnLayout);
+    }
+
+    for (const StudyButton &button : buttons)
+    {
         QPushButton *btn = new QPushButton(button.name, ui->developWidget);
+
+        btn->setObjectName(button.name);
 
         btn->setProperty("trackedColorButton", true);
         btn->setProperty("priority", button.priority);
@@ -115,10 +165,14 @@ MainWindow::MainWindow(QWidget *parent)
                     }
 
                     QString appTitle = btn->property("appTitle").toString();
+                    QString instanceName = btn->objectName();
 
                     if (!appTitle.isEmpty())
                     {
-                        activateWindowByTitle(appTitle);
+                        if (appTitle == "Chrome")
+                        {
+                            activateWindowByTitle(instanceName);
+                        }
                     }
                 });
     }
