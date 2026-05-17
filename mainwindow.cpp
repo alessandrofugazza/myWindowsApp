@@ -5,7 +5,10 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
+#include <QHBoxLayout>
 #include <QIcon>
+#include <QLabel>
+#include <QMap>
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QSettings>
@@ -15,6 +18,12 @@
 #include <utility>
 
 #include <windows.h>
+
+struct StudyButton
+{
+    QString name;
+    int priority;
+};
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -43,23 +52,44 @@ MainWindow::MainWindow(QWidget *parent)
 
     // study buttons
 
-    QStringList buttonNames =
+    QList<StudyButton> buttons =
         {
-            "Task A",
-            "Task B",
-            "Task C"
+            {"Task A", 1},
+            {"Task B", 1},
+            {"Task C", 2},
+            {"Task D", 2},
+            {"Task E", 3}
         };
 
-    QVBoxLayout *layout = new QVBoxLayout(ui->developWidget);
-    ui->developWidget->setLayout(layout);
+    QHBoxLayout *mainLayout = new QHBoxLayout(ui->developWidget);
+    ui->developWidget->setLayout(mainLayout);
 
-    for (const QString &name : buttonNames)
+    QMap<int, QVBoxLayout*> priorityLayouts;
+
+    for (const StudyButton &button : buttons)
     {
-        QPushButton *btn = new QPushButton(name, ui->developWidget);
+        if (!priorityLayouts.contains(button.priority))
+        {
+            QVBoxLayout *columnLayout = new QVBoxLayout();
+
+            QLabel *title = new QLabel(
+                QString("Priority %1").arg(button.priority),
+                ui->developWidget
+                );
+
+            title->setAlignment(Qt::AlignCenter);
+            columnLayout->addWidget(title);
+
+            priorityLayouts.insert(button.priority, columnLayout);
+            mainLayout->addLayout(columnLayout);
+        }
+
+        QPushButton *btn = new QPushButton(button.name, ui->developWidget);
 
         btn->setProperty("trackedColorButton", true);
+        btn->setProperty("priority", button.priority);
 
-        layout->addWidget(btn);
+        priorityLayouts[button.priority]->addWidget(btn);
 
         connect(btn, &QPushButton::clicked, this, [this, btn]()
                 {
@@ -70,6 +100,13 @@ MainWindow::MainWindow(QWidget *parent)
                     updateButtonColor(btn, now);
                 });
     }
+
+    for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
+    {
+        columnLayout->addStretch();
+    }
+
+    mainLayout->addStretch();
 
     // timer
 
