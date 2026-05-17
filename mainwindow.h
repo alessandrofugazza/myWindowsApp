@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QTimer>
 #include <QSystemTrayIcon>
+#include <QDateTime>
 #include <QPushButton>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -64,5 +66,10 @@ private:
 
     void readSettings();
     void writeSettings();
+
+    QDateTime lastClicked;
+
+    void updateButtonColor(QPushButton* btn, QDateTime clickedTime);
+
 };
 #endif // MAINWINDOW_H
