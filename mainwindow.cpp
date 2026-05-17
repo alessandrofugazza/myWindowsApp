@@ -207,28 +207,21 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
         return;
     }
 
-    qint64 seconds = clickedTime.secsTo(QDateTime::currentDateTime());
+    qint64 secondsElapsed =
+        clickedTime.secsTo(QDateTime::currentDateTime());
 
-    int r;
-    int g;
+    constexpr double maxSeconds = 60.0 * 60.0;
 
-    if (seconds < 30)
-    {
-        double t = seconds / 30.0;
+    double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
-        r = static_cast<int>(255 * t);
-        g = 255;
-    }
-    else
-    {
-        double t = qMin((seconds - 30) / 30.0, 1.0);
+    int r = static_cast<int>(255 * t);
 
-        r = 255;
-        g = static_cast<int>(255 * (1.0 - t));
-    }
+    int g = static_cast<int>(255 * (1.0 - t));
 
     btn->setStyleSheet(
-        QString("background-color: rgb(%1,%2,0);")
+        QString(
+            "background-color: rgb(%1,%2,0);"
+            )
             .arg(r)
             .arg(g)
         );
