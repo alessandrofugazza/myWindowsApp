@@ -33,12 +33,13 @@ private slots:
     void updateCountdown();
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-    // void on_openMainBtn_clicked();
-    void on_openLeftBtn_clicked();
-    // void on_openRightBtn_clicked();
+    void on_activateMainBtn_clicked();
+    void on_activateLeftBtn_clicked();
+    void on_activateRightBtn_clicked();
 
-    // void on_openWebtestBtn_clicked();
-    // void on_openRfcBtn_clicked();
+    void on_activateWebtestRightBtn_clicked();
+    void on_activateWebtestLeftBtn_clicked();
+    void on_activateRfcBtn_clicked();
 
     // void on_openTools1Btn_clicked();
     // void on_openTools2Btn_clicked();

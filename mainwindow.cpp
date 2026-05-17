@@ -9,8 +9,9 @@
 #include <QSettings>
 #include <windows.h>
 #include <QCloseEvent>
-#include <QFile>
+#include <QMessageBox>
 #include <QDir>
+#include <QDirIterator>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/img/icons/sources/img/icons/icon.ico"));
+    trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
 
     trayIcon->setToolTip("My Windows App");
     trayIcon->show();
@@ -157,30 +158,35 @@ void MainWindow::handleWindowButton(QPushButton *btn, const QString &target)
 }
 
 
-// void MainWindow::on_openMainBtn_clicked()
-// {
-//     handleWindowButton(ui->openMainBtn, "main");
-// }
-
-void MainWindow::on_openLeftBtn_clicked()
+void MainWindow::on_activateMainBtn_clicked()
 {
-    handleWindowButton(ui->openLeftBtn, "left");
+    handleWindowButton(ui->activateMainBtn, "main");
 }
 
-// void MainWindow::on_openRightBtn_clicked()
-// {
-//     handleWindowButton(ui->openRightBtn, "right");
-// }
+void MainWindow::on_activateLeftBtn_clicked()
+{
+    handleWindowButton(ui->activateLeftBtn, "left");
+}
 
-// void MainWindow::on_openWebtestBtn_clicked()
-// {
-//     handleWindowButton(ui->openWebtestBtn, "webtest");
-// }
+void MainWindow::on_activateRightBtn_clicked()
+{
+    handleWindowButton(ui->activateRightBtn, "right");
+}
 
-// void MainWindow::on_openRfcBtn_clicked()
-// {
-//     handleWindowButton(ui->openRfcBtn, "reference");
-// }
+void MainWindow::on_activateWebtestRightBtn_clicked()
+{
+    handleWindowButton(ui->activateWebtestRightBtn, "webtest");
+}
+
+void MainWindow::on_activateWebtestLeftBtn_clicked()
+{
+    handleWindowButton(ui->activateWebtestLeftBtn, "webtest");
+}
+
+void MainWindow::on_activateRfcBtn_clicked()
+{
+    handleWindowButton(ui->activateRfcBtn, "reference");
+}
 
 // void MainWindow::on_openTools1Btn_clicked()
 // {
@@ -234,6 +240,7 @@ void MainWindow::updateCountdown()
             QSystemTrayIcon::Information,
             5000
             );
+
     }
 
 }

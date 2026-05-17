@@ -11,8 +11,6 @@ qt_add_executable(myWindowsApp
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    resources.qrc
-    sources/img/icons/icon.ico
 
 )
 

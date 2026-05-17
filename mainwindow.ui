@@ -27,10 +27,10 @@
      <widget class="QWidget" name="widget" native="true">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>130</y>
-        <width>631</width>
-        <height>431</height>
+        <x>170</x>
+        <y>80</y>
+        <width>861</width>
+        <height>601</height>
        </rect>
       </property>
       <widget class="QLabel" name="label">
@@ -72,19 +72,6 @@
         <string>timeLeftLabel</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="openLeftBtn">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>280</y>
-         <width>111</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>openLeftBtn</string>
-       </property>
-      </widget>
       <widget class="QTextEdit" name="notConcluded">
        <property name="geometry">
         <rect>
@@ -94,6 +81,78 @@
          <height>104</height>
         </rect>
        </property>
+      </widget>
+      <widget class="QPushButton" name="activateWebtestRightBtn">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>380</y>
+         <width>171</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>WEBTEST RIGHT</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="activateRfcBtn">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>450</y>
+         <width>111</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>RFC</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="activateWebtestLeftBtn">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>380</y>
+         <width>141</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>WEBTEST LEFT</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>280</y>
+         <width>260</width>
+         <height>37</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="activateLeftBtn">
+          <property name="text">
+           <string>LEFT</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="activateMainBtn">
+          <property name="text">
+           <string>MAIN</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="activateRightBtn">
+          <property name="text">
+           <string>RIGHT</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>
