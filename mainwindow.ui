@@ -6,26 +6,98 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1366</width>
+    <height>884</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MyWindowsApp</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="testPushButton">
+   <widget class="QStackedWidget" name="viewsStack">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>240</y>
-      <width>111</width>
-      <height>35</height>
+      <x>79</x>
+      <y>49</y>
+      <width>1201</width>
+      <height>751</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Test</string>
-    </property>
+    <widget class="QWidget" name="productionView">
+     <widget class="QWidget" name="widget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>130</y>
+        <width>631</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>50</y>
+         <width>131</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>this is prod</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="startTimerBtn">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>150</y>
+         <width>111</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>start t</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="timeLeftLabel">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>150</y>
+         <width>121</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>timeLeftLabel</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="openLeftBtn">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>280</y>
+         <width>111</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>openLeftBtn</string>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="notConcluded">
+       <property name="geometry">
+        <rect>
+         <x>390</x>
+         <y>280</y>
+         <width>104</width>
+         <height>104</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="developView"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -33,12 +105,30 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1366</width>
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSections">
+    <property name="title">
+     <string>Sections</string>
+    </property>
+    <addaction name="actionProductionView"/>
+    <addaction name="actionDevelopView"/>
+   </widget>
+   <addaction name="menuSections"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionProductionView">
+   <property name="text">
+    <string>Production</string>
+   </property>
+  </action>
+  <action name="actionDevelopView">
+   <property name="text">
+    <string>Develop</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

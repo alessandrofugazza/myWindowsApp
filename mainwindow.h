@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
+#include <QSystemTrayIcon>
+#include <QPushButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,10 +22,44 @@ public:
 
 
 
+protected:
+    bool event(QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
-    void on_testPushButton_clicked();
+
+
+    void startCountdown();
+    void updateCountdown();
+    void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+
+    // void on_openMainBtn_clicked();
+    void on_openLeftBtn_clicked();
+    // void on_openRightBtn_clicked();
+
+    // void on_openWebtestBtn_clicked();
+    // void on_openRfcBtn_clicked();
+
+    // void on_openTools1Btn_clicked();
+    // void on_openTools2Btn_clicked();
+    // void on_openTools3Btn_clicked();
+
+    // void on_openDeepen1Btn_clicked();
+    // void on_openDeepen2Btn_clicked();
+    // void on_openDeepen3Btn_clicked();
 
 private:
     Ui::MainWindow *ui;
+    QTimer timer;
+    int remainingTime;
+
+    QSystemTrayIcon *trayIcon = nullptr;
+
+    bool activateWindowByTitle(const QString &target);
+    void handleWindowButton(QPushButton *btn, const QString &target);
+
+
+    void readSettings();
+    void writeSettings();
 };
 #endif // MAINWINDOW_H
