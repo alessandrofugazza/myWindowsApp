@@ -23,6 +23,7 @@ struct StudyButton
 {
     QString name;
     int priority;
+    QString appTitle;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -54,11 +55,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     QList<StudyButton> buttons =
         {
-            {"Task A", 1},
-            {"Task B", 1},
-            {"Task C", 2},
-            {"Task D", 2},
-            {"Task E", 3}
+            {"Task A", 1, "main"},
+            {"Task B", 1, "left"},
+            {"Task C", 2, "right"},
+            {"Task D", 2, ""},
+            {"Task E", 3, "webtest"}
         };
 
     QHBoxLayout *mainLayout = new QHBoxLayout(ui->developWidget);
@@ -88,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         btn->setProperty("trackedColorButton", true);
         btn->setProperty("priority", button.priority);
+        btn->setProperty("appTitle", button.appTitle);
 
         priorityLayouts[button.priority]->addWidget(btn);
 
@@ -98,6 +100,13 @@ MainWindow::MainWindow(QWidget *parent)
                     btn->setProperty("lastClicked", now);
 
                     updateButtonColor(btn, now);
+
+                    QString appTitle = btn->property("appTitle").toString();
+
+                    if (!appTitle.isEmpty())
+                    {
+                        activateWindowByTitle(appTitle);
+                    }
                 });
     }
 
