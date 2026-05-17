@@ -5,18 +5,23 @@
 #include <QCloseEvent>
 #include <QDateTime>
 #include <QDebug>
+#include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QSettings>
+#include <QSize>
+#include <QSizePolicy>
 #include <QString>
+#include <QStringList>
 #include <QSystemTrayIcon>
 #include <QVBoxLayout>
-#include <utility>
+#include <QWidget>
 #include <QSet>
 #include <algorithm>
+#include <utility>
 
 #include <windows.h>
 
@@ -26,6 +31,35 @@ struct StudyButton
     int priority;
     QString appTitle;
 };
+
+QString formatButtonText(const QString &text, int maxLineLength = 20)
+{
+    QStringList words = text.split(' ', Qt::SkipEmptyParts);
+    QStringList lines;
+    QString currentLine;
+
+    for (const QString &word : words)
+    {
+        if (currentLine.isEmpty())
+        {
+            currentLine = word;
+        }
+        else if (currentLine.length() + 1 + word.length() <= maxLineLength)
+        {
+            currentLine += " " + word;
+        }
+        else
+        {
+            lines.append(currentLine);
+            currentLine = word;
+        }
+    }
+
+    if (!currentLine.isEmpty())
+        lines.append(currentLine);
+
+    return lines.join('\n');
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -52,8 +86,6 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->viewsStack->setCurrentIndex(1);
             });
 
-    // study buttons
-
     QList<StudyButton> buttons =
         {
             {"AHK", 4, "Chrome"},
@@ -70,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
             {"Deepen 1", 4, "Chrome"},
             {"Deepen 2", 5, "Chrome"},
             {"Deepen 3", 6, "Chrome"},
-            {"Doblo", 2, ""},
+            {"Doblo", 1, ""},
             {"Excel", 3, "Chrome"},
             {"FTO", 1, "Chrome"},
             {"Finance", 1, "Chrome"},
@@ -96,8 +128,35 @@ MainWindow::MainWindow(QWidget *parent)
             {"iOS Development", 2, "Chrome"}
         };
 
+    QFontMetrics metrics(ui->developWidget->font());
+
+    int maxButtonWidth = 0;
+    int maxButtonHeight = 0;
+
+    for (const StudyButton &button : buttons)
+    {
+        QString wrappedText = formatButtonText(button.name);
+
+        QSize textSize = metrics.size(
+            Qt::TextShowMnemonic,
+            wrappedText
+            );
+
+        maxButtonWidth = qMax(maxButtonWidth, textSize.width());
+        maxButtonHeight = qMax(maxButtonHeight, textSize.height());
+    }
+
+    maxButtonWidth += 34;
+    maxButtonHeight += 20;
+
+    const int columnGap = 32;
+
     QHBoxLayout *mainLayout = new QHBoxLayout(ui->developWidget);
     ui->developWidget->setLayout(mainLayout);
+
+    mainLayout->setSpacing(columnGap);
+    mainLayout->setContentsMargins(20, 20, 20, 20);
+    mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     QSet<int> priorities;
 
@@ -112,27 +171,49 @@ MainWindow::MainWindow(QWidget *parent)
 
     for (int priority : sortedPriorities)
     {
-        QVBoxLayout *columnLayout = new QVBoxLayout();
+        QWidget *columnWidget = new QWidget(ui->developWidget);
+
+        columnWidget->setMinimumWidth(maxButtonWidth);
+        columnWidget->setMaximumWidth(maxButtonWidth);
+
+        QVBoxLayout *columnLayout = new QVBoxLayout(columnWidget);
+
+        columnLayout->setSpacing(10);
+        columnLayout->setContentsMargins(0, 0, 0, 0);
+        columnLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
         QLabel *title = new QLabel(
             QString("Priority %1").arg(priority),
-            ui->developWidget
+            columnWidget
             );
 
+        title->setMinimumWidth(maxButtonWidth);
+        title->setMaximumWidth(maxButtonWidth);
         title->setAlignment(Qt::AlignCenter);
 
         columnLayout->addWidget(title);
 
         priorityLayouts.insert(priority, columnLayout);
 
-        mainLayout->addLayout(columnLayout);
+        mainLayout->addWidget(columnWidget);
     }
 
     for (const StudyButton &button : buttons)
     {
-        QPushButton *btn = new QPushButton(button.name, ui->developWidget);
+        QPushButton *btn = new QPushButton(
+            formatButtonText(button.name),
+            ui->developWidget
+            );
 
         btn->setObjectName(button.name);
+
+        btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
+        btn->setMaximumSize(maxButtonWidth, maxButtonHeight);
+
+        btn->setSizePolicy(
+            QSizePolicy::Fixed,
+            QSizePolicy::Fixed
+            );
 
         btn->setProperty("trackedColorButton", true);
         btn->setProperty("priority", button.priority);
@@ -150,7 +231,8 @@ MainWindow::MainWindow(QWidget *parent)
 
                     int priority = btn->property("priority").toInt();
 
-                    QVBoxLayout *columnLayout = priorityLayouts.value(priority, nullptr);
+                    QVBoxLayout *columnLayout =
+                        priorityLayouts.value(priority, nullptr);
 
                     if (columnLayout != nullptr)
                     {
@@ -164,8 +246,11 @@ MainWindow::MainWindow(QWidget *parent)
                         columnLayout->insertWidget(insertIndex, btn);
                     }
 
-                    QString appTitle = btn->property("appTitle").toString();
-                    QString instanceName = btn->objectName();
+                    QString appTitle =
+                        btn->property("appTitle").toString();
+
+                    QString instanceName =
+                        btn->objectName();
 
                     if (!appTitle.isEmpty())
                     {
@@ -182,14 +267,8 @@ MainWindow::MainWindow(QWidget *parent)
         columnLayout->addStretch();
     }
 
-    mainLayout->addStretch();
-
-    // timer
-
     connect(&timer, &QTimer::timeout,
             this, &MainWindow::updateCountdown);
-
-    // read settings
 
     readSettings();
 }
@@ -214,16 +293,43 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
     double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
-    int r = static_cast<int>(255 * t);
+    // softer green -> softer red
+    int startR = 76;
+    int startG = 175;
+    int startB = 80;
 
-    int g = static_cast<int>(255 * (1.0 - t));
+    int endR = 183;
+    int endG = 28;
+    int endB = 28;
+
+    int r = static_cast<int>(startR + (endR - startR) * t);
+    int g = static_cast<int>(startG + (endG - startG) * t);
+    int b = static_cast<int>(startB + (endB - startB) * t);
+
+    // perceived brightness
+    double luminance =
+        (0.299 * r) +
+        (0.587 * g) +
+        (0.114 * b);
+
+    QString textColor =
+        luminance > 95
+            ? "rgb(20,20,20)"
+            : "rgb(245,245,245)";
 
     btn->setStyleSheet(
         QString(
-            "background-color: rgb(%1,%2,0);"
+            "QPushButton {"
+            "background-color: rgb(%1,%2,%3);"
+            "color: %4;"
+            "border: 1px solid rgba(255,255,255,45);"
+            "border-radius: 4px;"
+            "}"
             )
             .arg(r)
             .arg(g)
+            .arg(b)
+            .arg(textColor)
         );
 }
 
@@ -293,6 +399,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
     while (hwnd != nullptr)
     {
         char title[512];
+
         GetWindowTextA(hwnd, title, sizeof(title));
 
         if (title[0] != '\0')
@@ -301,10 +408,13 @@ bool MainWindow::activateWindowByTitle(const QString &target)
 
             if (t.contains(target, Qt::CaseInsensitive))
             {
-                ShowWindow(hwnd, SW_RESTORE);
+                ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
 
-                qDebug() << "Window with title containing" << target << "found.";
+                qDebug()
+                    << "Window with title containing"
+                    << target
+                    << "found.";
 
                 return true;
             }
@@ -313,12 +423,18 @@ bool MainWindow::activateWindowByTitle(const QString &target)
         hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
     }
 
-    qDebug() << "Window with title containing" << target << "not found.";
+    qDebug()
+        << "Window with title containing"
+        << target
+        << "not found.";
 
     return false;
 }
 
-void MainWindow::handleWindowButton(QPushButton *btn, const QString &target)
+void MainWindow::handleWindowButton(
+    QPushButton *btn,
+    const QString &target
+    )
 {
     Q_UNUSED(btn);
 
@@ -360,7 +476,11 @@ void MainWindow::updateCountdown()
     remainingTime--;
 
     if (remainingTime >= 0)
-        ui->timeLeftLabel->setText(QString::number(remainingTime));
+    {
+        ui->timeLeftLabel->setText(
+            QString::number(remainingTime)
+            );
+    }
 
     if (remainingTime <= 0)
     {
@@ -379,7 +499,9 @@ void MainWindow::on_startTimerBtn_clicked()
 {
     remainingTime = 5;
 
-    ui->timeLeftLabel->setText(QString::number(remainingTime));
+    ui->timeLeftLabel->setText(
+        QString::number(remainingTime)
+        );
 
     timer.start(1000);
 }

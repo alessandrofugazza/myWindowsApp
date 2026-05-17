@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1366</width>
-    <height>884</height>
+    <width>2231</width>
+    <height>1138</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>79</x>
       <y>49</y>
-      <width>1201</width>
-      <height>751</height>
+      <width>1971</width>
+      <height>971</height>
      </rect>
     </property>
     <widget class="QWidget" name="productionView">
@@ -160,10 +160,10 @@
      <widget class="QWidget" name="developWidget" native="true">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>60</y>
-        <width>841</width>
-        <height>531</height>
+        <x>150</x>
+        <y>70</y>
+        <width>1761</width>
+        <height>761</height>
        </rect>
       </property>
      </widget>
@@ -175,7 +175,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1366</width>
+     <width>2231</width>
      <height>29</height>
     </rect>
    </property>
