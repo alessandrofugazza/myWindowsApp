@@ -41,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->viewsStack->setCurrentIndex(1);
             });
 
+    // study buttons
+
     QStringList buttonNames =
         {
             "Task A",
@@ -69,8 +71,12 @@ MainWindow::MainWindow(QWidget *parent)
                 });
     }
 
+    // timer
+
     connect(&timer, &QTimer::timeout,
             this, &MainWindow::updateCountdown);
+
+    // read settings
 
     readSettings();
 }
