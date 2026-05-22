@@ -22,6 +22,7 @@
 #include <QSet>
 #include <algorithm>
 #include <utility>
+#include <QMessageBox>
 
 #include <windows.h>
 
@@ -293,7 +294,6 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
     double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
-    // softer green -> softer red
     int startR = 76;
     int startG = 175;
     int startB = 80;
@@ -306,15 +306,9 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
     int g = static_cast<int>(startG + (endG - startG) * t);
     int b = static_cast<int>(startB + (endB - startB) * t);
 
-    // perceived brightness
-    double luminance =
-        (0.299 * r) +
-        (0.587 * g) +
-        (0.114 * b);
-
     QString textColor =
-        luminance > 95
-            ? "rgb(20,20,20)"
+        t < 0.45
+            ? "rgb(15,15,15)"
             : "rgb(245,245,245)";
 
     btn->setStyleSheet(
@@ -380,6 +374,10 @@ void MainWindow::readSettings()
     ui->notConcluded->setPlainText(
         settings.value("notConcluded", "").toString()
         );
+
+    ui->studyNotes->setPlainText(
+        settings.value("studyNotes", "").toString()
+        );
 }
 
 void MainWindow::writeSettings()
@@ -389,6 +387,11 @@ void MainWindow::writeSettings()
     settings.setValue(
         "notConcluded",
         ui->notConcluded->toPlainText()
+        );
+
+    settings.setValue(
+        "studyNotes",
+        ui->studyNotes->toPlainText()
         );
 }
 
@@ -491,6 +494,12 @@ void MainWindow::updateCountdown()
             "Your countdown ended.",
             QSystemTrayIcon::Information,
             5000
+            );
+
+        QMessageBox::information(
+            this,
+            "Timer finished",
+            "Your countdown ended."
             );
     }
 }
