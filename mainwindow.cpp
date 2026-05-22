@@ -77,12 +77,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(trayIcon, &QSystemTrayIcon::activated,
             this, &MainWindow::trayIconActivated);
 
-    connect(ui->actionProductionView, &QAction::triggered, this, [this]()
+    connect(ui->actionOtherView, &QAction::triggered, this, [this]()
             {
                 ui->viewsStack->setCurrentIndex(0);
             });
 
-    connect(ui->actionDevelopView, &QAction::triggered, this, [this]()
+    connect(ui->actionProductionView, &QAction::triggered, this, [this]()
             {
                 ui->viewsStack->setCurrentIndex(1);
             });

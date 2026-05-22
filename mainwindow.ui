@@ -23,7 +23,7 @@
       <height>971</height>
      </rect>
     </property>
-    <widget class="QWidget" name="productionView">
+    <widget class="QWidget" name="otherView">
      <widget class="QWidget" name="widget" native="true">
       <property name="geometry">
        <rect>
@@ -156,7 +156,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="developView">
+    <widget class="QWidget" name="productionView">
      <widget class="QWidget" name="developWidget" native="true">
       <property name="geometry">
        <rect>
@@ -200,19 +200,25 @@
      <string>Sections</string>
     </property>
     <addaction name="actionProductionView"/>
-    <addaction name="actionDevelopView"/>
+    <addaction name="actionOtherView"/>
    </widget>
    <addaction name="menuSections"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOtherView">
+   <property name="text">
+    <string>Other</string>
+   </property>
+   <property name="toolTip">
+    <string>Other</string>
+   </property>
+  </action>
   <action name="actionProductionView">
    <property name="text">
     <string>Production</string>
    </property>
-  </action>
-  <action name="actionDevelopView">
-   <property name="text">
-    <string>Develop</string>
+   <property name="toolTip">
+    <string>Production</string>
    </property>
   </action>
  </widget>
