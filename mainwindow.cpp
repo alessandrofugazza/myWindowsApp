@@ -301,7 +301,7 @@ void MainWindow::checkTaskWithChance()
                     .arg(seconds);
 
     qDebug() << "Current chance:"
-             << QString::number(chance * 100.0, 'f', 2) + "%";
+             << QString::number(chance * 100.0, 'f', 1) + "%";
 
 
     //
@@ -331,7 +331,7 @@ void MainWindow::updateCurrentChanceLabel()
     double chance = currentChance();
 
     ui->currentChanceLbl->setText(
-        QString("%1%").arg(chance * 100, 0, 'f', 2)
+        QString("%1%").arg(chance * 100, 0, 'f', 1)
         );
 
     if (chance == 1.0)
