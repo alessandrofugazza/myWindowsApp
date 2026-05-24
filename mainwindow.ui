@@ -269,6 +269,31 @@
       <zorder>studyButtonsContainer</zorder>
      </widget>
     </widget>
+    <widget class="QWidget" name="optionsView">
+     <widget class="QWidget" name="widget_2" native="true">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>60</y>
+        <width>1451</width>
+        <height>411</height>
+       </rect>
+      </property>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>60</y>
+         <width>72</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>optview</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -277,7 +302,7 @@
      <x>0</x>
      <y>0</y>
      <width>2231</width>
-     <height>29</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSections">
@@ -287,7 +312,14 @@
     <addaction name="actionProductionView"/>
     <addaction name="actionOtherView"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionEdit_Options"/>
+   </widget>
    <addaction name="menuSections"/>
+   <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOtherView">
@@ -304,6 +336,16 @@
    </property>
    <property name="toolTip">
     <string>Production</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>Options</string>
+   </property>
+  </action>
+  <action name="actionEdit_Options">
+   <property name="text">
+    <string>Edit Options</string>
    </property>
   </action>
  </widget>

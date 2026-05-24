@@ -87,13 +87,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionOtherView, &QAction::triggered, this, [this]()
             {
-                ui->viewsStack->setCurrentIndex(0);
+                ui->viewsStack->setCurrentWidget(ui->otherView);
             });
 
     connect(ui->actionProductionView, &QAction::triggered, this, [this]()
             {
-                ui->viewsStack->setCurrentIndex(1);
+                ui->viewsStack->setCurrentWidget(ui->productionView);
             });
+
+    connect(ui->actionEdit_Options, &QAction::triggered, this, [this]()
+            {
+                ui->viewsStack->setCurrentWidget(ui->optionsView);
+            });
+
 
     QList<StudyButton> buttons =
         {
