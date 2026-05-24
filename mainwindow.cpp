@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-
+readSettings();
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
@@ -266,7 +266,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&timer, &QTimer::timeout,
             this, &MainWindow::updateCountdown);
 
-    readSettings();
+
 }
 
 MainWindow::~MainWindow()
@@ -310,15 +310,32 @@ void MainWindow::checkTaskWithChance()
 
     if (roll < chance)
     {
-        ui->currentChanceLbl->setText(
-            QString("Task triggered!")
-            );
-        ui->taskIsDoneBtn->setEnabled(true);
+        doTaskTriggeredStuff();
 
     } else {
-        ui->currentChanceLbl->setText(
-            QString("%1%").arg(chance * 100, 0, 'f', 2)
-            );
+        updateCurrentChanceLabel();
+    }
+}
+
+void MainWindow::doTaskTriggeredStuff()
+{
+    ui->currentChanceLbl->setText(
+        QString("Task triggered!")
+        );
+    ui->taskIsDoneBtn->setEnabled(true);
+}
+
+void MainWindow::updateCurrentChanceLabel()
+{
+    double chance = currentChance();
+
+    ui->currentChanceLbl->setText(
+        QString("%1%").arg(chance * 100, 0, 'f', 2)
+        );
+
+    if (chance == 1.0)
+    {
+        doTaskTriggeredStuff();
     }
 }
 
@@ -386,6 +403,8 @@ bool MainWindow::event(QEvent *event)
                 btn->property("lastClicked").toDateTime()
                 );
         }
+
+        updateCurrentChanceLabel();
     }
 
     return QMainWindow::event(event);
@@ -430,7 +449,7 @@ void MainWindow::readSettings()
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
 
-    checkTaskWithChance();
+    updateCurrentChanceLabel();
 
 }
 
@@ -581,6 +600,9 @@ void MainWindow::resetChanceTimer()
 
 double MainWindow::currentChance() const
 {
+    if (!chanceStartTime.isValid())
+        return 0.0;
+
     constexpr double maxSeconds = 25.0 * 60.0;
 
     double elapsedSeconds =
@@ -588,20 +610,19 @@ double MainWindow::currentChance() const
 
     double progress = elapsedSeconds / maxSeconds;
 
-    if (progress > 1.0)
-        progress = 1.0;
-
-    if (progress < 0.0)
-        progress = 0.0;
+    progress = qBound(0.0, progress, 1.0);
 
     return progress;
-
 }
 void MainWindow::on_taskIsDoneBtn_clicked()
 {
     resetChanceTimer();
-    checkTaskWithChance();
+
     ui->taskIsDoneBtn->setEnabled(false);
+
+    updateCurrentChanceLabel();
+
     writeSettings();
+
 }
 

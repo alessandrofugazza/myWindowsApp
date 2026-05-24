@@ -71,6 +71,8 @@ private:
     double currentChance() const;
     void resetChanceTimer();
     void checkTaskWithChance();
+    void updateCurrentChanceLabel();
+    void doTaskTriggeredStuff();
 };
 
 #endif // MAINWINDOW_H
