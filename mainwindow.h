@@ -46,6 +46,8 @@ private slots:
 
     void on_taskIsDoneBtn_clicked();
 
+    void on_reopenLastTopicBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -73,6 +75,7 @@ private:
     void checkTaskWithChance();
     void updateCurrentChanceLabel();
     void doTaskTriggeredStuff();
+    QString lastOpenedTopic;
 };
 
 #endif // MAINWINDOW_H

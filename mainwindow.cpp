@@ -449,6 +449,9 @@ void MainWindow::readSettings()
         settings.value("studyNotes", "").toString()
         );
 
+    lastOpenedTopic =
+        settings.value("lastOpenedTopic", "").toString();
+
     chanceStartTime = settings.value(
                                   "chance/startTime",
                                   QDateTime::currentDateTime()
@@ -475,6 +478,11 @@ void MainWindow::writeSettings()
         ui->studyNotes->toPlainText()
         );
 
+    settings.setValue(
+        "lastOpenedTopic",
+        lastOpenedTopic
+        );
+
     settings.setValue("chance/startTime", chanceStartTime);
 }
 
@@ -492,15 +500,11 @@ bool MainWindow::activateWindowByTitle(const QString &target)
         {
             QString t = QString::fromLatin1(title);
 
-            if (t.contains(target, Qt::CaseInsensitive))
+            if (t == target)
             {
                 ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
-
-                qDebug()
-                    << "Window with title containing"
-                    << target
-                    << "found.";
+                lastOpenedTopic = target;
 
                 return true;
             }
@@ -622,6 +626,7 @@ double MainWindow::currentChance() const
 
     return progress;
 }
+
 void MainWindow::on_taskIsDoneBtn_clicked()
 {
     resetChanceTimer();
@@ -634,4 +639,27 @@ void MainWindow::on_taskIsDoneBtn_clicked()
     writeSettings();
 
 }
+
+void MainWindow::on_reopenLastTopicBtn_clicked()
+{
+    if (lastOpenedTopic.isEmpty())
+    {
+        QMessageBox::information(
+            this,
+            "No topic",
+            "No topic was opened yet."
+            );
+        return;
+    }
+
+    if (!activateWindowByTitle(lastOpenedTopic))
+    {
+        QMessageBox::warning(
+            this,
+            "Topic not found",
+            QString("Could not find a window with title '%1'.").arg(lastOpenedTopic)
+            );
+    }
+}
+
 

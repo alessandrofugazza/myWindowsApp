@@ -239,7 +239,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="reopenLastBtn">
+      <widget class="QPushButton" name="reopenLastTopicBtn">
        <property name="geometry">
         <rect>
          <x>1010</x>
@@ -254,7 +254,7 @@
       </widget>
       <zorder>studyNotes</zorder>
       <zorder>layoutWidget</zorder>
-      <zorder>reopenLastBtn</zorder>
+      <zorder>reopenLastTopicBtn</zorder>
       <zorder>taskIsDoneBtn</zorder>
      </widget>
     </widget>
