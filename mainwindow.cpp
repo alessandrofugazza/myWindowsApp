@@ -24,6 +24,7 @@
 #include <utility>
 #include <QMessageBox>
 
+
 #include <windows.h>
 
 struct StudyButton
@@ -69,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+
+
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
     trayIcon->setToolTip("My Windows App");
@@ -91,41 +94,30 @@ MainWindow::MainWindow(QWidget *parent)
         {
             {"AHK", 4, "Chrome"},
             {"Anki", 3, "Chrome"},
-            {"Artificial Intelligence", 6, "Chrome"},
             {"Automotive", 2, "Chrome"},
             {"C++", 4, "Chrome"},
             {"CB125R", 1, ""},
-            {"CRI", 5, "Chrome"},
             {"Canophilia", 2, "Chrome"},
             {"Chrome Extensions Development", 2, "Chrome"},
             {"CompTIA", 1, "Chrome"},
-            {"Data Science", 6, "Chrome"},
-            {"Deepen 1", 4, "Chrome"},
-            {"Deepen 2", 5, "Chrome"},
-            {"Deepen 3", 6, "Chrome"},
             {"Doblo", 1, ""},
             {"Excel", 3, "Chrome"},
             {"FTO", 1, "Chrome"},
             {"Finance", 1, "Chrome"},
-            {"Flipper", 7, "Chrome"},
+            {"Flipper", 9, "Chrome"},
             {"GitHub Copilot", 1, "Chrome"},
             {"JavaScript", 4, "Chrome"},
             {"Law", 3, ""},
             {"Learn", 2, "Chrome"},
             {"Markdown", 1, "Chrome"},
             {"Obsidian", 1, "Chrome"},
-            {"PLC", 5, "Chrome"},
             {"Power User", 5, "Chrome"},
             {"Project Serena", 3, "Chrome"},
-            {"Prompt Engineering", 9, "Chrome"},
+            {"Prompt Engineering", 8, "Chrome"},
             {"Python", 4, "Chrome"},
             {"Swift", 4, "Chrome"},
-            {"Tools 1", 3, "Chrome"},
-            {"Tools 2", 4, "Chrome"},
-            {"Tools 3", 5, "Chrome"},
             {"Web Development", 3, "Chrome"},
             {"Windows Development", 2, "Chrome"},
-            {"Word", 6, "Chrome"},
             {"iOS Development", 2, "Chrome"}
         };
 
@@ -224,6 +216,9 @@ MainWindow::MainWindow(QWidget *parent)
 
         connect(btn, &QPushButton::clicked, this, [this, btn]()
                 {
+
+                    checkTaskWithChance();
+
                     QDateTime now = QDateTime::currentDateTime();
 
                     btn->setProperty("lastClicked", now);
@@ -279,6 +274,54 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::checkTaskWithChance()
+{
+    double chance = currentChance();
+
+    // DEBUG
+
+    QDateTime now = QDateTime::currentDateTime();
+
+    qint64 elapsedSeconds =
+        chanceStartTime.secsTo(now);
+
+    qint64 minutes = elapsedSeconds / 60;
+    qint64 seconds = elapsedSeconds % 60;
+
+    qDebug() << "========================";
+    qDebug() << "Current time:"
+             << now.toString("yyyy-MM-dd hh:mm:ss");
+
+    qDebug() << "Timer started at:"
+             << chanceStartTime.toString("yyyy-MM-dd hh:mm:ss");
+
+    qDebug() << "Elapsed:"
+             << QString("%1m %2s")
+                    .arg(minutes)
+                    .arg(seconds);
+
+    qDebug() << "Current chance:"
+             << QString::number(chance * 100.0, 'f', 2) + "%";
+
+
+    //
+
+    double roll = QRandomGenerator::global()->generateDouble();
+
+    if (roll < chance)
+    {
+        ui->currentChanceLbl->setText(
+            QString("Task triggered!")
+            );
+        ui->taskIsDoneBtn->setEnabled(true);
+
+    } else {
+        ui->currentChanceLbl->setText(
+            QString("%1%").arg(chance * 100, 0, 'f', 2)
+            );
+    }
+}
+
 void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 {
     if (!clickedTime.isValid())
@@ -290,7 +333,7 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
     qint64 secondsElapsed =
         clickedTime.secsTo(QDateTime::currentDateTime());
 
-    constexpr double maxSeconds = 60.0 * 60.0;
+    constexpr double maxSeconds = 2.0 * 60.0 * 60.0;
 
     double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
@@ -378,6 +421,17 @@ void MainWindow::readSettings()
     ui->studyNotes->setPlainText(
         settings.value("studyNotes", "").toString()
         );
+
+    chanceStartTime = settings.value(
+                                  "chance/startTime",
+                                  QDateTime::currentDateTime()
+                                  ).toDateTime();
+
+    if (!chanceStartTime.isValid())
+        chanceStartTime = QDateTime::currentDateTime();
+
+    checkTaskWithChance();
+
 }
 
 void MainWindow::writeSettings()
@@ -393,6 +447,8 @@ void MainWindow::writeSettings()
         "studyNotes",
         ui->studyNotes->toPlainText()
         );
+
+    settings.setValue("chance/startTime", chanceStartTime);
 }
 
 bool MainWindow::activateWindowByTitle(const QString &target)
@@ -514,3 +570,38 @@ void MainWindow::on_startTimerBtn_clicked()
 
     timer.start(1000);
 }
+
+void MainWindow::resetChanceTimer()
+{
+    // chanceTimer.restart();
+    chanceStartTime = QDateTime::currentDateTime();
+    writeSettings();
+
+}
+
+double MainWindow::currentChance() const
+{
+    constexpr double maxSeconds = 25.0 * 60.0;
+
+    double elapsedSeconds =
+        chanceStartTime.secsTo(QDateTime::currentDateTime());
+
+    double progress = elapsedSeconds / maxSeconds;
+
+    if (progress > 1.0)
+        progress = 1.0;
+
+    if (progress < 0.0)
+        progress = 0.0;
+
+    return progress;
+
+}
+void MainWindow::on_taskIsDoneBtn_clicked()
+{
+    resetChanceTimer();
+    checkTaskWithChance();
+    ui->taskIsDoneBtn->setEnabled(false);
+    writeSettings();
+}
+

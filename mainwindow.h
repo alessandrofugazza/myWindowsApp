@@ -8,6 +8,9 @@
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QElapsedTimer>
+#include <QMessageBox>
+#include <QRandomGenerator>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -41,6 +44,8 @@ private slots:
 
     void on_startTimerBtn_clicked();
 
+    void on_taskIsDoneBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -58,6 +63,14 @@ private:
     void writeSettings();
 
     void updateButtonColor(QPushButton *btn, QDateTime clickedTime);
+
+    QElapsedTimer chanceTimer;
+    QDateTime chanceStartTime;
+
+
+    double currentChance() const;
+    void resetChanceTimer();
+    void checkTaskWithChance();
 };
 
 #endif // MAINWINDOW_H
