@@ -266,6 +266,13 @@ readSettings();
     connect(&timer, &QTimer::timeout,
             this, &MainWindow::updateCountdown);
 
+    QList<QPushButton*> allButtons = findChildren<QPushButton*>();
+
+    for (QPushButton *btn : allButtons)
+    {
+        btn->setCursor(Qt::PointingHandCursor);
+    }
+
 
 }
 

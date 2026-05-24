@@ -184,14 +184,14 @@
       </widget>
       <widget class="QPushButton" name="taskIsDoneBtn">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="geometry">
         <rect>
          <x>660</x>
          <y>720</y>
-         <width>201</width>
-         <height>51</height>
+         <width>241</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="font">
@@ -199,6 +199,9 @@
          <pointsize>12</pointsize>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="text">
         <string>TASK IS DONE</string>
@@ -236,6 +239,23 @@
         </item>
        </layout>
       </widget>
+      <widget class="QPushButton" name="reopenLastBtn">
+       <property name="geometry">
+        <rect>
+         <x>1010</x>
+         <y>730</y>
+         <width>141</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Reopen Last</string>
+       </property>
+      </widget>
+      <zorder>studyNotes</zorder>
+      <zorder>layoutWidget</zorder>
+      <zorder>reopenLastBtn</zorder>
+      <zorder>taskIsDoneBtn</zorder>
      </widget>
     </widget>
    </widget>
