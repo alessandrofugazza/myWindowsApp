@@ -323,6 +323,7 @@ void MainWindow::doTaskTriggeredStuff()
         QString("Task triggered!")
         );
     ui->taskIsDoneBtn->setEnabled(true);
+    ui->taskIsDoneBtn->setText("TASK COMPLETED");
 }
 
 void MainWindow::updateCurrentChanceLabel()
@@ -619,6 +620,7 @@ void MainWindow::on_taskIsDoneBtn_clicked()
     resetChanceTimer();
 
     ui->taskIsDoneBtn->setEnabled(false);
+    ui->taskIsDoneBtn->setText("TASK IS DONE");
 
     updateCurrentChanceLabel();
 
