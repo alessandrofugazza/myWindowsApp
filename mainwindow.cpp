@@ -77,6 +77,29 @@ MainWindow::MainWindow(QWidget *parent)
 
     readSettings();
 
+    connect(
+        ui->btnColorTimeSpanSpinbox,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        [this](int)
+        {
+            QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+            for (QPushButton *btn : std::as_const(buttons))
+            {
+                if (!btn->property("trackedColorButton").toBool())
+                    continue;
+
+                updateButtonColor(
+                    btn,
+                    btn->property("lastClicked").toDateTime()
+                    );
+            }
+
+            writeSettings();
+        }
+        );
+
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
     trayIcon->setToolTip("My Windows App");
@@ -392,7 +415,14 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
     qint64 secondsElapsed =
         clickedTime.secsTo(QDateTime::currentDateTime());
 
-    constexpr double maxSeconds = 2.0 * 60.0 * 60.0;
+    int timeSpanMinutes =
+        ui->btnColorTimeSpanSpinbox->value();
+
+    if (timeSpanMinutes <= 0)
+        timeSpanMinutes = 1;
+
+    double maxSeconds =
+        static_cast<double>(timeSpanMinutes) * 60.0;
 
     double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
@@ -491,6 +521,10 @@ void MainWindow::readSettings()
                                   QDateTime::currentDateTime()
                                   ).toDateTime();
 
+    ui->btnColorTimeSpanSpinbox->setValue(
+        settings.value("buttonColor/timeSpanMinutes", 120).toInt()
+        );
+
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
 
@@ -518,6 +552,11 @@ void MainWindow::writeSettings()
         );
 
     settings.setValue("chance/startTime", chanceStartTime);
+
+    settings.setValue(
+        "buttonColor/timeSpanMinutes",
+        ui->btnColorTimeSpanSpinbox->value()
+        );
 }
 
 bool MainWindow::activateWindowByTitle(const QString &target)
