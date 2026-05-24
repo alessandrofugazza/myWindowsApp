@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-readSettings();
+    readSettings();
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
@@ -113,7 +113,7 @@ readSettings();
             {"Obsidian", 1, "Chrome"},
             {"Power User", 5, "Chrome"},
             {"Project S", 3, "Chrome"},
-        {"Project A", 2, "Chrome"},
+            {"Project A", 2, "Chrome"},
             {"Prompt Engineering", 8, "Chrome"},
             {"Python", 4, "Chrome"},
             {"Swift", 4, "Chrome"},
@@ -145,11 +145,22 @@ readSettings();
 
     const int columnGap = 32;
 
-    QHBoxLayout *mainLayout = new QHBoxLayout(ui->developWidget);
-    ui->developWidget->setLayout(mainLayout);
+    // IMPORTANT:
+    // Do not put this layout directly on ui->developWidget.
+    // developWidget already contains Designer-positioned widgets
+    // such as taskIsDoneBtn and reopenLastTopicBtn.
+    //
+    // A layout installed directly on developWidget can overlap or
+    // steal mouse events from those buttons, making only part of
+    // the visible button clickable.
+    QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
+    studyButtonsContainer->setObjectName("studyButtonsContainer");
+    studyButtonsContainer->setGeometry(20, 20, 1720, 580);
+
+    QHBoxLayout *mainLayout = new QHBoxLayout(studyButtonsContainer);
 
     mainLayout->setSpacing(columnGap);
-    mainLayout->setContentsMargins(20, 20, 20, 20);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     QSet<int> priorities;
@@ -165,7 +176,7 @@ readSettings();
 
     for (int priority : sortedPriorities)
     {
-        QWidget *columnWidget = new QWidget(ui->developWidget);
+        QWidget *columnWidget = new QWidget(studyButtonsContainer);
 
         columnWidget->setMinimumWidth(maxButtonWidth);
         columnWidget->setMaximumWidth(maxButtonWidth);
@@ -196,7 +207,7 @@ readSettings();
     {
         QPushButton *btn = new QPushButton(
             formatButtonText(button.name),
-            ui->developWidget
+            studyButtonsContainer
             );
 
         btn->setObjectName(button.name);
@@ -273,6 +284,10 @@ readSettings();
     {
         btn->setCursor(Qt::PointingHandCursor);
     }
+
+    // Keep Designer buttons above any runtime-created widgets.
+    ui->taskIsDoneBtn->raise();
+    ui->reopenLastTopicBtn->raise();
 
 
 }
