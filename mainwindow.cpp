@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->viewsStack->setCurrentWidget(ui->productionView);
+
     // POLISH do this for everything?
     ui->currentChanceLbl->setText("settings not read yet");
 
