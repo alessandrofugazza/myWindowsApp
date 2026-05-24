@@ -210,6 +210,12 @@ MainWindow::MainWindow(QWidget *parent)
             studyButtonsContainer
             );
 
+        QFont font = btn->font();
+
+        font.setWeight(QFont::DemiBold);
+
+        btn->setFont(font);
+
         btn->setObjectName(button.name);
 
         btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
