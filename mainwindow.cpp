@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->currentChanceLbl->setText("settings not read yet");
+
     readSettings();
 
     trayIcon = new QSystemTrayIcon(this);
