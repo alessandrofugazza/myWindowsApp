@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    // POLISH do this for everything?
     ui->currentChanceLbl->setText("settings not read yet");
 
     readSettings();
@@ -114,8 +115,9 @@ MainWindow::MainWindow(QWidget *parent)
             {"Markdown", 1, "Chrome"},
             {"Obsidian", 1, "Chrome"},
             {"Power User", 5, "Chrome"},
-            {"Project S", 3, "Chrome"},
-            {"Project A", 2, "Chrome"},
+            {"Project S", 2, "Chrome"},
+            {"Project A", 3, "Chrome"},
+            {"Project P", 4, "Chrome"},
             {"Prompt Engineering", 8, "Chrome"},
             {"Python", 4, "Chrome"},
             {"Swift", 4, "Chrome"},
