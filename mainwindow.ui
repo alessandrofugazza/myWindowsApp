@@ -371,7 +371,7 @@
         <rect>
          <x>90</x>
          <y>50</y>
-         <width>176</width>
+         <width>184</width>
          <height>31</height>
         </rect>
        </property>
@@ -384,7 +384,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="btnColorTimeSpanSpinbox"/>
+         <widget class="QSpinBox" name="btnColorTimeSpanSpinbox">
+          <property name="maximum">
+           <number>180</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
