@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>2231</width>
-    <height>1138</height>
+    <height>1215</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QStackedWidget" name="viewsStack">
     <property name="geometry">
      <rect>
-      <x>79</x>
-      <y>49</y>
-      <width>1971</width>
-      <height>971</height>
+      <x>29</x>
+      <y>29</y>
+      <width>2171</width>
+      <height>1141</height>
      </rect>
     </property>
     <widget class="QWidget" name="otherView">
@@ -160,10 +160,10 @@
      <widget class="QWidget" name="developWidget" native="true">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>70</y>
-        <width>1761</width>
-        <height>881</height>
+        <x>40</x>
+        <y>30</y>
+        <width>2071</width>
+        <height>1081</height>
        </rect>
       </property>
       <widget class="QTextEdit" name="studyNotes">
@@ -262,11 +262,98 @@
         </rect>
        </property>
       </widget>
+      <widget class="QProgressBar" name="chanceProgressBar">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>840</y>
+         <width>1981</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="moveTopicBtn">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>640</x>
+         <y>900</y>
+         <width>241</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string>MOVE TPC IS DONE</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>940</x>
+         <y>900</y>
+         <width>227</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Current chance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="moveTopicChanceLbl">
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QProgressBar" name="moveTopicProgressBar">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>990</y>
+         <width>1981</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
       <zorder>studyNotes</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>reopenLastTopicBtn</zorder>
       <zorder>taskIsDoneBtn</zorder>
       <zorder>studyButtonsContainer</zorder>
+      <zorder>chanceProgressBar</zorder>
+      <zorder>moveTopicBtn</zorder>
+      <zorder>layoutWidget_2</zorder>
+      <zorder>moveTopicProgressBar</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="optionsView">

@@ -48,6 +48,8 @@ private slots:
 
     void on_reopenLastTopicBtn_clicked();
 
+    void on_moveTopicBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -68,6 +70,11 @@ private:
 
     QElapsedTimer chanceTimer;
     QDateTime chanceStartTime;
+    QDateTime moveTopicChanceStartTime;
+
+    void resetMoveTopicChanceTimer();
+    double currentMoveTopicChance() const;
+    void updateMoveTopicChanceLabel();
 
 
     double currentChance() const;
@@ -76,6 +83,7 @@ private:
     void updateCurrentChanceLabel();
     void doTaskTriggeredStuff();
     QString lastOpenedTopic;
+    bool taskIsTriggered = false;
 };
 
 #endif // MAINWINDOW_H

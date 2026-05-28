@@ -134,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
             {"Canophilia", 3, "Chrome"},
             {"Chrome Extensions Development", 3, "Chrome"},
             {"CompTIA", 1, "Chrome"},
+            {"Data Science", 2, "Chrome"},
             {"Doblo", 1, ""},
             {"Excel", 7, "Chrome"},
             {"FTO", 1, "Chrome"},
@@ -238,6 +239,8 @@ MainWindow::MainWindow(QWidget *parent)
         mainLayout->addWidget(columnWidget);
     }
 
+    int studyButtonIndex = 0;
+
     for (const StudyButton &button : buttons)
     {
         QPushButton *btn = new QPushButton(
@@ -264,6 +267,8 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setProperty("trackedColorButton", true);
         btn->setProperty("priority", button.priority);
         btn->setProperty("appTitle", button.appTitle);
+        btn->setProperty("originalIndex", studyButtonIndex);
+        ++studyButtonIndex;
 
         priorityLayouts[button.priority]->addWidget(btn);
 
@@ -277,6 +282,8 @@ MainWindow::MainWindow(QWidget *parent)
                     btn->setProperty("lastClicked", now);
 
                     updateButtonColor(btn, now);
+
+                    writeSettings();
 
                     int priority = btn->property("priority").toInt();
 
@@ -314,6 +321,94 @@ MainWindow::MainWindow(QWidget *parent)
     for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
     {
         columnLayout->addStretch();
+    }
+
+    {
+        QSettings settings;
+
+        QList<QPushButton*> createdButtons = findChildren<QPushButton*>();
+
+        for (QPushButton *btn : std::as_const(createdButtons))
+        {
+            if (!btn->property("trackedColorButton").toBool())
+                continue;
+
+            QDateTime lastClicked = settings.value(
+                                                QString("studyButtons/%1/lastClicked")
+                                                    .arg(btn->objectName())
+                                                ).toDateTime();
+
+            if (!lastClicked.isValid())
+                continue;
+
+            btn->setProperty("lastClicked", lastClicked);
+
+            updateButtonColor(btn, lastClicked);
+        }
+
+        for (int priority : sortedPriorities)
+        {
+            QVBoxLayout *columnLayout =
+                priorityLayouts.value(priority, nullptr);
+
+            if (!columnLayout)
+                continue;
+
+            QList<QPushButton*> priorityButtons;
+
+            for (int i = 0; i < columnLayout->count(); ++i)
+            {
+                QWidget *widget =
+                    columnLayout->itemAt(i)->widget();
+
+                QPushButton *btn =
+                    qobject_cast<QPushButton*>(widget);
+
+                if (!btn)
+                    continue;
+
+                if (!btn->property("trackedColorButton").toBool())
+                    continue;
+
+                priorityButtons.append(btn);
+            }
+
+            std::sort(
+                priorityButtons.begin(),
+                priorityButtons.end(),
+                [](QPushButton *a, QPushButton *b)
+                {
+                    QDateTime aClicked =
+                        a->property("lastClicked").toDateTime();
+
+                    QDateTime bClicked =
+                        b->property("lastClicked").toDateTime();
+
+                    if (aClicked.isValid() != bClicked.isValid())
+                        return !aClicked.isValid();
+
+                    if (aClicked.isValid() && bClicked.isValid() && aClicked != bClicked)
+                        return aClicked < bClicked;
+
+                    return
+                        a->property("originalIndex").toInt()
+                        <
+                        b->property("originalIndex").toInt();
+                }
+                );
+
+            for (QPushButton *btn : priorityButtons)
+            {
+                columnLayout->removeWidget(btn);
+
+                int insertIndex = columnLayout->count() - 1;
+
+                if (insertIndex < 0)
+                    insertIndex = 0;
+
+                columnLayout->insertWidget(insertIndex, btn);
+            }
+        }
     }
 
     connect(&timer, &QTimer::timeout,
@@ -386,17 +481,24 @@ void MainWindow::doTaskTriggeredStuff()
     ui->currentChanceLbl->setText(
         QString("Task triggered!")
         );
+    taskIsTriggered = true;
     ui->taskIsDoneBtn->setEnabled(true);
     ui->taskIsDoneBtn->setText("TASK COMPLETED");
 }
 
 void MainWindow::updateCurrentChanceLabel()
 {
+    if (taskIsTriggered)
+    {
+        return;
+    }
     double chance = currentChance();
 
     ui->currentChanceLbl->setText(
         QString("%1%").arg(chance * 100, 0, 'f', 1)
         );
+
+    ui->chanceProgressBar->setValue(static_cast<int>(chance * 100));
 
     if (chance == 1.0)
     {
@@ -459,6 +561,8 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
         );
 }
 
+// ON FOCUS
+
 bool MainWindow::event(QEvent *event)
 {
     if (event->type() == QEvent::WindowActivate)
@@ -477,6 +581,7 @@ bool MainWindow::event(QEvent *event)
         }
 
         updateCurrentChanceLabel();
+        updateMoveTopicChanceLabel();
     }
 
     return QMainWindow::event(event);
@@ -530,6 +635,17 @@ void MainWindow::readSettings()
 
     updateCurrentChanceLabel();
 
+    moveTopicChanceStartTime = settings.value(
+                                           "moveTopicChance/startTime",
+                                           QDateTime::currentDateTime()
+                                           ).toDateTime();
+
+    if (!moveTopicChanceStartTime.isValid())
+        moveTopicChanceStartTime = QDateTime::currentDateTime();
+
+    updateMoveTopicChanceLabel();
+    taskIsTriggered = settings.value(
+                                  "taskIsTriggered", false).toBool();
 }
 
 void MainWindow::writeSettings()
@@ -557,6 +673,39 @@ void MainWindow::writeSettings()
         "buttonColor/timeSpanMinutes",
         ui->btnColorTimeSpanSpinbox->value()
         );
+
+    settings.setValue(
+        "moveTopicChance/startTime",
+        moveTopicChanceStartTime
+        );
+
+    settings.setValue(
+        "taskIsTriggered",
+        taskIsTriggered
+        );
+
+    QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+    for (QPushButton *btn : std::as_const(buttons))
+    {
+        if (!btn->property("trackedColorButton").toBool())
+            continue;
+
+        QDateTime lastClicked =
+            btn->property("lastClicked").toDateTime();
+
+        QString key = QString("studyButtons/%1/lastClicked")
+                          .arg(btn->objectName());
+
+        if (lastClicked.isValid())
+        {
+            settings.setValue(key, lastClicked);
+        }
+        else
+        {
+            settings.remove(key);
+        }
+    }
 }
 
 bool MainWindow::activateWindowByTitle(const QString &target)
@@ -708,7 +857,7 @@ void MainWindow::on_taskIsDoneBtn_clicked()
     ui->taskIsDoneBtn->setText("TASK IS DONE");
 
     updateCurrentChanceLabel();
-
+    taskIsTriggered = false;
     writeSettings();
 
 }
@@ -735,4 +884,57 @@ void MainWindow::on_reopenLastTopicBtn_clicked()
     }
 }
 
+void MainWindow::resetMoveTopicChanceTimer()
+{
+    moveTopicChanceStartTime = QDateTime::currentDateTime();
+    writeSettings();
+}
+
+double MainWindow::currentMoveTopicChance() const
+{
+    if (!moveTopicChanceStartTime.isValid())
+        return 0.0;
+
+    constexpr double maxSeconds = 30.0 * 60.0;
+
+    double elapsedSeconds =
+        moveTopicChanceStartTime.secsTo(QDateTime::currentDateTime());
+
+    double progress = elapsedSeconds / maxSeconds;
+
+    return qBound(0.0, progress, 1.0);
+}
+
+void MainWindow::updateMoveTopicChanceLabel()
+{
+    double chance = currentMoveTopicChance();
+
+    ui->moveTopicChanceLbl->setText(
+        QString("%1%").arg(chance * 100, 0, 'f', 1)
+        );
+
+    ui->moveTopicProgressBar->setValue(
+        static_cast<int>(chance * 100)
+        );
+
+    if (chance == 1.0)
+    {
+        ui->moveTopicChanceLbl->setText("Move topic triggered!");
+        ui->moveTopicBtn->setEnabled(true);
+        ui->moveTopicBtn->setText("MOVE TOPIC");
+    }
+}
+
+void MainWindow::on_moveTopicBtn_clicked()
+{
+    resetMoveTopicChanceTimer();
+
+    ui->moveTopicBtn->setEnabled(false);
+    ui->moveTopicBtn->setText("MOVE TOPIC");
+
+    updateMoveTopicChanceLabel();
+
+    writeSettings();
+
+}
 
