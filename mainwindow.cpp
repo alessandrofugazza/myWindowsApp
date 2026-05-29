@@ -155,6 +155,9 @@ MainWindow::MainWindow(QWidget *parent)
             {"Swift", 4, "Chrome"},
             {"Web Development", 3, "Chrome"},
             {"Windows Development", 2, "Chrome"},
+            {"Netlify", 6, "Netlify"},
+            {"Qt Creator", 4, "Qt Creator"},
+            {"Chrome Devtools", 5, "Chrome Devtools"},
             {"iOS Development", 2, "Chrome"}
         };
 
@@ -411,8 +414,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-    connect(&timer, &QTimer::timeout,
-            this, &MainWindow::updateCountdown);
+
 
     QList<QPushButton*> allButtons = findChildren<QPushButton*>();
 
@@ -528,36 +530,39 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
     double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
-    int startR = 76;
-    int startG = 175;
-    int startB = 80;
+    int r, g, b;
 
-    int endR = 183;
-    int endG = 28;
-    int endB = 28;
+    if (t < 0.5)
+    {
+        double localT = t / 0.5;
 
-    int r = static_cast<int>(startR + (endR - startR) * t);
-    int g = static_cast<int>(startG + (endG - startG) * t);
-    int b = static_cast<int>(startB + (endB - startB) * t);
+        r = static_cast<int>(46  + (202 - 46)  * localT);
+        g = static_cast<int>(125 + (138 - 125) * localT);
+        b = static_cast<int>(50  + (4   - 50)  * localT);
+    }
+    else
+    {
+        double localT = (t - 0.5) / 0.5;
 
-    QString textColor =
-        t < 0.45
-            ? "rgb(15,15,15)"
-            : "rgb(245,245,245)";
+        r = static_cast<int>(202 + (183 - 202) * localT);
+        g = static_cast<int>(138 + (28  - 138) * localT);
+        b = static_cast<int>(4   + (28  - 4)   * localT);
+    }
 
     btn->setStyleSheet(
         QString(
             "QPushButton {"
             "background-color: rgb(%1,%2,%3);"
-            "color: %4;"
-            "border: 1px solid rgba(255,255,255,45);"
+            "color: rgb(255,255,255);"
+            "font-weight: 600;"
+            "border: 1px solid rgba(255,255,255,80);"
             "border-radius: 4px;"
+            "padding: 4px 8px;"
             "}"
             )
             .arg(r)
             .arg(g)
             .arg(b)
-            .arg(textColor)
         );
 }
 
@@ -610,9 +615,7 @@ void MainWindow::readSettings()
 {
     QSettings settings;
 
-    ui->notConcluded->setPlainText(
-        settings.value("notConcluded", "").toString()
-        );
+
 
     ui->studyNotes->setPlainText(
         settings.value("studyNotes", "").toString()
@@ -652,10 +655,7 @@ void MainWindow::writeSettings()
 {
     QSettings settings;
 
-    settings.setValue(
-        "notConcluded",
-        ui->notConcluded->toPlainText()
-        );
+
 
     settings.setValue(
         "studyNotes",
@@ -783,46 +783,9 @@ void MainWindow::on_activateRfcBtn_clicked()
     handleWindowButton(ui->activateRfcBtn, "reference");
 }
 
-void MainWindow::updateCountdown()
-{
-    remainingTime--;
 
-    if (remainingTime >= 0)
-    {
-        ui->timeLeftLabel->setText(
-            QString::number(remainingTime)
-            );
-    }
 
-    if (remainingTime <= 0)
-    {
-        timer.stop();
 
-        trayIcon->showMessage(
-            "Timer finished",
-            "Your countdown ended.",
-            QSystemTrayIcon::Information,
-            5000
-            );
-
-        QMessageBox::information(
-            this,
-            "Timer finished",
-            "Your countdown ended."
-            );
-    }
-}
-
-void MainWindow::on_startTimerBtn_clicked()
-{
-    remainingTime = 5;
-
-    ui->timeLeftLabel->setText(
-        QString::number(remainingTime)
-        );
-
-    timer.start(1000);
-}
 
 void MainWindow::resetChanceTimer()
 {

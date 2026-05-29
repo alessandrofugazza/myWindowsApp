@@ -27,61 +27,12 @@
      <widget class="QWidget" name="widget" native="true">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>80</y>
-        <width>861</width>
-        <height>601</height>
+        <x>40</x>
+        <y>20</y>
+        <width>2041</width>
+        <height>861</height>
        </rect>
       </property>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>50</y>
-         <width>131</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>this is prod</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="startTimerBtn">
-       <property name="geometry">
-        <rect>
-         <x>150</x>
-         <y>150</y>
-         <width>111</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>start t</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="timeLeftLabel">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>150</y>
-         <width>121</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>timeLeftLabel</string>
-       </property>
-      </widget>
-      <widget class="QTextEdit" name="notConcluded">
-       <property name="geometry">
-        <rect>
-         <x>390</x>
-         <y>280</y>
-         <width>104</width>
-         <height>104</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QPushButton" name="activateWebtestRightBtn">
        <property name="geometry">
         <rect>
@@ -153,6 +104,19 @@
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QPushButton" name="sigSltTestBtn">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>50</y>
+         <width>111</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>sig slt test</string>
+       </property>
       </widget>
      </widget>
     </widget>

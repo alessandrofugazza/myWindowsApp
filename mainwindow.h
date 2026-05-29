@@ -31,7 +31,6 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private slots:
-    void updateCountdown();
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
     void on_activateMainBtn_clicked();
@@ -42,7 +41,7 @@ private slots:
     void on_activateWebtestLeftBtn_clicked();
     void on_activateRfcBtn_clicked();
 
-    void on_startTimerBtn_clicked();
+
 
     void on_taskIsDoneBtn_clicked();
 
