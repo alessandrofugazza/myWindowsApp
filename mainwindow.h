@@ -49,6 +49,10 @@ private slots:
 
     void on_moveTopicBtn_clicked();
 
+    // develop
+
+    void changeText();
+
 private:
     Ui::MainWindow *ui;
 

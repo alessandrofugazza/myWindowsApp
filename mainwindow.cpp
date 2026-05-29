@@ -427,7 +427,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->taskIsDoneBtn->raise();
     ui->reopenLastTopicBtn->raise();
 
+    // develop
 
+    connect(ui->sigSltTestBtn, SIGNAL(clicked()), this, SLOT(changeText()));
 }
 
 MainWindow::~MainWindow()
@@ -899,5 +901,12 @@ void MainWindow::on_moveTopicBtn_clicked()
 
     writeSettings();
 
+}
+
+// develop
+
+void MainWindow::changeText()
+{
+    ui->label->setText("okay...");
 }
 
