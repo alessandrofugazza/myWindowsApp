@@ -429,7 +429,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // develop
 
-    connect(ui->sigSltTestBtn, SIGNAL(clicked()), this, SLOT(changeText()));
+    connect(ui->sigSltTestBtn, &QPushButton::clicked, this, &MainWindow::changeText);
 }
 
 MainWindow::~MainWindow()
@@ -482,12 +482,22 @@ void MainWindow::checkTaskWithChance()
 
 void MainWindow::doTaskTriggeredStuff()
 {
-    ui->currentChanceLbl->setText(
-        QString("Task triggered!")
-        );
+    bool isTask =
+        QRandomGenerator::global()->bounded(2) == 0;
+
+    if (isTask)
+    {
+        ui->currentChanceLbl->setText("Task triggered!");
+        ui->taskIsDoneBtn->setText("TASK COMPLETED");
+    }
+    else
+    {
+        ui->currentChanceLbl->setText("Move topic triggered!");
+        ui->taskIsDoneBtn->setText("MOVE TOPIC");
+    }
+
     taskIsTriggered = true;
     ui->taskIsDoneBtn->setEnabled(true);
-    ui->taskIsDoneBtn->setText("TASK COMPLETED");
 }
 
 void MainWindow::updateCurrentChanceLabel()
@@ -588,7 +598,7 @@ bool MainWindow::event(QEvent *event)
         }
 
         updateCurrentChanceLabel();
-        updateMoveTopicChanceLabel();
+
     }
 
     return QMainWindow::event(event);
@@ -640,15 +650,9 @@ void MainWindow::readSettings()
 
     updateCurrentChanceLabel();
 
-    moveTopicChanceStartTime = settings.value(
-                                           "moveTopicChance/startTime",
-                                           QDateTime::currentDateTime()
-                                           ).toDateTime();
 
-    if (!moveTopicChanceStartTime.isValid())
-        moveTopicChanceStartTime = QDateTime::currentDateTime();
 
-    updateMoveTopicChanceLabel();
+
     taskIsTriggered = settings.value(
                                   "taskIsTriggered", false).toBool();
 }
@@ -785,10 +789,6 @@ void MainWindow::on_activateRfcBtn_clicked()
     handleWindowButton(ui->activateRfcBtn, "reference");
 }
 
-
-
-
-
 void MainWindow::resetChanceTimer()
 {
     // chanceTimer.restart();
@@ -847,60 +847,6 @@ void MainWindow::on_reopenLastTopicBtn_clicked()
             QString("Could not find a window with title '%1'.").arg(lastOpenedTopic)
             );
     }
-}
-
-void MainWindow::resetMoveTopicChanceTimer()
-{
-    moveTopicChanceStartTime = QDateTime::currentDateTime();
-    writeSettings();
-}
-
-double MainWindow::currentMoveTopicChance() const
-{
-    if (!moveTopicChanceStartTime.isValid())
-        return 0.0;
-
-    constexpr double maxSeconds = 30.0 * 60.0;
-
-    double elapsedSeconds =
-        moveTopicChanceStartTime.secsTo(QDateTime::currentDateTime());
-
-    double progress = elapsedSeconds / maxSeconds;
-
-    return qBound(0.0, progress, 1.0);
-}
-
-void MainWindow::updateMoveTopicChanceLabel()
-{
-    double chance = currentMoveTopicChance();
-
-    ui->moveTopicChanceLbl->setText(
-        QString("%1%").arg(chance * 100, 0, 'f', 1)
-        );
-
-    ui->moveTopicProgressBar->setValue(
-        static_cast<int>(chance * 100)
-        );
-
-    if (chance == 1.0)
-    {
-        ui->moveTopicChanceLbl->setText("Move topic triggered!");
-        ui->moveTopicBtn->setEnabled(true);
-        ui->moveTopicBtn->setText("MOVE TOPIC");
-    }
-}
-
-void MainWindow::on_moveTopicBtn_clicked()
-{
-    resetMoveTopicChanceTimer();
-
-    ui->moveTopicBtn->setEnabled(false);
-    ui->moveTopicBtn->setText("MOVE TOPIC");
-
-    updateMoveTopicChanceLabel();
-
-    writeSettings();
-
 }
 
 // develop

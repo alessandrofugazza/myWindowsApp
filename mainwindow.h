@@ -47,7 +47,7 @@ private slots:
 
     void on_reopenLastTopicBtn_clicked();
 
-    void on_moveTopicBtn_clicked();
+
 
     // develop
 
