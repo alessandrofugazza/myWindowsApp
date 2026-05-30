@@ -134,6 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setToolTip("My Windows App");
     trayIcon->show();
 
+    // when tray icon clicked
     connect(
         trayIcon,
         &QSystemTrayIcon::activated,
@@ -141,6 +142,8 @@ MainWindow::MainWindow(QWidget *parent)
         &MainWindow::trayIconActivated
         );
 
+    // change views logic
+    // OTHER
     connect(
         ui->actionOtherView,
         &QAction::triggered,
@@ -151,6 +154,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
+    // PRODUCTION
     connect(
         ui->actionProductionView,
         &QAction::triggered,
@@ -161,6 +165,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
+    // OPTIONS
     connect(
         ui->actionEdit_Options,
         &QAction::triggered,
@@ -171,6 +176,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
+    // Study button data list
+    // TODO reorder this shit and most of all dont make it hard coded
     QList<StudyButton> buttons =
         {
             {"AHK", 5, "Chrome"},
@@ -209,6 +216,7 @@ MainWindow::MainWindow(QWidget *parent)
             {"iOS Development", 2, "Chrome"}
         };
 
+    // measure study btns size so they're all the same
     QFontMetrics metrics(ui->developWidget->font());
 
     int maxButtonWidth = 0;
@@ -227,79 +235,107 @@ MainWindow::MainWindow(QWidget *parent)
         maxButtonHeight = qMax(maxButtonHeight, textSize.height());
     }
 
+    // add padding to btns
     maxButtonWidth += 34;
     maxButtonHeight += 20;
 
+    // TODO make it app wide const
     const int columnGap = 32;
 
+    // create widget containing the dynamically generated btns
     QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
     studyButtonsContainer->setObjectName("studyButtonsContainer");
+    // CHECK these values?? where do they come from
     studyButtonsContainer->setGeometry(20, 20, 1720, 580);
 
+    // Creates a horizontal layout inside the container.
+    // Each priority column will be added horizontally.
     QHBoxLayout *mainLayout = new QHBoxLayout(studyButtonsContainer);
 
+    // Of horizontal layout, sets spacing, removes margins, and aligns columns to top-left.
     mainLayout->setSpacing(columnGap);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
+    //Creates a set of unique priority values.
     QSet<int> priorities;
 
+    // Collects all priority numbers from the button list.
     for (const StudyButton &button : buttons)
     {
         priorities.insert(button.priority);
     }
 
+    // Turns the set into a list.
+    // QUERY why are we doing this?
     QList<int> sortedPriorities = priorities.values();
 
+    // Sorts priorities from smallest to largest.
     std::sort(sortedPriorities.begin(), sortedPriorities.end());
 
+    // Loops through each priority number.
     for (int priority : sortedPriorities)
     {
+        // Creates a widget for one priority column.
         QWidget *columnWidget = new QWidget(studyButtonsContainer);
 
+        // Forces the column width to match the button width.
         columnWidget->setMinimumWidth(maxButtonWidth);
         columnWidget->setMaximumWidth(maxButtonWidth);
 
+        // Creates a vertical layout for this column.
         QVBoxLayout *columnLayout = new QVBoxLayout(columnWidget);
 
+        // Sets vertical spacing, removes margins, and centers items horizontally.
+        // TODO spacing should be app wide const
         columnLayout->setSpacing(10);
         columnLayout->setContentsMargins(0, 0, 0, 0);
         columnLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
+        // Creates the column title label.
         QLabel *title = new QLabel(
             QString("Priority %1").arg(priority),
             columnWidget
             );
 
+        // Makes the label same width as buttons and centers the text.
         title->setMinimumWidth(maxButtonWidth);
         title->setMaximumWidth(maxButtonWidth);
         title->setAlignment(Qt::AlignCenter);
 
         columnLayout->addWidget(title);
 
+        // Stores the layout in a map.
         priorityLayouts.insert(priority, columnLayout);
 
         mainLayout->addWidget(columnWidget);
     }
 
+    // Tracks the order of buttons.
     int studyButtonIndex = 0;
 
+    // Loops over every button definition.
     for (const StudyButton &button : buttons)
     {
+        // create each, button, inittially under parent studyButtonsContainer
         QPushButton *btn = new QPushButton(
             formatButtonText(button.name),
             studyButtonsContainer
             );
 
+        // set to weight semibold
         QFont font = btn->font();
         font.setWeight(QFont::DemiBold);
         btn->setFont(font);
 
+        // QUERY why not convert to camelcase for consitency
         btn->setObjectName(button.name);
 
         btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
         btn->setMaximumSize(maxButtonWidth, maxButtonHeight);
 
+        // Tells layouts not to stretch or shrink the button.
+        // QUERY why is this needed?
         btn->setSizePolicy(
             QSizePolicy::Fixed,
             QSizePolicy::Fixed
@@ -310,6 +346,7 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setProperty("appTitle", button.appTitle);
         btn->setProperty("originalIndex", studyButtonIndex);
 
+        // QUERY why is this increment here? and not at start
         ++studyButtonIndex;
 
         priorityLayouts[button.priority]->addWidget(btn);
@@ -324,6 +361,7 @@ MainWindow::MainWindow(QWidget *parent)
 
                 QDateTime now = QDateTime::currentDateTime();
 
+                // QUERY do all this after it check wether click was valid?
                 btn->setProperty("lastClicked", now);
 
                 updateButtonColor(btn, now);
@@ -355,6 +393,7 @@ MainWindow::MainWindow(QWidget *parent)
 
                 if (!appTitle.isEmpty())
                 {
+                    // TODO other apps
                     if (appTitle == "Chrome")
                     {
                         activateWindowByTitle(instanceName);
