@@ -577,32 +577,37 @@ bool MainWindow::nativeEvent(
         );
 }
 
+// actual functions
+
+// get current chance of task succeeding
+double MainWindow::currentChance() const
+{
+    if (!chanceStartTime.isValid())
+        return 0.0;
+
+    // POLISH app wide const?
+    constexpr double maxSeconds = 25.0 * 60.0;
+
+    double elapsedSeconds =
+        chanceStartTime.secsTo(QDateTime::currentDateTime());
+
+    double progress = elapsedSeconds / maxSeconds;
+
+    progress = qBound(0.0, progress, 1.0);
+
+    return progress;
+}
+
+// check if task is triggered against currentchance
 void MainWindow::checkTaskWithChance()
 {
     double chance = currentChance();
 
     QDateTime now = QDateTime::currentDateTime();
 
+    // QUERY why not .secsTo?
     qint64 elapsedSeconds =
         chanceStartTime.secsTo(now);
-
-    qint64 minutes = elapsedSeconds / 60;
-    qint64 seconds = elapsedSeconds % 60;
-
-    qDebug() << "========================";
-    qDebug() << "Current time:"
-             << now.toString("yyyy-MM-dd hh:mm:ss");
-
-    qDebug() << "Timer started at:"
-             << chanceStartTime.toString("yyyy-MM-dd hh:mm:ss");
-
-    qDebug() << "Elapsed:"
-             << QString("%1m %2s")
-                    .arg(minutes)
-                    .arg(seconds);
-
-    qDebug() << "Current chance:"
-             << QString::number(chance * 100.0, 'f', 1) + "%";
 
     double roll = QRandomGenerator::global()->generateDouble();
 
@@ -616,6 +621,7 @@ void MainWindow::checkTaskWithChance()
     }
 }
 
+// runs when checkTaskWithChance succeeds
 void MainWindow::doTaskTriggeredStuff()
 {
     bool isTask =
@@ -636,6 +642,7 @@ void MainWindow::doTaskTriggeredStuff()
     ui->taskIsDoneBtn->setEnabled(true);
 }
 
+// Updates the chance label and progress bar.
 void MainWindow::updateCurrentChanceLabel()
 {
     if (taskIsTriggered)
@@ -651,6 +658,7 @@ void MainWindow::updateCurrentChanceLabel()
 
     ui->chanceProgressBar->setValue(static_cast<int>(chance * 100));
 
+    // POLISH comparing floating-point with == is often not ideal, but here currentChance() clamps to exactly 1.0, so it is acceptable.
     if (chance == 1.0)
     {
         doTaskTriggeredStuff();
@@ -681,6 +689,7 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
     int r, g, b;
 
+    // TODO better interpolation
     if (t < 0.5)
     {
         double localT = t / 0.5;
@@ -717,6 +726,7 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
 bool MainWindow::event(QEvent *event)
 {
+    // Runs when the window becomes active/focused.
     if (event->type() == QEvent::WindowActivate)
     {
         QList<QPushButton*> buttons = findChildren<QPushButton*>();
@@ -736,12 +746,6 @@ bool MainWindow::event(QEvent *event)
     }
 
     return QMainWindow::event(event);
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    writeSettings();
-    QWidget::closeEvent(event);
 }
 
 void MainWindow::readSettings()
@@ -916,23 +920,6 @@ void MainWindow::resetChanceTimer()
     writeSettings();
 }
 
-double MainWindow::currentChance() const
-{
-    if (!chanceStartTime.isValid())
-        return 0.0;
-
-    constexpr double maxSeconds = 25.0 * 60.0;
-
-    double elapsedSeconds =
-        chanceStartTime.secsTo(QDateTime::currentDateTime());
-
-    double progress = elapsedSeconds / maxSeconds;
-
-    progress = qBound(0.0, progress, 1.0);
-
-    return progress;
-}
-
 void MainWindow::on_taskIsDoneBtn_clicked()
 {
     resetChanceTimer();
@@ -968,4 +955,10 @@ void MainWindow::on_reopenLastTopicBtn_clicked()
             QString("Could not find a window with title '%1'.").arg(lastOpenedTopic)
             );
     }
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    QMainWindow::closeEvent(event);
 }
