@@ -29,6 +29,12 @@ public:
 protected:
     bool event(QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    bool nativeEvent(
+        const QByteArray &eventType,
+        void *message,
+        qintptr *result
+        ) override;
+
 
 private slots:
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -87,6 +93,9 @@ private:
     void doTaskTriggeredStuff();
     QString lastOpenedTopic;
     bool taskIsTriggered = false;
+
+    static constexpr int HOTKEY_ID = 1;
+
 };
 
 #endif // MAINWINDOW_H
