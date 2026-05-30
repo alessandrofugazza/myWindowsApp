@@ -403,6 +403,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
     }
 
+    // Adds empty flexible space at the bottom of every priority column.
     for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
     {
         columnLayout->addStretch();
@@ -496,6 +497,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
+    // Set pointer cursor on all buttons
     QList<QPushButton*> allButtons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : allButtons)
@@ -503,8 +505,6 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setCursor(Qt::PointingHandCursor);
     }
 
-    ui->taskIsDoneBtn->raise();
-    ui->reopenLastTopicBtn->raise();
 }
 
 MainWindow::~MainWindow()
