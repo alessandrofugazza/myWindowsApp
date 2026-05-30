@@ -507,6 +507,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 }
 
+// DESTRUCTOR
 MainWindow::~MainWindow()
 {
     HWND hwnd = reinterpret_cast<HWND>(winId());
@@ -551,20 +552,24 @@ bool MainWindow::nativeEvent(
         {
             qDebug() << "Shift + Alt + D pressed globally";
 
-            if (isMinimized())
-                showNormal();
+            // ALL THIS IS FOR REFOCUS
 
-            show();
-            raise();
-            activateWindow();
+            // if (isMinimized())
+            //     showNormal();
 
-            ui->viewsStack->setCurrentWidget(ui->developWidget);
-            ui->currentChanceLbl->setText("Global hotkey pressed");
+            // show();
+            // raise();
+            // activateWindow();
+
+            // ui->viewsStack->setCurrentWidget(ui->developWidget);
+
+            qDebug() << "Global hotkey pressed";
 
             return true;
         }
     }
 
+    // If it was not your hotkey, let the normal Qt event handler process it.
     return QMainWindow::nativeEvent(
         eventType,
         message,
