@@ -51,7 +51,7 @@ private slots:
 
     // develop
 
-    void changeText();
+
 
 private:
     Ui::MainWindow *ui;

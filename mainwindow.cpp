@@ -429,7 +429,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // develop
 
-    connect(ui->sigSltTestBtn, &QPushButton::clicked, this, &MainWindow::changeText);
+
 }
 
 MainWindow::~MainWindow()
@@ -851,8 +851,5 @@ void MainWindow::on_reopenLastTopicBtn_clicked()
 
 // develop
 
-void MainWindow::changeText()
-{
-    ui->label->setText("okay...");
-}
+
 
