@@ -63,7 +63,6 @@ private:
     Ui::MainWindow *ui;
 
     QTimer timer;
-    int remainingTime;
 
     QSystemTrayIcon *trayIcon = nullptr;
 

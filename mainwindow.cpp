@@ -33,6 +33,7 @@ struct StudyButton
     QString appTitle;
 };
 
+// wraps long button text onto multiple lines
 QString formatButtonText(const QString &text, int maxLineLength = 20)
 {
     QStringList words = text.split(' ', Qt::SkipEmptyParts);
@@ -62,12 +63,15 @@ QString formatButtonText(const QString &text, int maxLineLength = 20)
     return lines.join('\n');
 }
 
+// constructor
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , remainingTime(0)
 {
     ui->setupUi(this);
+
+
+    // hotkey registration
 
     HWND hwnd = reinterpret_cast<HWND>(winId());
 
@@ -85,18 +89,26 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "RegisterHotKey succeeded";
     }
 
+    // set initial view at launch
+
     ui->viewsStack->setCurrentWidget(ui->productionView);
 
+    // default current ui state before loading
+    // POLISH do this for every setting?
     ui->currentChanceLbl->setText("settings not read yet");
 
+    // load ui state
     readSettings();
 
+    // setting for btn color timespan
+    // QUERY why is this here??
     connect(
         ui->btnColorTimeSpanSpinbox,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
         [this](int)
         {
+            // POLISH can mark the btns here instead next couple lines?
             QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
             for (QPushButton *btn : std::as_const(buttons))
@@ -110,10 +122,13 @@ MainWindow::MainWindow(QWidget *parent)
                     );
             }
 
+            // CHECK am i updating data on each action i can do in UI?
             writeSettings();
         }
         );
 
+
+    // set up tray icon
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
     trayIcon->setToolTip("My Windows App");
@@ -181,6 +196,7 @@ MainWindow::MainWindow(QWidget *parent)
             {"Power User", 7, "Chrome"},
             {"Project S", 3, "Chrome"},
             {"Project A", 4, "Chrome"},
+            {"Project G", 4, "Chrome"},
             {"Project P", 5, "Chrome"},
             {"Prompt Engineering", 8, "Chrome"},
             {"Python", 4, "Chrome"},
@@ -464,6 +480,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::Trigger)
+    {
+        if (isMinimized())
+            showNormal();
+
+        show();
+        raise();
+        activateWindow();
+    }
+}
+
 bool MainWindow::nativeEvent(
     const QByteArray &eventType,
     void *message,
@@ -663,19 +692,6 @@ bool MainWindow::event(QEvent *event)
     }
 
     return QMainWindow::event(event);
-}
-
-void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
-{
-    if (reason == QSystemTrayIcon::Trigger)
-    {
-        if (isMinimized())
-            showNormal();
-
-        show();
-        raise();
-        activateWindow();
-    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
