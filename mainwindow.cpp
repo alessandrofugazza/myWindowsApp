@@ -24,8 +24,10 @@
 #include <utility>
 #include <QMessageBox>
 
-
 #include <windows.h>
+
+#include <QShortcut>
+#include <QKeySequence>
 
 struct StudyButton
 {
@@ -69,6 +71,16 @@ MainWindow::MainWindow(QWidget *parent)
     , remainingTime(0)
 {
     ui->setupUi(this);
+
+    auto *shortcut = new QShortcut(
+        QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_D),
+        this
+        );
+
+    connect(shortcut, &QShortcut::activated, this, [this]()
+            {
+                qDebug() << "Shift + Alt + D pressed";
+            });
 
     ui->viewsStack->setCurrentWidget(ui->productionView);
 
