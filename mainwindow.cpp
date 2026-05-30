@@ -26,9 +26,6 @@
 
 #include <windows.h>
 
-#include <QShortcut>
-#include <QKeySequence>
-
 struct StudyButton
 {
     QString name;
@@ -72,19 +69,24 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    auto *shortcut = new QShortcut(
-        QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_D),
-        this
-        );
+    HWND hwnd = reinterpret_cast<HWND>(winId());
 
-    connect(shortcut, &QShortcut::activated, this, [this]()
-            {
-                qDebug() << "Shift + Alt + D pressed";
-            });
+    if (!RegisterHotKey(
+            hwnd,
+            HOTKEY_ID,
+            MOD_SHIFT | MOD_ALT,
+            'D'
+            ))
+    {
+        qDebug() << "RegisterHotKey failed. Error:" << GetLastError();
+    }
+    else
+    {
+        qDebug() << "RegisterHotKey succeeded";
+    }
 
     ui->viewsStack->setCurrentWidget(ui->productionView);
 
-    // POLISH do this for everything?
     ui->currentChanceLbl->setText("settings not read yet");
 
     readSettings();
@@ -117,24 +119,42 @@ MainWindow::MainWindow(QWidget *parent)
     trayIcon->setToolTip("My Windows App");
     trayIcon->show();
 
-    connect(trayIcon, &QSystemTrayIcon::activated,
-            this, &MainWindow::trayIconActivated);
+    connect(
+        trayIcon,
+        &QSystemTrayIcon::activated,
+        this,
+        &MainWindow::trayIconActivated
+        );
 
-    connect(ui->actionOtherView, &QAction::triggered, this, [this]()
-            {
-                ui->viewsStack->setCurrentWidget(ui->otherView);
-            });
+    connect(
+        ui->actionOtherView,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            ui->viewsStack->setCurrentWidget(ui->otherView);
+        }
+        );
 
-    connect(ui->actionProductionView, &QAction::triggered, this, [this]()
-            {
-                ui->viewsStack->setCurrentWidget(ui->productionView);
-            });
+    connect(
+        ui->actionProductionView,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            ui->viewsStack->setCurrentWidget(ui->productionView);
+        }
+        );
 
-    connect(ui->actionEdit_Options, &QAction::triggered, this, [this]()
-            {
-                ui->viewsStack->setCurrentWidget(ui->optionsView);
-            });
-
+    connect(
+        ui->actionEdit_Options,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            ui->viewsStack->setCurrentWidget(ui->optionsView);
+        }
+        );
 
     QList<StudyButton> buttons =
         {
@@ -196,14 +216,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     const int columnGap = 32;
 
-    // IMPORTANT:
-    // Do not put this layout directly on ui->developWidget.
-    // developWidget already contains Designer-positioned widgets
-    // such as taskIsDoneBtn and reopenLastTopicBtn.
-    //
-    // A layout installed directly on developWidget can overlap or
-    // steal mouse events from those buttons, making only part of
-    // the visible button clickable.
     QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
     studyButtonsContainer->setObjectName("studyButtonsContainer");
     studyButtonsContainer->setGeometry(20, 20, 1720, 580);
@@ -264,9 +276,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
 
         QFont font = btn->font();
-
         font.setWeight(QFont::DemiBold);
-
         btn->setFont(font);
 
         btn->setObjectName(button.name);
@@ -283,54 +293,59 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setProperty("priority", button.priority);
         btn->setProperty("appTitle", button.appTitle);
         btn->setProperty("originalIndex", studyButtonIndex);
+
         ++studyButtonIndex;
 
         priorityLayouts[button.priority]->addWidget(btn);
 
-        connect(btn, &QPushButton::clicked, this, [this, btn]()
+        connect(
+            btn,
+            &QPushButton::clicked,
+            this,
+            [this, btn]()
+            {
+                checkTaskWithChance();
+
+                QDateTime now = QDateTime::currentDateTime();
+
+                btn->setProperty("lastClicked", now);
+
+                updateButtonColor(btn, now);
+
+                writeSettings();
+
+                int priority = btn->property("priority").toInt();
+
+                QVBoxLayout *columnLayout =
+                    priorityLayouts.value(priority, nullptr);
+
+                if (columnLayout != nullptr)
                 {
+                    columnLayout->removeWidget(btn);
 
-                    checkTaskWithChance();
+                    int insertIndex = columnLayout->count() - 1;
 
-                    QDateTime now = QDateTime::currentDateTime();
+                    if (insertIndex < 0)
+                        insertIndex = 0;
 
-                    btn->setProperty("lastClicked", now);
+                    columnLayout->insertWidget(insertIndex, btn);
+                }
 
-                    updateButtonColor(btn, now);
+                QString appTitle =
+                    btn->property("appTitle").toString();
 
-                    writeSettings();
+                QString instanceName =
+                    btn->objectName();
 
-                    int priority = btn->property("priority").toInt();
-
-                    QVBoxLayout *columnLayout =
-                        priorityLayouts.value(priority, nullptr);
-
-                    if (columnLayout != nullptr)
+                if (!appTitle.isEmpty())
+                {
+                    if (appTitle == "Chrome")
                     {
-                        columnLayout->removeWidget(btn);
-
-                        int insertIndex = columnLayout->count() - 1;
-
-                        if (insertIndex < 0)
-                            insertIndex = 0;
-
-                        columnLayout->insertWidget(insertIndex, btn);
+                        activateWindowByTitle(instanceName);
                     }
-
-                    QString appTitle =
-                        btn->property("appTitle").toString();
-
-                    QString instanceName =
-                        btn->objectName();
-
-                    if (!appTitle.isEmpty())
-                    {
-                        if (appTitle == "Chrome")
-                        {
-                            activateWindowByTitle(instanceName);
-                        }
-                    }
-                });
+                }
+            }
+            );
     }
 
     for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
@@ -426,8 +441,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-
-
     QList<QPushButton*> allButtons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : allButtons)
@@ -435,25 +448,65 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setCursor(Qt::PointingHandCursor);
     }
 
-    // Keep Designer buttons above any runtime-created widgets.
     ui->taskIsDoneBtn->raise();
     ui->reopenLastTopicBtn->raise();
-
-    // develop
-
-
 }
 
 MainWindow::~MainWindow()
 {
+    HWND hwnd = reinterpret_cast<HWND>(winId());
+
+    UnregisterHotKey(
+        hwnd,
+        HOTKEY_ID
+        );
+
     delete ui;
+}
+
+bool MainWindow::nativeEvent(
+    const QByteArray &eventType,
+    void *message,
+    qintptr *result
+    )
+{
+    Q_UNUSED(eventType);
+    Q_UNUSED(result);
+
+    MSG *msg = static_cast<MSG *>(message);
+
+    if (msg->message == WM_HOTKEY)
+    {
+        qDebug() << "WM_HOTKEY received";
+
+        if (msg->wParam == HOTKEY_ID)
+        {
+            qDebug() << "Shift + Alt + D pressed globally";
+
+            if (isMinimized())
+                showNormal();
+
+            show();
+            raise();
+            activateWindow();
+
+            ui->viewsStack->setCurrentWidget(ui->developWidget);
+            ui->currentChanceLbl->setText("Global hotkey pressed");
+
+            return true;
+        }
+    }
+
+    return QMainWindow::nativeEvent(
+        eventType,
+        message,
+        result
+        );
 }
 
 void MainWindow::checkTaskWithChance()
 {
     double chance = currentChance();
-
-    // DEBUG
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -478,16 +531,14 @@ void MainWindow::checkTaskWithChance()
     qDebug() << "Current chance:"
              << QString::number(chance * 100.0, 'f', 1) + "%";
 
-
-    //
-
     double roll = QRandomGenerator::global()->generateDouble();
 
     if (roll < chance)
     {
         doTaskTriggeredStuff();
-
-    } else {
+    }
+    else
+    {
         updateCurrentChanceLabel();
     }
 }
@@ -518,6 +569,7 @@ void MainWindow::updateCurrentChanceLabel()
     {
         return;
     }
+
     double chance = currentChance();
 
     ui->currentChanceLbl->setText(
@@ -590,8 +642,6 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
         );
 }
 
-// ON FOCUS
-
 bool MainWindow::event(QEvent *event)
 {
     if (event->type() == QEvent::WindowActivate)
@@ -610,7 +660,6 @@ bool MainWindow::event(QEvent *event)
         }
 
         updateCurrentChanceLabel();
-
     }
 
     return QMainWindow::event(event);
@@ -639,8 +688,6 @@ void MainWindow::readSettings()
 {
     QSettings settings;
 
-
-
     ui->studyNotes->setPlainText(
         settings.value("studyNotes", "").toString()
         );
@@ -660,20 +707,17 @@ void MainWindow::readSettings()
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
 
-    updateCurrentChanceLabel();
-
-
-
-
     taskIsTriggered = settings.value(
-                                  "taskIsTriggered", false).toBool();
+                                  "taskIsTriggered",
+                                  false
+                                  ).toBool();
+
+    updateCurrentChanceLabel();
 }
 
 void MainWindow::writeSettings()
 {
     QSettings settings;
-
-
 
     settings.setValue(
         "studyNotes",
@@ -685,7 +729,10 @@ void MainWindow::writeSettings()
         lastOpenedTopic
         );
 
-    settings.setValue("chance/startTime", chanceStartTime);
+    settings.setValue(
+        "chance/startTime",
+        chanceStartTime
+        );
 
     settings.setValue(
         "buttonColor/timeSpanMinutes",
@@ -744,6 +791,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
             {
                 ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
+
                 lastOpenedTopic = target;
 
                 return true;
@@ -754,7 +802,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
     }
 
     qDebug()
-        << "Window with title containing"
+        << "Window with exact title"
         << target
         << "not found.";
 
@@ -803,10 +851,9 @@ void MainWindow::on_activateRfcBtn_clicked()
 
 void MainWindow::resetChanceTimer()
 {
-    // chanceTimer.restart();
     chanceStartTime = QDateTime::currentDateTime();
-    writeSettings();
 
+    writeSettings();
 }
 
 double MainWindow::currentChance() const
@@ -830,13 +877,14 @@ void MainWindow::on_taskIsDoneBtn_clicked()
 {
     resetChanceTimer();
 
+    taskIsTriggered = false;
+
     ui->taskIsDoneBtn->setEnabled(false);
     ui->taskIsDoneBtn->setText("TASK IS DONE");
 
     updateCurrentChanceLabel();
-    taskIsTriggered = false;
-    writeSettings();
 
+    writeSettings();
 }
 
 void MainWindow::on_reopenLastTopicBtn_clicked()
@@ -848,6 +896,7 @@ void MainWindow::on_reopenLastTopicBtn_clicked()
             "No topic",
             "No topic was opened yet."
             );
+
         return;
     }
 
@@ -860,8 +909,3 @@ void MainWindow::on_reopenLastTopicBtn_clicked()
             );
     }
 }
-
-// develop
-
-
-
