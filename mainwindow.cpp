@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 qDebug() << "progressIsBeingTracked:" << progressIsBeingTracked;
             }
-        );
+            );
 
     // hotkey registration
 
@@ -231,17 +231,6 @@ bool MainWindow::nativeEvent(
         {
             qDebug() << "Shift + Alt + D pressed globally";
 
-            // ALL THIS IS FOR REFOCUS
-
-            // if (isMinimized())
-            //     showNormal();
-
-            // show();
-            // raise();
-            // activateWindow();
-
-            // ui->viewsStack->setCurrentWidget(ui->developWidget);
-
             QPushButton *selectedButton = nullptr;
 
             QList<QPushButton*> buttons = findChildren<QPushButton*>();
@@ -321,11 +310,16 @@ bool MainWindow::nativeEvent(
                     .arg(elapsedMinutes)
                     .arg(remainingSeconds);
 
-            updateButtonStatsLabels(selectedButton);
-
-            // DEBUG
+            selectedButton->setProperty("selected", false);
 
             progressIsBeingTracked = false;
+
+            updateButtonColor(
+                selectedButton,
+                selectedButton->property("lastClicked").toDateTime()
+                );
+
+            updateButtonStatsLabels(selectedButton);
 
             writeSettings();
 
@@ -354,7 +348,6 @@ bool MainWindow::nativeEvent(
         }
     }
 
-    // If it was not your hotkey, let the normal Qt event handler process it.
     return QMainWindow::nativeEvent(
         eventType,
         message,
@@ -364,13 +357,11 @@ bool MainWindow::nativeEvent(
 
 // actual functions
 
-// get current chance of task succeeding
 double MainWindow::calculateCurrentTaskChance() const
 {
     if (!chanceStartTime.isValid())
         return 0.0;
 
-    // POLISH app wide const?
     constexpr double maxSeconds = 25.0 * 60.0;
 
     double elapsedSeconds =
@@ -383,14 +374,12 @@ double MainWindow::calculateCurrentTaskChance() const
     return progress;
 }
 
-// check if task is triggered against currentchance
 void MainWindow::checkTaskWithChance()
 {
     double chance = calculateCurrentTaskChance();
 
     QDateTime now = QDateTime::currentDateTime();
 
-    // QUERY why not .secsTo?
     qint64 elapsedSeconds =
         chanceStartTime.secsTo(now);
 
@@ -406,7 +395,6 @@ void MainWindow::checkTaskWithChance()
     }
 }
 
-// runs when checkTaskWithChance succeeds
 void MainWindow::doTaskTriggeredStuff()
 {
     bool isTask =
@@ -427,7 +415,6 @@ void MainWindow::doTaskTriggeredStuff()
     ui->taskIsDoneBtn->setEnabled(true);
 }
 
-// Updates the chance label and progress bar.
 void MainWindow::updateCurrentChanceLabel()
 {
     if (taskIsTriggered)
@@ -443,7 +430,6 @@ void MainWindow::updateCurrentChanceLabel()
 
     ui->chanceProgressBar->setValue(static_cast<int>(chance * 100));
 
-    // POLISH comparing floating-point with == is often not ideal, but here currentChance() clamps to exactly 1.0, so it is acceptable.
     if (chance == 1.0)
     {
         doTaskTriggeredStuff();
@@ -497,7 +483,6 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
     int r, g, b;
 
-    // TODO better interpolation
     if (t < 0.5)
     {
         double localT = t / 0.5;
@@ -538,7 +523,6 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
 bool MainWindow::event(QEvent *event)
 {
-    // Runs when the window becomes active/focused.
     if (event->type() == QEvent::WindowActivate)
     {
         QList<QPushButton*> buttons = findChildren<QPushButton*>();
@@ -562,7 +546,6 @@ bool MainWindow::event(QEvent *event)
     return QMainWindow::event(event);
 }
 
-// TODO make this more programmatic
 void MainWindow::readSettings()
 {
     QSettings settings;
@@ -579,7 +562,6 @@ void MainWindow::readSettings()
                                   QDateTime::currentDateTime()
                                   ).toDateTime();
 
-    // TODO app wide const for default value
     ui->btnColorTimeSpanSpinbox->setValue(
         settings.value("buttonColor/timeSpanMinutes", 120).toInt()
         );
@@ -587,20 +569,21 @@ void MainWindow::readSettings()
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
 
-    // TODO Potential issue: if taskIsTriggered is true, this function returns immediately, so it will not restore the button text to "TASK COMPLETED" or "MOVE TOPIC". It only remembers that something was triggered, not which one.
     taskIsTriggered = settings.value(
                                   "taskIsTriggered",
                                   false
                                   ).toBool();
 
+    progressIsBeingTracked = settings.value(
+                                         "studyButtons/progressIsBeingTracked",
+                                         false
+                                         ).toBool();
+
     updateCurrentChanceLabel();
 }
 
-// TODO better default values
 void MainWindow::writeSettings()
 {
-
-    // doesnt save if dev mode is on
     if (ui->devModeCheckBox->isChecked())
     {
         qDebug() << "DEV MODE: writeSettings skipped";
@@ -634,7 +617,12 @@ void MainWindow::writeSettings()
         taskIsTriggered
         );
 
-    // save study btns lastclick
+    settings.setValue(
+        "studyButtons/progressIsBeingTracked",
+        progressIsBeingTracked
+        );
+
+    QString activeStudyButtonName;
 
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
@@ -654,6 +642,14 @@ void MainWindow::writeSettings()
 
         qint64 cumulativeSeconds =
             btn->property("cumulativeSeconds").toLongLong();
+
+        bool selected =
+            btn->property("selected").toBool();
+
+        if (progressIsBeingTracked && selected)
+        {
+            activeStudyButtonName = btn->objectName();
+        }
 
         QString lastClickedKey =
             QString("studyButtons/%1/lastClicked")
@@ -692,23 +688,29 @@ void MainWindow::writeSettings()
         settings.setValue(clickCountKey, clickCount);
         settings.setValue(cumulativeSecondsKey, cumulativeSeconds);
     }
-}
 
-// Searches open Windows windows by exact title.
-//If it finds one, it activates it.
+    if (progressIsBeingTracked && !activeStudyButtonName.isEmpty())
+    {
+        settings.setValue(
+            "studyButtons/activeStudyButtonName",
+            activeStudyButtonName
+            );
+    }
+    else
+    {
+        settings.remove("studyButtons/activeStudyButtonName");
+        settings.setValue("studyButtons/progressIsBeingTracked", false);
+    }
+}
 
 bool MainWindow::activateWindowByTitle(const QString &target)
 {
-    // Gets the first top-level window.
     HWND hwnd = FindWindowA(nullptr, nullptr);
 
-    // Loops through windows until there are no more.
-    // CHECK any way to avoid looping over everything?
     while (hwnd != nullptr)
     {
         char title[512];
 
-        // POLISH potential issue: this is not Unicode-safe. For non-ASCII window titles, GetWindowTextW would be better.
         GetWindowTextA(hwnd, title, sizeof(title));
 
         if (title[0] != '\0')
@@ -720,7 +722,6 @@ bool MainWindow::activateWindowByTitle(const QString &target)
                 ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
 
-                // CHECK this lasttopic position only makes sense for chrome istances
                 lastOpenedTopic = target;
 
                 return true;
@@ -829,10 +830,6 @@ void MainWindow::onResetTopicsBtnClicked()
             );
     }
 
-    //
-    // restore original ordering
-    //
-
     for (auto it = priorityLayouts.begin();
          it != priorityLayouts.end();
          ++it)
@@ -887,15 +884,18 @@ void MainWindow::onResetTopicsBtnClicked()
         }
     }
 
+    progressIsBeingTracked = false;
+
+    settings.remove("studyButtons/activeStudyButtonName");
+    settings.setValue("studyButtons/progressIsBeingTracked", false);
+
     writeSettings();
 }
 
 void MainWindow::setupStudyButtons()
 {
-    // Study button data list
-    // TODO reorder this shit and most of all dont make it hard coded
     QList<StudyButton> buttons = defaultStudyButtons();
-    // measure study btns size so they're all the same
+
     QFontMetrics metrics(ui->developWidget->font());
 
     int maxButtonWidth = 0;
@@ -914,107 +914,79 @@ void MainWindow::setupStudyButtons()
         maxButtonHeight = qMax(maxButtonHeight, textSize.height());
     }
 
-    // add padding to btns
     maxButtonWidth += 34;
     maxButtonHeight += 20;
 
-    // TODO make it app wide const
     const int columnGap = 32;
 
-    // create widget containing the dynamically generated btns
     QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
     studyButtonsContainer->setObjectName("studyButtonsContainer");
-    // CHECK these values?? where do they come from
     studyButtonsContainer->setGeometry(20, 20, 1720, 580);
 
-    // Creates a horizontal layout inside the container.
-    // Each priority column will be added horizontally.
     QHBoxLayout *mainLayout = new QHBoxLayout(studyButtonsContainer);
 
-    // Of horizontal layout, sets spacing, removes margins, and aligns columns to top-left.
     mainLayout->setSpacing(columnGap);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
-    //Creates a set of unique priority values.
     QSet<int> priorities;
 
-    // Collects all priority numbers from the button list.
     for (const StudyButton &button : buttons)
     {
         priorities.insert(button.priority);
     }
 
-    // Turns the set into a list.
-    // QUERY why are we doing this?
     QList<int> sortedPriorities = priorities.values();
 
-    // Sorts priorities from smallest to largest.
     std::sort(sortedPriorities.begin(), sortedPriorities.end());
 
-    // Loops through each priority number.
     for (int priority : sortedPriorities)
     {
-        // Creates a widget for one priority column.
         QWidget *columnWidget = new QWidget(studyButtonsContainer);
 
-        // Forces the column width to match the button width.
         columnWidget->setMinimumWidth(maxButtonWidth);
         columnWidget->setMaximumWidth(maxButtonWidth);
 
-        // Creates a vertical layout for this column.
         QVBoxLayout *columnLayout = new QVBoxLayout(columnWidget);
 
-        // Sets vertical spacing, removes margins, and centers items horizontally.
-        // TODO spacing should be app wide const
         columnLayout->setSpacing(10);
         columnLayout->setContentsMargins(0, 0, 0, 0);
         columnLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-        // Creates the column title label.
         QLabel *title = new QLabel(
             QString("Priority %1").arg(priority),
             columnWidget
             );
 
-        // Makes the label same width as buttons and centers the text.
         title->setMinimumWidth(maxButtonWidth);
         title->setMaximumWidth(maxButtonWidth);
         title->setAlignment(Qt::AlignCenter);
 
         columnLayout->addWidget(title);
 
-        // Stores the layout in a map.
         priorityLayouts.insert(priority, columnLayout);
 
         mainLayout->addWidget(columnWidget);
     }
 
-    // Tracks the order of buttons.
     int studyButtonIndex = 0;
 
-    // Loops over every button definition.
     for (const StudyButton &button : buttons)
     {
-        // create each, button, inittially under parent studyButtonsContainer
         QPushButton *btn = new QPushButton(
             formatButtonText(button.name),
             studyButtonsContainer
             );
 
-        // set to weight semibold
         QFont font = btn->font();
         font.setWeight(QFont::DemiBold);
         btn->setFont(font);
 
-        // QUERY why not convert to camelcase for consitency
         btn->setObjectName(button.name);
 
         btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
         btn->setMaximumSize(maxButtonWidth, maxButtonHeight);
 
-        // Tells layouts not to stretch or shrink the button.
-        // QUERY why is this needed?
         btn->setSizePolicy(
             QSizePolicy::Fixed,
             QSizePolicy::Fixed
@@ -1030,12 +1002,10 @@ void MainWindow::setupStudyButtons()
 
         updateButtonStatsLabels(btn);
 
-        // QUERY why is this increment here? and not at start
         ++studyButtonIndex;
 
         priorityLayouts[button.priority]->addWidget(btn);
 
-        // LOGIC FOR WHEN A STUDY BTN IS CLICKED
         connect(
             btn,
             &QPushButton::clicked,
@@ -1047,16 +1017,20 @@ void MainWindow::setupStudyButtons()
             );
     }
 
-    // Adds empty flexible space at the bottom of every priority column.
     for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
     {
         columnLayout->addStretch();
     }
 }
 
-void MainWindow::restoreStudyButtonSettings() {
-
+void MainWindow::restoreStudyButtonSettings()
+{
     QSettings settings;
+
+    QString activeStudyButtonName =
+        settings.value("studyButtons/activeStudyButtonName", "").toString();
+
+    bool restoredActiveStudyButton = false;
 
     QList<QPushButton*> createdButtons = findChildren<QPushButton*>();
 
@@ -1090,6 +1064,20 @@ void MainWindow::restoreStudyButtonSettings() {
         btn->setProperty("clickCount", clickCount);
         btn->setProperty("cumulativeSeconds", cumulativeSeconds);
 
+        bool isActiveButton =
+            progressIsBeingTracked
+            &&
+            !activeStudyButtonName.isEmpty()
+            &&
+            btn->objectName() == activeStudyButtonName
+            &&
+            lastClicked.isValid();
+
+        btn->setProperty("selected", isActiveButton);
+
+        if (isActiveButton)
+            restoredActiveStudyButton = true;
+
         if (lastClicked.isValid())
         {
             btn->setProperty("lastClicked", lastClicked);
@@ -1105,6 +1093,13 @@ void MainWindow::restoreStudyButtonSettings() {
         updateButtonStatsLabels(btn);
     }
 
+    if (progressIsBeingTracked && !restoredActiveStudyButton)
+    {
+        progressIsBeingTracked = false;
+        settings.remove("studyButtons/activeStudyButtonName");
+        settings.setValue("studyButtons/progressIsBeingTracked", false);
+    }
+
     for (auto it = priorityLayouts.begin();
          it != priorityLayouts.end();
          ++it)
@@ -1113,7 +1108,6 @@ void MainWindow::restoreStudyButtonSettings() {
 
         if (!columnLayout)
             continue;
-
 
         QList<QPushButton*> priorityButtons;
 
@@ -1170,10 +1164,10 @@ void MainWindow::restoreStudyButtonSettings() {
             columnLayout->insertWidget(insertIndex, btn);
         }
     }
-
 }
 
-void MainWindow::handleStudyButtonClicked(QPushButton *btn) {
+void MainWindow::handleStudyButtonClicked(QPushButton *btn)
+{
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
     for (QPushButton *otherBtn : std::as_const(buttons))
@@ -1197,7 +1191,6 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn) {
 
     QDateTime now = QDateTime::currentDateTime();
 
-    // QUERY do all this after it check wether click was valid?
     btn->setProperty("lastClicked", now);
 
     progressIsBeingTracked = true;
@@ -1237,7 +1230,6 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn) {
 
     if (!appTitle.isEmpty())
     {
-        // TODO other apps
         if (appTitle == "Chrome")
         {
             activateWindowByTitle(instanceName);
