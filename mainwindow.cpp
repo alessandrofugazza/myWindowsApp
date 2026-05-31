@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "Helpers/buttonhelpers.h"
+#include "Models/studybutton.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -26,14 +27,6 @@
 #include <QMessageBox>
 
 #include <windows.h>
-#include <random>
-
-struct StudyButton
-{
-    QString name;
-    int priority;
-    QString appTitle;
-};
 
 // constructor
 MainWindow::MainWindow(QWidget *parent)
