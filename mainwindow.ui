@@ -107,6 +107,18 @@
       </widget>
      </widget>
     </widget>
+    <widget class="QWidget" name="developView">
+     <widget class="QWidget" name="widget_3" native="true">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>2081</width>
+        <height>1061</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="productionView">
      <widget class="QWidget" name="developWidget" native="true">
       <property name="geometry">
@@ -331,6 +343,7 @@
     </property>
     <addaction name="actionProductionView"/>
     <addaction name="actionOtherView"/>
+    <addaction name="actionDevelopView"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -366,6 +379,11 @@
   <action name="actionEdit_Options">
    <property name="text">
     <string>Edit Options</string>
+   </property>
+  </action>
+  <action name="actionDevelopView">
+   <property name="text">
+    <string>Develop</string>
    </property>
   </action>
  </widget>

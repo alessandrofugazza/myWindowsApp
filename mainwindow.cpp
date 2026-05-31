@@ -148,6 +148,17 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
+    // DEVELOP
+    connect(
+        ui->actionDevelopView,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            ui->viewsStack->setCurrentWidget(ui->developView);
+        }
+        );
+
     // OPTIONS
     connect(
         ui->actionEdit_Options,
