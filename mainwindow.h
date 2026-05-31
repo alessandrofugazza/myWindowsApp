@@ -85,6 +85,8 @@ private:
     void setupStudyButtons();
 
     void restoreStudyButtonSettings();
+
+    void handleStudyButtonClicked(QPushButton *btn);
 };
 
 #endif // MAINWINDOW_H

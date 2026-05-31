@@ -1023,75 +1023,7 @@ void MainWindow::setupStudyButtons()
             this,
             [this, btn]()
             {
-                QList<QPushButton*> buttons = findChildren<QPushButton*>();
-
-                for (QPushButton *otherBtn : std::as_const(buttons))
-                {
-                    if (!otherBtn->property("trackedColorButton").toBool())
-                        continue;
-
-                    otherBtn->setProperty("selected", false);
-
-                    updateButtonColor(
-                        otherBtn,
-                        otherBtn->property("lastClicked").toDateTime()
-                        );
-
-                    updateButtonStatsLabels(otherBtn);
-                }
-
-                btn->setProperty("selected", true);
-
-                checkTaskWithChance();
-
-                QDateTime now = QDateTime::currentDateTime();
-
-                // QUERY do all this after it check wether click was valid?
-                btn->setProperty("lastClicked", now);
-
-                progressIsBeingTracked = true;
-
-                int clickCount =
-                    btn->property("clickCount").toInt();
-
-                btn->setProperty("clickCount", clickCount + 1);
-
-                updateButtonColor(btn, now);
-                updateButtonStatsLabels(btn);
-
-                writeSettings();
-
-                int priority = btn->property("priority").toInt();
-
-                QVBoxLayout *columnLayout =
-                    priorityLayouts.value(priority, nullptr);
-
-                if (columnLayout != nullptr)
-                {
-                    columnLayout->removeWidget(btn);
-
-                    int insertIndex = columnLayout->count() - 1;
-
-                    if (insertIndex < 0)
-                        insertIndex = 0;
-
-                    columnLayout->insertWidget(insertIndex, btn);
-                }
-
-                QString appTitle =
-                    btn->property("appTitle").toString();
-
-                QString instanceName =
-                    btn->objectName();
-
-                if (!appTitle.isEmpty())
-                {
-                    // TODO other apps
-                    if (appTitle == "Chrome")
-                    {
-                        activateWindowByTitle(instanceName);
-                    }
-                }
+                handleStudyButtonClicked(btn);
             }
             );
     }
@@ -1220,4 +1152,76 @@ void MainWindow::restoreStudyButtonSettings() {
         }
     }
 
+}
+
+void MainWindow::handleStudyButtonClicked(QPushButton *btn) {
+    QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+    for (QPushButton *otherBtn : std::as_const(buttons))
+    {
+        if (!otherBtn->property("trackedColorButton").toBool())
+            continue;
+
+        otherBtn->setProperty("selected", false);
+
+        updateButtonColor(
+            otherBtn,
+            otherBtn->property("lastClicked").toDateTime()
+            );
+
+        updateButtonStatsLabels(otherBtn);
+    }
+
+    btn->setProperty("selected", true);
+
+    checkTaskWithChance();
+
+    QDateTime now = QDateTime::currentDateTime();
+
+    // QUERY do all this after it check wether click was valid?
+    btn->setProperty("lastClicked", now);
+
+    progressIsBeingTracked = true;
+
+    int clickCount =
+        btn->property("clickCount").toInt();
+
+    btn->setProperty("clickCount", clickCount + 1);
+
+    updateButtonColor(btn, now);
+    updateButtonStatsLabels(btn);
+
+    writeSettings();
+
+    int priority = btn->property("priority").toInt();
+
+    QVBoxLayout *columnLayout =
+        priorityLayouts.value(priority, nullptr);
+
+    if (columnLayout != nullptr)
+    {
+        columnLayout->removeWidget(btn);
+
+        int insertIndex = columnLayout->count() - 1;
+
+        if (insertIndex < 0)
+            insertIndex = 0;
+
+        columnLayout->insertWidget(insertIndex, btn);
+    }
+
+    QString appTitle =
+        btn->property("appTitle").toString();
+
+    QString instanceName =
+        btn->objectName();
+
+    if (!appTitle.isEmpty())
+    {
+        // TODO other apps
+        if (appTitle == "Chrome")
+        {
+            activateWindowByTitle(instanceName);
+        }
+    }
 }
