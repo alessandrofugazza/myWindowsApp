@@ -52,8 +52,6 @@ MainWindow::MainWindow(QWidget *parent)
             }
             );
 
-    // hotkey registration
-
     HWND hwnd = reinterpret_cast<HWND>(winId());
 
     if (!RegisterHotKey(
@@ -70,26 +68,19 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "RegisterHotKey succeeded";
     }
 
-    // set initial view at launch
-
     ui->viewsStack->setCurrentWidget(ui->productionView);
 
-    // default current ui state before loading
-    // POLISH do this for every setting?
     ui->currentChanceLbl->setText("settings not read yet");
+    ui->trackingStartedAtLbl->setText("Not started");
 
-    // load ui state
     readSettings();
 
-    // setting for btn color timespan
-    // QUERY why is this here??
     connect(
         ui->btnColorTimeSpanSpinbox,
         QOverload<int>::of(&QSpinBox::valueChanged),
         this,
         [this](int)
         {
-            // POLISH can mark the btns here instead next couple lines?
             QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
             for (QPushButton *btn : std::as_const(buttons))
@@ -105,19 +96,15 @@ MainWindow::MainWindow(QWidget *parent)
                 updateButtonStatsLabels(btn);
             }
 
-            // CHECK am i updating data on each action i can do in UI?
             writeSettings();
         }
         );
 
-
-    // set up tray icon
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
     trayIcon->setToolTip("My Windows App");
     trayIcon->show();
 
-    // when tray icon clicked
     connect(
         trayIcon,
         &QSystemTrayIcon::activated,
@@ -125,8 +112,6 @@ MainWindow::MainWindow(QWidget *parent)
         &MainWindow::trayIconActivated
         );
 
-    // change views logic
-    // OTHER
     connect(
         ui->actionOtherView,
         &QAction::triggered,
@@ -137,7 +122,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
-    // PRODUCTION
     connect(
         ui->actionProductionView,
         &QAction::triggered,
@@ -148,7 +132,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
-    // DEVELOP
     connect(
         ui->actionDevelopView,
         &QAction::triggered,
@@ -159,7 +142,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
-    // OPTIONS
     connect(
         ui->actionEdit_Options,
         &QAction::triggered,
@@ -170,20 +152,16 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
-
-
     setupStudyButtons();
 
     restoreStudyButtonSettings();
 
-    // Set pointer cursor on all buttons
     QList<QPushButton*> allButtons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : allButtons)
     {
         btn->setCursor(Qt::PointingHandCursor);
     }
-
 }
 
 // DESTRUCTOR
@@ -354,8 +332,6 @@ bool MainWindow::nativeEvent(
         result
         );
 }
-
-// actual functions
 
 double MainWindow::calculateCurrentTaskChance() const
 {
@@ -579,6 +555,23 @@ void MainWindow::readSettings()
                                          false
                                          ).toBool();
 
+    trackingStartedAt =
+        settings.value(
+                    "trackingStartedAt",
+                    QDateTime()
+                    ).toDateTime();
+
+    if (trackingStartedAt.isValid())
+    {
+        ui->trackingStartedAtLbl->setText(
+            trackingStartedAt.toString("yyyy-MM-dd HH:mm:ss")
+            );
+    }
+    else
+    {
+        ui->trackingStartedAtLbl->setText("Not started");
+    }
+
     updateCurrentChanceLabel();
 }
 
@@ -615,6 +608,11 @@ void MainWindow::writeSettings()
     settings.setValue(
         "taskIsTriggered",
         taskIsTriggered
+        );
+
+    settings.setValue(
+        "trackingStartedAt",
+        trackingStartedAt
         );
 
     settings.setValue(
@@ -801,6 +799,12 @@ void MainWindow::onResetTopicsBtnClicked()
     {
         return;
     }
+
+    trackingStartedAt = QDateTime::currentDateTime();
+
+    ui->trackingStartedAtLbl->setText(
+        trackingStartedAt.toString("yyyy-MM-dd HH:mm:ss")
+        );
 
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 

@@ -87,6 +87,8 @@ private:
     void restoreStudyButtonSettings();
 
     void handleStudyButtonClicked(QPushButton *btn);
+
+    QDateTime trackingStartedAt;
 };
 
 #endif // MAINWINDOW_H

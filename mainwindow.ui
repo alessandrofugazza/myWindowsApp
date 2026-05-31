@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="viewsStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="otherView">
        <widget class="QWidget" name="widget" native="true">
@@ -360,6 +360,32 @@
           <string>Dev mode</string>
          </property>
         </widget>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>910</y>
+           <width>235</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Last recorded since</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="trackingStartedAtLbl">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
         <zorder>reopenLastTopicBtn</zorder>
@@ -369,6 +395,8 @@
         <zorder>resetTopicsBtn</zorder>
         <zorder>debugBtn</zorder>
         <zorder>devModeCheckBox</zorder>
+        <zorder>label_4</zorder>
+        <zorder>trackingStartedAtLbl</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
