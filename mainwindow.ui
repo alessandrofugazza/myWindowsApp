@@ -111,75 +111,107 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QWidget" name="widget_3" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Rating: </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="dogOwnerRatingLbl">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 0, 0);</string>
-               </property>
-               <property name="text">
-                <string>100</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>Cumulative time (m) : </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="cumulativeTimeSb"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QLabel" name="label_6">
-               <property name="text">
-                <string>Amount: </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="timesOutSb"/>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <item>
-              <widget class="QLabel" name="label_7">
-               <property name="text">
-                <string>Training: </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="didTrainingCb">
-               <property name="text">
-                <string>CheckBox</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
+          <widget class="QCheckBox" name="didTrainingCb">
+           <property name="geometry">
+            <rect>
+             <x>180</x>
+             <y>810</y>
+             <width>151</width>
+             <height>51</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>CheckBox</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_7">
+           <property name="geometry">
+            <rect>
+             <x>14</x>
+             <y>830</y>
+             <width>111</width>
+             <height>41</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Training: </string>
+           </property>
+          </widget>
+          <widget class="QSpinBox" name="timesOutSb">
+           <property name="geometry">
+            <rect>
+             <x>210</x>
+             <y>550</y>
+             <width>121</width>
+             <height>51</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_6">
+           <property name="geometry">
+            <rect>
+             <x>14</x>
+             <y>558</y>
+             <width>101</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Amount: </string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_5">
+           <property name="geometry">
+            <rect>
+             <x>14</x>
+             <y>286</y>
+             <width>201</width>
+             <height>41</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Cumulative time (m) : </string>
+           </property>
+          </widget>
+          <widget class="QSpinBox" name="cumulativeTimeSb">
+           <property name="geometry">
+            <rect>
+             <x>300</x>
+             <y>310</y>
+             <width>101</width>
+             <height>61</height>
+            </rect>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>30</y>
+             <width>71</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Rating: </string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="dogOwnerRatingLbl">
+           <property name="geometry">
+            <rect>
+             <x>140</x>
+             <y>30</y>
+             <width>91</width>
+             <height>41</height>
+            </rect>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 0, 0);</string>
+           </property>
+           <property name="text">
+            <string>100</string>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
