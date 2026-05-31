@@ -81,6 +81,7 @@ private:
     QPushButton *selectedStudyButton = nullptr;
 
     bool progressIsBeingTracked = false;
+
 };
 
 #endif // MAINWINDOW_H
