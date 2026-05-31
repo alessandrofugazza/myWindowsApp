@@ -252,6 +252,19 @@
         <string>debug</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="devModeCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>1640</x>
+         <y>760</y>
+         <width>141</width>
+         <height>29</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Dev mode</string>
+       </property>
+      </widget>
       <zorder>studyNotes</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>reopenLastTopicBtn</zorder>
@@ -260,6 +273,7 @@
       <zorder>chanceProgressBar</zorder>
       <zorder>resetTopicsBtn</zorder>
       <zorder>debugBtn</zorder>
+      <zorder>devModeCheckBox</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="optionsView">

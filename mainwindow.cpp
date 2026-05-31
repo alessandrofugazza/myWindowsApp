@@ -588,6 +588,14 @@ void MainWindow::readSettings()
 // TODO better default values
 void MainWindow::writeSettings()
 {
+
+    // doesnt save if dev mode is on
+    if (ui->devModeCheckBox->isChecked())
+    {
+        qDebug() << "DEV MODE: writeSettings skipped";
+        return;
+    }
+
     QSettings settings;
 
     settings.setValue(
