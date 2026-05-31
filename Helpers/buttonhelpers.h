@@ -1,7 +1,7 @@
 #ifndef BUTTONHELPERS_H
 #define BUTTONHELPERS_H
 
-include <QString>
+#include <QMainWindow>
 
 class QPushButton;
 
