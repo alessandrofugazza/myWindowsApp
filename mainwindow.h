@@ -38,16 +38,9 @@ protected:
 
 private slots:
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
-
     void onTaskIsDoneBtnClicked();
-
     void onReopenLastTopicBtnClicked();
-
-
-
-    // develop
-
-
+    void onResetTopicsBtnClicked();
 
 private:
     Ui::MainWindow *ui;

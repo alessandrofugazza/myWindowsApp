@@ -226,12 +226,26 @@
         <number>24</number>
        </property>
       </widget>
+      <widget class="QPushButton" name="resetTopicsBtn">
+       <property name="geometry">
+        <rect>
+         <x>1260</x>
+         <y>750</y>
+         <width>111</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>RESET</string>
+       </property>
+      </widget>
       <zorder>studyNotes</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>reopenLastTopicBtn</zorder>
       <zorder>taskIsDoneBtn</zorder>
       <zorder>studyButtonsContainer</zorder>
       <zorder>chanceProgressBar</zorder>
+      <zorder>resetTopicsBtn</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="optionsView">
@@ -244,13 +258,13 @@
         <height>411</height>
        </rect>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>90</x>
          <y>50</y>
-         <width>184</width>
-         <height>31</height>
+         <width>217</width>
+         <height>37</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -280,7 +294,7 @@
      <x>0</x>
      <y>0</y>
      <width>2231</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSections">

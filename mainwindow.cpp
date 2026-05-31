@@ -25,6 +25,7 @@
 #include <QMessageBox>
 
 #include <windows.h>
+#include <random>
 
 struct StudyButton
 {
@@ -63,6 +64,89 @@ QString formatButtonText(const QString &text, int maxLineLength = 20)
     return lines.join('\n');
 }
 
+QString formatSecondsAsHoursMinutes(qint64 seconds)
+{
+    if (seconds < 0)
+        seconds = 0;
+
+    qint64 totalMinutes = seconds / 60;
+    qint64 hours = totalMinutes / 60;
+    qint64 minutes = totalMinutes % 60;
+
+    return QString("%1:%2")
+        .arg(hours, 2, 10, QChar('0'))
+        .arg(minutes, 2, 10, QChar('0'));
+}
+
+void updateButtonStatsLabels(QPushButton *btn)
+{
+    QLabel *clickCountLabel =
+        btn->findChild<QLabel*>("clickCountLabel");
+
+    QLabel *cumulativeTimeLabel =
+        btn->findChild<QLabel*>("cumulativeTimeLabel");
+
+    if (!clickCountLabel)
+    {
+        clickCountLabel = new QLabel(btn);
+        clickCountLabel->setObjectName("clickCountLabel");
+        clickCountLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+        clickCountLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        clickCountLabel->setStyleSheet(
+            "font-size: 8px;"
+            "font-weight: 500;"
+            "color: rgba(255,255,255,190);"
+            "background: transparent;"
+            );
+    }
+
+    if (!cumulativeTimeLabel)
+    {
+        cumulativeTimeLabel = new QLabel(btn);
+        cumulativeTimeLabel->setObjectName("cumulativeTimeLabel");
+        cumulativeTimeLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+        cumulativeTimeLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        cumulativeTimeLabel->setStyleSheet(
+            "font-size: 8px;"
+            "font-weight: 500;"
+            "color: rgba(255,255,255,190);"
+            "background: transparent;"
+            );
+    }
+
+    int clickCount =
+        btn->property("clickCount").toInt();
+
+    qint64 cumulativeSeconds =
+        btn->property("cumulativeSeconds").toLongLong();
+
+    clickCountLabel->setText(QString::number(clickCount));
+    cumulativeTimeLabel->setText(formatSecondsAsHoursMinutes(cumulativeSeconds));
+
+    int labelHeight = 12;
+    int labelY = btn->height() - labelHeight - 3;
+
+    clickCountLabel->setGeometry(
+        6,
+        labelY,
+        btn->width() / 2 - 8,
+        labelHeight
+        );
+
+    cumulativeTimeLabel->setGeometry(
+        btn->width() / 2,
+        labelY,
+        btn->width() / 2 - 6,
+        labelHeight
+        );
+
+    clickCountLabel->raise();
+    cumulativeTimeLabel->raise();
+
+    clickCountLabel->show();
+    cumulativeTimeLabel->show();
+}
+
 // constructor
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -70,6 +154,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    connect(
+        ui->resetTopicsBtn,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::onResetTopicsBtnClicked
+        );
 
     // hotkey registration
 
@@ -120,6 +210,8 @@ MainWindow::MainWindow(QWidget *parent)
                     btn,
                     btn->property("lastClicked").toDateTime()
                     );
+
+                updateButtonStatsLabels(btn);
             }
 
             // CHECK am i updating data on each action i can do in UI?
@@ -346,6 +438,10 @@ MainWindow::MainWindow(QWidget *parent)
         btn->setProperty("priority", button.priority);
         btn->setProperty("appTitle", button.appTitle);
         btn->setProperty("originalIndex", studyButtonIndex);
+        btn->setProperty("clickCount", 0);
+        btn->setProperty("cumulativeSeconds", 0);
+
+        updateButtonStatsLabels(btn);
 
         // QUERY why is this increment here? and not at start
         ++studyButtonIndex;
@@ -371,6 +467,8 @@ MainWindow::MainWindow(QWidget *parent)
                         otherBtn,
                         otherBtn->property("lastClicked").toDateTime()
                         );
+
+                    updateButtonStatsLabels(otherBtn);
                 }
 
                 btn->setProperty("selected", true);
@@ -382,7 +480,13 @@ MainWindow::MainWindow(QWidget *parent)
                 // QUERY do all this after it check wether click was valid?
                 btn->setProperty("lastClicked", now);
 
+                int clickCount =
+                    btn->property("clickCount").toInt();
+
+                btn->setProperty("clickCount", clickCount + 1);
+
                 updateButtonColor(btn, now);
+                updateButtonStatsLabels(btn);
 
                 writeSettings();
 
@@ -447,6 +551,21 @@ MainWindow::MainWindow(QWidget *parent)
                                                  .arg(btn->objectName())
                                              ).toDateTime();
 
+            int clickCount = settings.value(
+                                         QString("studyButtons/%1/clickCount")
+                                             .arg(btn->objectName()),
+                                         0
+                                         ).toInt();
+
+            qint64 cumulativeSeconds = settings.value(
+                                                   QString("studyButtons/%1/cumulativeSeconds")
+                                                       .arg(btn->objectName()),
+                                                   0
+                                                   ).toLongLong();
+
+            btn->setProperty("clickCount", clickCount);
+            btn->setProperty("cumulativeSeconds", cumulativeSeconds);
+
             if (lastClicked.isValid())
             {
                 btn->setProperty("lastClicked", lastClicked);
@@ -458,6 +577,8 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 btn->setProperty("lastDone", lastDone);
             }
+
+            updateButtonStatsLabels(btn);
         }
 
         for (int priority : sortedPriorities)
@@ -648,6 +769,13 @@ bool MainWindow::nativeEvent(
             if (elapsedSeconds < 0)
                 elapsedSeconds = 0;
 
+            qint64 cumulativeSeconds =
+                selectedButton->property("cumulativeSeconds").toLongLong();
+
+            cumulativeSeconds += elapsedSeconds;
+
+            selectedButton->setProperty("cumulativeSeconds", cumulativeSeconds);
+
             qint64 elapsedHours =
                 elapsedSeconds / 3600;
 
@@ -663,6 +791,8 @@ bool MainWindow::nativeEvent(
                     .arg(elapsedMinutes)
                     .arg(remainingSeconds);
 
+            updateButtonStatsLabels(selectedButton);
+
             writeSettings();
 
             QMessageBox::information(
@@ -672,12 +802,14 @@ bool MainWindow::nativeEvent(
                     "Topic: %1\n"
                     "Last opened: %2\n"
                     "Last done: %3\n"
-                    "Elapsed: %4"
+                    "Elapsed: %4\n"
+                    "Total: %5"
                     )
                     .arg(selectedButton->objectName())
                     .arg(lastClicked.toString("yyyy-MM-dd HH:mm:ss"))
                     .arg(lastDone.toString("yyyy-MM-dd HH:mm:ss"))
                     .arg(elapsedText)
+                    .arg(formatSecondsAsHoursMinutes(cumulativeSeconds))
                 );
 
             qDebug() << "Global hotkey pressed";
@@ -810,6 +942,8 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
                 .arg(borderAlpha)
             );
 
+        updateButtonStatsLabels(btn);
+
         return;
     }
 
@@ -864,6 +998,8 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
             .arg(borderWidth)
             .arg(borderAlpha)
         );
+
+    updateButtonStatsLabels(btn);
 }
 
 bool MainWindow::event(QEvent *event)
@@ -882,6 +1018,8 @@ bool MainWindow::event(QEvent *event)
                 btn,
                 btn->property("lastClicked").toDateTime()
                 );
+
+            updateButtonStatsLabels(btn);
         }
 
         updateCurrentChanceLabel();
@@ -969,12 +1107,26 @@ void MainWindow::writeSettings()
         QDateTime lastDone =
             btn->property("lastDone").toDateTime();
 
+        int clickCount =
+            btn->property("clickCount").toInt();
+
+        qint64 cumulativeSeconds =
+            btn->property("cumulativeSeconds").toLongLong();
+
         QString lastClickedKey =
             QString("studyButtons/%1/lastClicked")
                 .arg(btn->objectName());
 
         QString lastDoneKey =
             QString("studyButtons/%1/lastDone")
+                .arg(btn->objectName());
+
+        QString clickCountKey =
+            QString("studyButtons/%1/clickCount")
+                .arg(btn->objectName());
+
+        QString cumulativeSecondsKey =
+            QString("studyButtons/%1/cumulativeSeconds")
                 .arg(btn->objectName());
 
         if (lastClicked.isValid())
@@ -994,6 +1146,9 @@ void MainWindow::writeSettings()
         {
             settings.remove(lastDoneKey);
         }
+
+        settings.setValue(clickCountKey, clickCount);
+        settings.setValue(cumulativeSecondsKey, cumulativeSeconds);
     }
 }
 
@@ -1088,4 +1243,107 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     writeSettings();
     QMainWindow::closeEvent(event);
+}
+
+void MainWindow::onResetTopicsBtnClicked()
+{
+    QSettings settings;
+
+    if (QMessageBox::question(
+            this,
+            "Reset topics",
+            "Reset all topic statistics and ordering?"
+            )
+        != QMessageBox::Yes)
+    {
+        return;
+    }
+
+    QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+    for (QPushButton *btn : std::as_const(buttons))
+    {
+        if (!btn->property("trackedColorButton").toBool())
+            continue;
+
+        btn->setProperty("lastClicked", QDateTime());
+        btn->setProperty("lastDone", QDateTime());
+
+        btn->setProperty("clickCount", 0);
+        btn->setProperty("cumulativeSeconds", 0);
+
+        btn->setProperty("selected", false);
+
+        updateButtonColor(
+            btn,
+            QDateTime()
+            );
+
+        updateButtonStatsLabels(btn);
+
+        settings.remove(
+            QString("studyButtons/%1")
+                .arg(btn->objectName())
+            );
+    }
+
+    //
+    // restore original ordering
+    //
+
+    for (auto it = priorityLayouts.begin();
+         it != priorityLayouts.end();
+         ++it)
+    {
+        QVBoxLayout *columnLayout = it.value();
+
+        QList<QPushButton*> priorityButtons;
+
+        for (int i = 0; i < columnLayout->count(); ++i)
+        {
+            QWidget *widget =
+                columnLayout->itemAt(i)->widget();
+
+            QPushButton *btn =
+                qobject_cast<QPushButton*>(widget);
+
+            if (!btn)
+                continue;
+
+            if (!btn->property("trackedColorButton").toBool())
+                continue;
+
+            priorityButtons.append(btn);
+        }
+
+        std::sort(
+            priorityButtons.begin(),
+            priorityButtons.end(),
+            [](QPushButton *a, QPushButton *b)
+            {
+                return
+                    a->property("originalIndex").toInt()
+                    <
+                    b->property("originalIndex").toInt();
+            }
+            );
+
+        for (QPushButton *btn : priorityButtons)
+        {
+            columnLayout->removeWidget(btn);
+
+            int insertIndex =
+                columnLayout->count() - 1;
+
+            if (insertIndex < 0)
+                insertIndex = 0;
+
+            columnLayout->insertWidget(
+                insertIndex,
+                btn
+                );
+        }
+    }
+
+    writeSettings();
 }
