@@ -161,6 +161,15 @@ MainWindow::MainWindow(QWidget *parent)
         &MainWindow::onResetTopicsBtnClicked
         );
 
+    connect(ui->debugBtn,
+            &QPushButton::clicked,
+            this,
+            [this]()
+            {
+                qDebug() << "progressIsBeingTracked:" << progressIsBeingTracked;
+            }
+        );
+
     // hotkey registration
 
     HWND hwnd = reinterpret_cast<HWND>(winId());
@@ -448,6 +457,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         priorityLayouts[button.priority]->addWidget(btn);
 
+        // LOGIC FOR WHEN A STUDY BTN IS CLICKED
         connect(
             btn,
             &QPushButton::clicked,
@@ -479,6 +489,8 @@ MainWindow::MainWindow(QWidget *parent)
 
                 // QUERY do all this after it check wether click was valid?
                 btn->setProperty("lastClicked", now);
+
+                progressIsBeingTracked = true;
 
                 int clickCount =
                     btn->property("clickCount").toInt();
@@ -792,6 +804,10 @@ bool MainWindow::nativeEvent(
                     .arg(remainingSeconds);
 
             updateButtonStatsLabels(selectedButton);
+
+            // DEBUG
+
+            progressIsBeingTracked = false;
 
             writeSettings();
 

@@ -79,6 +79,8 @@ private:
     static constexpr int HOTKEY_ID = 1;
 
     QPushButton *selectedStudyButton = nullptr;
+
+    bool progressIsBeingTracked = false;
 };
 
 #endif // MAINWINDOW_H
