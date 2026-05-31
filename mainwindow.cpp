@@ -748,6 +748,7 @@ bool MainWindow::event(QEvent *event)
     return QMainWindow::event(event);
 }
 
+// TODO make this more programmatic
 void MainWindow::readSettings()
 {
     QSettings settings;
@@ -764,6 +765,7 @@ void MainWindow::readSettings()
                                   QDateTime::currentDateTime()
                                   ).toDateTime();
 
+    // TODO app wide const for default value
     ui->btnColorTimeSpanSpinbox->setValue(
         settings.value("buttonColor/timeSpanMinutes", 120).toInt()
         );
@@ -771,6 +773,7 @@ void MainWindow::readSettings()
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
 
+    // TODO Potential issue: if taskIsTriggered is true, this function returns immediately, so it will not restore the button text to "TASK COMPLETED" or "MOVE TOPIC". It only remembers that something was triggered, not which one.
     taskIsTriggered = settings.value(
                                   "taskIsTriggered",
                                   false
@@ -779,6 +782,7 @@ void MainWindow::readSettings()
     updateCurrentChanceLabel();
 }
 
+// TODO better default values
 void MainWindow::writeSettings()
 {
     QSettings settings;
@@ -804,14 +808,11 @@ void MainWindow::writeSettings()
         );
 
     settings.setValue(
-        "moveTopicChance/startTime",
-        moveTopicChanceStartTime
-        );
-
-    settings.setValue(
         "taskIsTriggered",
         taskIsTriggered
         );
+
+    // save study btns lastclick
 
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
@@ -837,14 +838,21 @@ void MainWindow::writeSettings()
     }
 }
 
+// Searches open Windows windows by exact title.
+//If it finds one, it activates it.
+
 bool MainWindow::activateWindowByTitle(const QString &target)
 {
+    // Gets the first top-level window.
     HWND hwnd = FindWindowA(nullptr, nullptr);
 
+    // Loops through windows until there are no more.
+    // CHECK any way to avoid looping over everything?
     while (hwnd != nullptr)
     {
         char title[512];
 
+        // POLISH potential issue: this is not Unicode-safe. For non-ASCII window titles, GetWindowTextW would be better.
         GetWindowTextA(hwnd, title, sizeof(title));
 
         if (title[0] != '\0')
@@ -856,6 +864,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
                 ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
 
+                // CHECK this lasttopic position only makes sense for chrome istances
                 lastOpenedTopic = target;
 
                 return true;
@@ -871,46 +880,6 @@ bool MainWindow::activateWindowByTitle(const QString &target)
         << "not found.";
 
     return false;
-}
-
-void MainWindow::handleWindowButton(
-    QPushButton *btn,
-    const QString &target
-    )
-{
-    Q_UNUSED(btn);
-
-    activateWindowByTitle(target);
-}
-
-void MainWindow::on_activateMainBtn_clicked()
-{
-    handleWindowButton(ui->activateMainBtn, "main");
-}
-
-void MainWindow::on_activateLeftBtn_clicked()
-{
-    handleWindowButton(ui->activateLeftBtn, "left");
-}
-
-void MainWindow::on_activateRightBtn_clicked()
-{
-    handleWindowButton(ui->activateRightBtn, "right");
-}
-
-void MainWindow::on_activateWebtestRightBtn_clicked()
-{
-    handleWindowButton(ui->activateWebtestRightBtn, "webtest");
-}
-
-void MainWindow::on_activateWebtestLeftBtn_clicked()
-{
-    handleWindowButton(ui->activateWebtestLeftBtn, "webtest");
-}
-
-void MainWindow::on_activateRfcBtn_clicked()
-{
-    handleWindowButton(ui->activateRfcBtn, "reference");
 }
 
 void MainWindow::resetChanceTimer()

@@ -39,16 +39,6 @@ protected:
 private slots:
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-    void on_activateMainBtn_clicked();
-    void on_activateLeftBtn_clicked();
-    void on_activateRightBtn_clicked();
-
-    void on_activateWebtestRightBtn_clicked();
-    void on_activateWebtestLeftBtn_clicked();
-    void on_activateRfcBtn_clicked();
-
-
-
     void on_taskIsDoneBtn_clicked();
 
     void on_reopenLastTopicBtn_clicked();
