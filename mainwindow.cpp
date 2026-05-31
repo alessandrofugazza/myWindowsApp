@@ -1251,6 +1251,87 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 {
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
+    QPushButton *previousSelectedButton = nullptr;
+
+    if (progressIsBeingTracked)
+    {
+        for (QPushButton *otherBtn : std::as_const(buttons))
+        {
+            if (!otherBtn->property("trackedColorButton").toBool())
+                continue;
+
+            if (!otherBtn->property("selected").toBool())
+                continue;
+
+            if (otherBtn == btn)
+                continue;
+
+            previousSelectedButton = otherBtn;
+            break;
+        }
+    }
+
+    if (previousSelectedButton != nullptr)
+    {
+        QDateTime lastClicked =
+            previousSelectedButton->property("lastClicked").toDateTime();
+
+        if (lastClicked.isValid())
+        {
+            QDateTime lastDone =
+                QDateTime::currentDateTime();
+
+            previousSelectedButton->setProperty("lastDone", lastDone);
+
+            qint64 elapsedSeconds =
+                lastClicked.secsTo(lastDone);
+
+            if (elapsedSeconds < 0)
+                elapsedSeconds = 0;
+
+            qint64 cumulativeSeconds =
+                previousSelectedButton->property("cumulativeSeconds").toLongLong();
+
+            cumulativeSeconds += elapsedSeconds;
+
+            previousSelectedButton->setProperty(
+                "cumulativeSeconds",
+                cumulativeSeconds
+                );
+
+            qint64 elapsedHours =
+                elapsedSeconds / 3600;
+
+            qint64 elapsedMinutes =
+                (elapsedSeconds % 3600) / 60;
+
+            qint64 remainingSeconds =
+                elapsedSeconds % 60;
+
+            QString elapsedText =
+                QString("%1h %2m %3s")
+                    .arg(elapsedHours)
+                    .arg(elapsedMinutes)
+                    .arg(remainingSeconds);
+
+            qDebug() << "Previous topic automatically ended:"
+                     << previousSelectedButton->objectName();
+
+            qDebug() << "Elapsed between lastClicked and lastDone:"
+                     << elapsedText;
+
+            qDebug() << "New cumulative time:"
+                     << formatSecondsAsHoursMinutes(cumulativeSeconds);
+        }
+        else
+        {
+            qDebug() << "Previous selected topic had no valid lastClicked:"
+                     << previousSelectedButton->objectName();
+        }
+
+        previousSelectedButton->setProperty("selected", false);
+    }
+
     for (QPushButton *otherBtn : std::as_const(buttons))
     {
         if (!otherBtn->property("trackedColorButton").toBool())
