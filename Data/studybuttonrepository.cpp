@@ -37,6 +37,8 @@ QList<StudyButton> defaultStudyButtons()
             {"Netlify", 6, "Netlify"},
             {"Qt Creator", 4, "Qt Creator"},
             {"Chrome Devtools", 5, "Chrome Devtools"},
-            {"iOS Development", 2, "Chrome"}
+            {"iOS Development", 2, "Chrome"},
+            {"Industrial Automation", 2, "Chrome"}
+
         };
 }
