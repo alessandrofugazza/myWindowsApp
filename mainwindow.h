@@ -39,9 +39,9 @@ protected:
 private slots:
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
 
-    void on_taskIsDoneBtn_clicked();
+    void onTaskIsDoneBtnClicked();
 
-    void on_reopenLastTopicBtn_clicked();
+    void onReopenLastTopicBtnClicked();
 
 
 
@@ -75,7 +75,7 @@ private:
     void updateMoveTopicChanceLabel();
 
 
-    double currentChance() const;
+    double calculateCurrentTaskChance() const;
     void resetChanceTimer();
     void checkTaskWithChance();
     void updateCurrentChanceLabel();

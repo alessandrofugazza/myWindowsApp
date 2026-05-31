@@ -580,7 +580,7 @@ bool MainWindow::nativeEvent(
 // actual functions
 
 // get current chance of task succeeding
-double MainWindow::currentChance() const
+double MainWindow::calculateCurrentTaskChance() const
 {
     if (!chanceStartTime.isValid())
         return 0.0;
@@ -601,7 +601,7 @@ double MainWindow::currentChance() const
 // check if task is triggered against currentchance
 void MainWindow::checkTaskWithChance()
 {
-    double chance = currentChance();
+    double chance = calculateCurrentTaskChance();
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -650,7 +650,7 @@ void MainWindow::updateCurrentChanceLabel()
         return;
     }
 
-    double chance = currentChance();
+    double chance = calculateCurrentTaskChance();
 
     ui->currentChanceLbl->setText(
         QString("%1%").arg(chance * 100, 0, 'f', 1)
@@ -885,25 +885,24 @@ bool MainWindow::activateWindowByTitle(const QString &target)
 void MainWindow::resetChanceTimer()
 {
     chanceStartTime = QDateTime::currentDateTime();
-
     writeSettings();
 }
 
-void MainWindow::on_taskIsDoneBtn_clicked()
+void MainWindow::onTaskIsDoneBtnClicked()
 {
     resetChanceTimer();
 
     taskIsTriggered = false;
 
     ui->taskIsDoneBtn->setEnabled(false);
-    ui->taskIsDoneBtn->setText("TASK IS DONE");
+    ui->taskIsDoneBtn->setText("TASK COMPLETED");
 
     updateCurrentChanceLabel();
 
     writeSettings();
 }
 
-void MainWindow::on_reopenLastTopicBtn_clicked()
+void MainWindow::onReopenLastTopicBtnClicked()
 {
     if (lastOpenedTopic.isEmpty())
     {
