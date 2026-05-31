@@ -239,6 +239,19 @@
         <string>RESET</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="debugBtn">
+       <property name="geometry">
+        <rect>
+         <x>1470</x>
+         <y>750</y>
+         <width>111</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>debug</string>
+       </property>
+      </widget>
       <zorder>studyNotes</zorder>
       <zorder>layoutWidget</zorder>
       <zorder>reopenLastTopicBtn</zorder>
@@ -246,6 +259,7 @@
       <zorder>studyButtonsContainer</zorder>
       <zorder>chanceProgressBar</zorder>
       <zorder>resetTopicsBtn</zorder>
+      <zorder>debugBtn</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="optionsView">
