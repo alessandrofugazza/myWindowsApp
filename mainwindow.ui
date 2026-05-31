@@ -111,7 +111,7 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QWidget" name="widget_3" native="true">
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>14</x>
@@ -156,7 +156,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="timesOutSb"/>
+                   <widget class="QSpinBox" name="amountOfTimesOutSb"/>
                   </item>
                  </layout>
                 </item>
@@ -360,7 +360,7 @@
           <string>Dev mode</string>
          </property>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>40</x>
@@ -386,6 +386,7 @@
           </item>
          </layout>
         </widget>
+        <zorder>layoutWidget</zorder>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
         <zorder>reopenLastTopicBtn</zorder>
@@ -395,8 +396,6 @@
         <zorder>resetTopicsBtn</zorder>
         <zorder>debugBtn</zorder>
         <zorder>devModeCheckBox</zorder>
-        <zorder>label_4</zorder>
-        <zorder>trackingStartedAtLbl</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
@@ -441,7 +440,7 @@
      <x>0</x>
      <y>0</y>
      <width>2231</width>
-     <height>29</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSections">

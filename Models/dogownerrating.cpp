@@ -1,10 +1,19 @@
 #include "dogownerrating.h"
 
-void DogOwnerRating::setAmount(int amount)
+void DogOwnerRating::setAmountOfTimesOut(int amount)
 {
-    if (m_amount != amount)
+    if (m_amountOfTimesOut != amount)
     {
-        m_amount = amount;
-        emit amountChanged();
+        m_amountOfTimesOut = amount;
+        emit amountOfTimesOutChanged();
+    }
+}
+
+void DogOwnerRating::setCumulativeTimeOut(int cumulativeTime)
+{
+    if (m_cumulativeTimeOut != cumulativeTime)
+    {
+        m_cumulativeTimeOut = cumulativeTime;
+        emit cumulativeTimeOutChanged();
     }
 }

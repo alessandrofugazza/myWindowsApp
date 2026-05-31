@@ -28,6 +28,7 @@
 #include <QMessageBox>
 
 #include <windows.h>
+#include "Models/dogownerrating.h"
 
 // constructor
 MainWindow::MainWindow(QWidget *parent)
@@ -35,6 +36,43 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // develop
+
+    m_amountOfTimesOut = ui->amountOfTimesOutSb->value();
+    m_cumulativeTimeOut = ui->cumulativeTimeOutSb->value();
+    // m_didTraining = ui->didTrainingCb->isChecked();
+
+    connect(
+        ui->amountOfTimesOutSb,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        &MainWindow::amountOfTimesOutChanged
+        );
+
+    connect(
+        ui->cumulativeTimeOutSb,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        &MainWindow::cumulativeTimeOutChanged
+        );
+
+    // connect(
+    //     ui->didTrainingCb,
+    //     QOverload<int>::of(&QSpinBox::valueChanged),
+    //     this,
+    //     &MainWindow::didTrainingChanged
+    //     );
+
+    connect(this, &MainWindow::dogOwnerRatingChanged, this, [this]()
+            {
+                ui->dogOwnerRatingScoreLbl->setText(
+                    QString::number(m_dogOwnerRatingScore)
+                    );
+            });
+
+    calculateDogOwnerRating();
+
 
     connect(
         ui->resetTopicsBtn,
@@ -895,6 +933,32 @@ void MainWindow::onResetTopicsBtnClicked()
 
     writeSettings();
 }
+
+// develop
+
+void MainWindow::calculateDogOwnerRating()
+{
+    m_dogOwnerRatingScore = ui->amountOfTimesOutSb->value() * ui->cumulativeTimeOutSb->value();
+    emit dogOwnerRatingChanged();
+}
+
+void MainWindow::amountOfTimesOutChanged(int amountOfTimesOut)
+{
+    m_dogOwnerRating.setAmountOfTimesOut(amountOfTimesOut);
+    calculateDogOwnerRating();
+}
+
+void MainWindow::cumulativeTimeOutChanged(int cumulativeTimeOut)
+{
+    m_dogOwnerRating.setCumulativeTimeOut(cumulativeTimeOut);
+    calculateDogOwnerRating();
+}
+
+// void MainWindow::didTrainingChanged(bool didTraining)
+// {
+//     m_dogOwnerRating.setDidTraining(didTraining);
+//     calculateDogOwnerRating();
+// }
 
 void MainWindow::setupStudyButtons()
 {

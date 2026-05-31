@@ -45,6 +45,16 @@ private slots:
     void onReopenLastTopicBtnClicked();
     void onResetTopicsBtnClicked();
 
+    // develop
+
+    void calculateDogOwnerRating();
+    void amountOfTimesOutChanged(int amountOfTimesOut);
+    void cumulativeTimeOutChanged(int cumulativeTimeOut);
+    // void didTrainingChanged(bool didTraining);
+
+signals:
+    void dogOwnerRatingChanged();
+
 private:
     Ui::MainWindow *ui;
 
@@ -96,9 +106,9 @@ private:
     // develop
     DogOwnerRating m_dogOwnerRating;
     double m_dogOwnerRatingScore;
-    int m_timesOut;
+    int m_amountOfTimesOut;
     int m_cumulativeTimeOut;
-    bool m_didTraining;
+    // bool m_didTraining;
 
 
 };

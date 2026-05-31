@@ -8,14 +8,18 @@ class DogOwnerRating : public QObject
     Q_OBJECT
 
 public:
-    int amount() const { return m_amount; }
-    void setAmount(int amount);
+    int amountOfTimesOut() const { return m_amountOfTimesOut; }
+    void setAmountOfTimesOut(int timesOut);
+    int cumulativeTimeOut() const { return m_cumulativeTimeOut; }
+    void setCumulativeTimeOut(int timesOut);
 
 signals:
-    void amountChanged();
+    void amountOfTimesOutChanged();
+    void cumulativeTimeOutChanged();
 
 private:
-    int m_amount = 0;
+    int m_amountOfTimesOut = 0;
+    int m_cumulativeTimeOut = 0;
 };
 
 
