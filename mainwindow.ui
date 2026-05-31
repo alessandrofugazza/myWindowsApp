@@ -14,319 +14,380 @@
    <string>MyWindowsApp</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QStackedWidget" name="viewsStack">
-    <property name="geometry">
-     <rect>
-      <x>29</x>
-      <y>29</y>
-      <width>2171</width>
-      <height>1141</height>
-     </rect>
-    </property>
-    <widget class="QWidget" name="otherView">
-     <widget class="QWidget" name="widget" native="true">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>20</y>
-        <width>2041</width>
-        <height>861</height>
-       </rect>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QStackedWidget" name="viewsStack">
+      <property name="currentIndex">
+       <number>1</number>
       </property>
-      <widget class="QPushButton" name="activateWebtestRightBtn">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>380</y>
-         <width>171</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>WEBTEST RIGHT</string>
-       </property>
+      <widget class="QWidget" name="otherView">
+       <widget class="QWidget" name="widget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>20</y>
+          <width>2041</width>
+          <height>861</height>
+         </rect>
+        </property>
+        <widget class="QPushButton" name="activateWebtestRightBtn">
+         <property name="geometry">
+          <rect>
+           <x>180</x>
+           <y>380</y>
+           <width>171</width>
+           <height>35</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>WEBTEST RIGHT</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="activateRfcBtn">
+         <property name="geometry">
+          <rect>
+           <x>70</x>
+           <y>450</y>
+           <width>111</width>
+           <height>35</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>RFC</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="activateWebtestLeftBtn">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>380</y>
+           <width>141</width>
+           <height>35</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>WEBTEST LEFT</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>280</y>
+           <width>260</width>
+           <height>37</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPushButton" name="activateLeftBtn">
+            <property name="text">
+             <string>LEFT</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="activateMainBtn">
+            <property name="text">
+             <string>MAIN</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="activateRightBtn">
+            <property name="text">
+             <string>RIGHT</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </widget>
-      <widget class="QPushButton" name="activateRfcBtn">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>450</y>
-         <width>111</width>
-         <height>35</height>
-        </rect>
+      <widget class="QWidget" name="developView">
+       <property name="autoFillBackground">
+        <bool>false</bool>
        </property>
-       <property name="text">
-        <string>RFC</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="activateWebtestLeftBtn">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>380</y>
-         <width>141</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>WEBTEST LEFT</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>280</y>
-         <width>260</width>
-         <height>37</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QPushButton" name="activateLeftBtn">
-          <property name="text">
-           <string>LEFT</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="activateMainBtn">
-          <property name="text">
-           <string>MAIN</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="activateRightBtn">
-          <property name="text">
-           <string>RIGHT</string>
-          </property>
+         <widget class="QWidget" name="widget_3" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Rating: </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="dogOwnerRatingLbl">
+               <property name="styleSheet">
+                <string notr="true">color: rgb(255, 0, 0);</string>
+               </property>
+               <property name="text">
+                <string>100</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Cumulative time (m) : </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="cumulativeTimeSb"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>Amount: </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="timesOutSb"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Training: </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="didTrainingCb">
+               <property name="text">
+                <string>CheckBox</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
       </widget>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="developView">
-     <widget class="QWidget" name="widget_3" native="true">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>2081</width>
-        <height>1061</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="productionView">
-     <widget class="QWidget" name="developWidget" native="true">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>30</y>
-        <width>2071</width>
-        <height>1081</height>
-       </rect>
-      </property>
-      <widget class="QTextEdit" name="studyNotes">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>620</y>
-         <width>541</width>
-         <height>211</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-         <bold>true</bold>
-        </font>
-       </property>
+      <widget class="QWidget" name="productionView">
+       <widget class="QWidget" name="developWidget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>30</y>
+          <width>2071</width>
+          <height>1081</height>
+         </rect>
+        </property>
+        <widget class="QTextEdit" name="studyNotes">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>620</y>
+           <width>541</width>
+           <height>211</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="taskIsDoneBtn">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>660</x>
+           <y>720</y>
+           <width>241</width>
+           <height>71</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>TASK IS DONE</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>640</x>
+           <y>640</y>
+           <width>227</width>
+           <height>32</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Current chance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="currentChanceLbl">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QPushButton" name="reopenLastTopicBtn">
+         <property name="geometry">
+          <rect>
+           <x>1010</x>
+           <y>730</y>
+           <width>141</width>
+           <height>51</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Reopen Last</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="studyButtonsContainer" native="true">
+         <property name="geometry">
+          <rect>
+           <x>19</x>
+           <y>29</y>
+           <width>1431</width>
+           <height>561</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QProgressBar" name="chanceProgressBar">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>840</y>
+           <width>1981</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="value">
+          <number>24</number>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="resetTopicsBtn">
+         <property name="geometry">
+          <rect>
+           <x>1260</x>
+           <y>750</y>
+           <width>111</width>
+           <height>35</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>RESET</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="debugBtn">
+         <property name="geometry">
+          <rect>
+           <x>1470</x>
+           <y>750</y>
+           <width>111</width>
+           <height>35</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>debug</string>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="devModeCheckBox">
+         <property name="geometry">
+          <rect>
+           <x>1640</x>
+           <y>760</y>
+           <width>141</width>
+           <height>29</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Dev mode</string>
+         </property>
+        </widget>
+        <zorder>studyNotes</zorder>
+        <zorder>layoutWidget</zorder>
+        <zorder>reopenLastTopicBtn</zorder>
+        <zorder>taskIsDoneBtn</zorder>
+        <zorder>studyButtonsContainer</zorder>
+        <zorder>chanceProgressBar</zorder>
+        <zorder>resetTopicsBtn</zorder>
+        <zorder>debugBtn</zorder>
+        <zorder>devModeCheckBox</zorder>
+       </widget>
       </widget>
-      <widget class="QPushButton" name="taskIsDoneBtn">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>660</x>
-         <y>720</y>
-         <width>241</width>
-         <height>71</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="text">
-        <string>TASK IS DONE</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>640</x>
-         <y>640</y>
-         <width>227</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Current chance</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="currentChanceLbl">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QPushButton" name="reopenLastTopicBtn">
-       <property name="geometry">
-        <rect>
-         <x>1010</x>
-         <y>730</y>
-         <width>141</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Reopen Last</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="studyButtonsContainer" native="true">
-       <property name="geometry">
-        <rect>
-         <x>19</x>
-         <y>29</y>
-         <width>1431</width>
-         <height>561</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QProgressBar" name="chanceProgressBar">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>840</y>
-         <width>1981</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="value">
-        <number>24</number>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="resetTopicsBtn">
-       <property name="geometry">
-        <rect>
-         <x>1260</x>
-         <y>750</y>
-         <width>111</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>RESET</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="debugBtn">
-       <property name="geometry">
-        <rect>
-         <x>1470</x>
-         <y>750</y>
-         <width>111</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>debug</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="devModeCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>1640</x>
-         <y>760</y>
-         <width>141</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Dev mode</string>
-       </property>
-      </widget>
-      <zorder>studyNotes</zorder>
-      <zorder>layoutWidget</zorder>
-      <zorder>reopenLastTopicBtn</zorder>
-      <zorder>taskIsDoneBtn</zorder>
-      <zorder>studyButtonsContainer</zorder>
-      <zorder>chanceProgressBar</zorder>
-      <zorder>resetTopicsBtn</zorder>
-      <zorder>debugBtn</zorder>
-      <zorder>devModeCheckBox</zorder>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="optionsView">
-     <widget class="QWidget" name="widget_2" native="true">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>60</y>
-        <width>1451</width>
-        <height>411</height>
-       </rect>
-      </property>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>50</y>
-         <width>217</width>
-         <height>37</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>btncolor timespan</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="btnColorTimeSpanSpinbox">
-          <property name="maximum">
-           <number>180</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <widget class="QWidget" name="optionsView">
+       <widget class="QWidget" name="widget_2" native="true">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>60</y>
+          <width>243</width>
+          <height>63</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>btncolor timespan</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="btnColorTimeSpanSpinbox">
+             <property name="maximum">
+              <number>180</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
-    </widget>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
