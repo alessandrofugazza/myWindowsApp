@@ -45,14 +45,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(
         ui->amountOfTimesOutSb,
-        QOverload<int>::of(&QSpinBox::valueChanged),
+        &QSpinBox::valueChanged,
         this,
         &MainWindow::amountOfTimesOutChanged
         );
 
     connect(
         ui->cumulativeTimeOutSb,
-        QOverload<int>::of(&QSpinBox::valueChanged),
+        &QSpinBox::valueChanged,
         this,
         &MainWindow::cumulativeTimeOutChanged
         );
@@ -64,8 +64,9 @@ MainWindow::MainWindow(QWidget *parent)
     //     &MainWindow::didTrainingChanged
     //     );
 
-    connect(this, &MainWindow::dogOwnerRatingChanged, this, [this]()
+    connect(this, &MainWindow::dogOwnerRatingChanged, [=]()
             {
+                qDebug() << "RECEIVING Dog owner rating changed. New score:" << m_dogOwnerRatingScore;
                 ui->dogOwnerRatingScoreLbl->setText(
                     QString::number(m_dogOwnerRatingScore)
                     );
@@ -938,7 +939,13 @@ void MainWindow::onResetTopicsBtnClicked()
 
 void MainWindow::calculateDogOwnerRating()
 {
-    m_dogOwnerRatingScore = ui->amountOfTimesOutSb->value() * ui->cumulativeTimeOutSb->value();
+    qDebug() << "Calculating dog owner rating with:"
+             << "amountOfTimesOut:" << m_dogOwnerRating.amountOfTimesOut()
+             << "cumulativeTimeOut:" << m_dogOwnerRating.cumulativeTimeOut();
+    m_dogOwnerRatingScore =
+        m_dogOwnerRating.amountOfTimesOut()
+        *
+        m_dogOwnerRating.cumulativeTimeOut();
     emit dogOwnerRatingChanged();
 }
 
