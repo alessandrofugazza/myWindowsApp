@@ -85,6 +85,7 @@ private:
 
     static constexpr int HOTKEY_ID = 1;
 
+    QPushButton *selectedStudyButton = nullptr;
 };
 
 #endif // MAINWINDOW_H

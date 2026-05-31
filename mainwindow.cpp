@@ -1,3 +1,5 @@
+// CHECK way too many loops when repainting or clicking buttons, can i optimize this by only updating colors of buttons that need it instead of all of them? maybe store pointers to them in a list when creating them?
+
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -342,6 +344,7 @@ MainWindow::MainWindow(QWidget *parent)
             );
 
         btn->setProperty("trackedColorButton", true);
+        btn->setProperty("selected", false);
         btn->setProperty("priority", button.priority);
         btn->setProperty("appTitle", button.appTitle);
         btn->setProperty("originalIndex", studyButtonIndex);
@@ -357,6 +360,23 @@ MainWindow::MainWindow(QWidget *parent)
             this,
             [this, btn]()
             {
+                QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+                for (QPushButton *otherBtn : std::as_const(buttons))
+                {
+                    if (!otherBtn->property("trackedColorButton").toBool())
+                        continue;
+
+                    otherBtn->setProperty("selected", false);
+
+                    updateButtonColor(
+                        otherBtn,
+                        otherBtn->property("lastClicked").toDateTime()
+                        );
+                }
+
+                btn->setProperty("selected", true);
+
                 checkTaskWithChance();
 
                 QDateTime now = QDateTime::currentDateTime();
@@ -667,9 +687,30 @@ void MainWindow::updateCurrentChanceLabel()
 
 void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 {
+    bool selected =
+        btn->property("selected").toBool();
+
+    int borderWidth =
+        selected ? 3 : 1;
+
+    int borderAlpha =
+        selected ? 230 : 80;
+
     if (!clickedTime.isValid())
     {
-        btn->setStyleSheet("");
+        btn->setStyleSheet(
+            QString(
+                "QPushButton {"
+                "font-weight: 600;"
+                "border: %1px solid rgba(255,255,255,%2);"
+                "border-radius: 4px;"
+                "padding: 4px 8px;"
+                "}"
+                )
+                .arg(borderWidth)
+                .arg(borderAlpha)
+            );
+
         return;
     }
 
@@ -713,7 +754,7 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
             "background-color: rgb(%1,%2,%3);"
             "color: rgb(255,255,255);"
             "font-weight: 600;"
-            "border: 1px solid rgba(255,255,255,80);"
+            "border: %4px solid rgba(255,255,255,%5);"
             "border-radius: 4px;"
             "padding: 4px 8px;"
             "}"
@@ -721,6 +762,8 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
             .arg(r)
             .arg(g)
             .arg(b)
+            .arg(borderWidth)
+            .arg(borderAlpha)
         );
 }
 
