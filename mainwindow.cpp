@@ -41,7 +41,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_amountOfTimesOut = ui->amountOfTimesOutSb->value();
     m_cumulativeTimeOut = ui->cumulativeTimeOutSb->value();
-    // m_didTraining = ui->didTrainingCb->isChecked();
 
     connect(
         ui->amountOfTimesOutSb,
@@ -57,14 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
         &MainWindow::cumulativeTimeOutChanged
         );
 
-    // connect(
-    //     ui->didTrainingCb,
-    //     QOverload<int>::of(&QSpinBox::valueChanged),
-    //     this,
-    //     &MainWindow::didTrainingChanged
-    //     );
-
-    connect(this, &MainWindow::dogOwnerRatingChanged, [=]()
+    connect(this, &MainWindow::dogOwnerRatingChanged, this, [this]()
             {
                 qDebug() << "RECEIVING Dog owner rating changed. New score:" << m_dogOwnerRatingScore;
                 ui->dogOwnerRatingScoreLbl->setText(
@@ -73,7 +65,6 @@ MainWindow::MainWindow(QWidget *parent)
             });
 
     calculateDogOwnerRating();
-
 
     connect(
         ui->resetTopicsBtn,
@@ -129,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
 
                 updateButtonColor(
                     btn,
-                    btn->property("lastClicked").toDateTime()
+                    buttonColorReferenceTime(btn)
                     );
 
                 updateButtonStatsLabels(btn);
@@ -214,6 +205,22 @@ MainWindow::~MainWindow()
         );
 
     delete ui;
+}
+
+QDateTime MainWindow::buttonColorReferenceTime(QPushButton *btn) const
+{
+    if (btn == nullptr)
+        return QDateTime();
+
+    bool selected =
+        btn->property("selected").toBool();
+
+    if (progressIsBeingTracked && selected)
+    {
+        return btn->property("lastClicked").toDateTime();
+    }
+
+    return btn->property("lastDone").toDateTime();
 }
 
 void MainWindow::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -333,7 +340,7 @@ bool MainWindow::nativeEvent(
 
             updateButtonColor(
                 selectedButton,
-                selectedButton->property("lastClicked").toDateTime()
+                buttonColorReferenceTime(selectedButton)
                 );
 
             updateButtonStatsLabels(selectedButton);
@@ -549,7 +556,7 @@ bool MainWindow::event(QEvent *event)
 
             updateButtonColor(
                 btn,
-                btn->property("lastClicked").toDateTime()
+                buttonColorReferenceTime(btn)
                 );
 
             updateButtonStatsLabels(btn);
@@ -862,7 +869,7 @@ void MainWindow::onResetTopicsBtnClicked()
 
         updateButtonColor(
             btn,
-            QDateTime()
+            buttonColorReferenceTime(btn)
             );
 
         updateButtonStatsLabels(btn);
@@ -942,10 +949,12 @@ void MainWindow::calculateDogOwnerRating()
     qDebug() << "Calculating dog owner rating with:"
              << "amountOfTimesOut:" << m_dogOwnerRating.amountOfTimesOut()
              << "cumulativeTimeOut:" << m_dogOwnerRating.cumulativeTimeOut();
+
     m_dogOwnerRatingScore =
         m_dogOwnerRating.amountOfTimesOut()
         *
         m_dogOwnerRating.cumulativeTimeOut();
+
     emit dogOwnerRatingChanged();
 }
 
@@ -960,12 +969,6 @@ void MainWindow::cumulativeTimeOutChanged(int cumulativeTimeOut)
     m_dogOwnerRating.setCumulativeTimeOut(cumulativeTimeOut);
     calculateDogOwnerRating();
 }
-
-// void MainWindow::didTrainingChanged(bool didTraining)
-// {
-//     m_dogOwnerRating.setDidTraining(didTraining);
-//     calculateDogOwnerRating();
-// }
 
 void MainWindow::setupStudyButtons()
 {
@@ -1156,14 +1159,17 @@ void MainWindow::restoreStudyButtonSettings()
         if (lastClicked.isValid())
         {
             btn->setProperty("lastClicked", lastClicked);
-
-            updateButtonColor(btn, lastClicked);
         }
 
         if (lastDone.isValid())
         {
             btn->setProperty("lastDone", lastDone);
         }
+
+        updateButtonColor(
+            btn,
+            buttonColorReferenceTime(btn)
+            );
 
         updateButtonStatsLabels(btn);
     }
@@ -1208,17 +1214,17 @@ void MainWindow::restoreStudyButtonSettings()
             priorityButtons.end(),
             [](QPushButton *a, QPushButton *b)
             {
-                QDateTime aClicked =
-                    a->property("lastClicked").toDateTime();
+                QDateTime aDone =
+                    a->property("lastDone").toDateTime();
 
-                QDateTime bClicked =
-                    b->property("lastClicked").toDateTime();
+                QDateTime bDone =
+                    b->property("lastDone").toDateTime();
 
-                if (aClicked.isValid() != bClicked.isValid())
-                    return !aClicked.isValid();
+                if (aDone.isValid() != bDone.isValid())
+                    return !aDone.isValid();
 
-                if (aClicked.isValid() && bClicked.isValid() && aClicked != bClicked)
-                    return aClicked < bClicked;
+                if (aDone.isValid() && bDone.isValid() && aDone != bDone)
+                    return aDone < bDone;
 
                 return
                     a->property("originalIndex").toInt()
@@ -1254,7 +1260,7 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 
         updateButtonColor(
             otherBtn,
-            otherBtn->property("lastClicked").toDateTime()
+            buttonColorReferenceTime(otherBtn)
             );
 
         updateButtonStatsLabels(otherBtn);
@@ -1275,7 +1281,7 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 
     btn->setProperty("clickCount", clickCount + 1);
 
-    updateButtonColor(btn, now);
+    updateButtonColor(btn, buttonColorReferenceTime(btn));
     updateButtonStatsLabels(btn);
 
     writeSettings();

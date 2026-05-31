@@ -103,6 +103,8 @@ private:
 
     QDateTime trackingStartedAt;
 
+    QDateTime buttonColorReferenceTime(QPushButton *btn) const;
+
     // develop
     DogOwnerRating m_dogOwnerRating;
     double m_dogOwnerRatingScore;
