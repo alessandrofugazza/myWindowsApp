@@ -14,6 +14,8 @@ qt_add_executable(myWindowsApp
     Helpers/buttonhelpers.h
     Helpers/buttonhelpers.cpp
     Models/studybutton.h
+    Data/studybuttonrepository.h
+    Data/studybuttonrepository.cpp
 
 )
 
