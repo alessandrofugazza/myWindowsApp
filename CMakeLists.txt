@@ -16,6 +16,9 @@ qt_add_executable(myWindowsApp
     Models/studybutton.h
     Data/studybuttonrepository.h
     Data/studybuttonrepository.cpp
+    Models/dogownerrating.h
+    Models/dogownerrating.cpp
+
 
 )
 

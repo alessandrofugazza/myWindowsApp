@@ -1,0 +1,4 @@
+#ifndef DOGOWNERRATING_H
+#define DOGOWNERRATING_H
+
+#endif // DOGOWNERRATING_H
