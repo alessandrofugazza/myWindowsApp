@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="viewsStack">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="otherView">
        <widget class="QWidget" name="widget" native="true">
@@ -131,7 +131,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="dogOwnerRatingLbl">
+               <widget class="QLabel" name="dogOwnerRatingScoreLbl">
                 <property name="styleSheet">
                  <string notr="true">color: rgb(255, 0, 0);</string>
                 </property>
@@ -170,7 +170,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="cumulativeTimeSb"/>
+                   <widget class="QSpinBox" name="cumulativeTimeOutSb"/>
                   </item>
                  </layout>
                 </item>

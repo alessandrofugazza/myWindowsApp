@@ -12,6 +12,9 @@
 #include <QMessageBox>
 #include <QRandomGenerator>
 
+// DEVELOP
+#include "Models/dogownerrating.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -89,6 +92,15 @@ private:
     void handleStudyButtonClicked(QPushButton *btn);
 
     QDateTime trackingStartedAt;
+
+    // develop
+    DogOwnerRating m_dogOwnerRating;
+    double m_dogOwnerRatingScore;
+    int m_timesOut;
+    int m_cumulativeTimeOut;
+    bool m_didTraining;
+
+
 };
 
 #endif // MAINWINDOW_H
