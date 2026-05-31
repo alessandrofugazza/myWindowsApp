@@ -1,5 +1,3 @@
-// CHECK way too many loops when repainting or clicking buttons, can i optimize this by only updating colors of buttons that need it instead of all of them? maybe store pointers to them in a list when creating them?
-
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -444,12 +442,22 @@ MainWindow::MainWindow(QWidget *parent)
                                                     .arg(btn->objectName())
                                                 ).toDateTime();
 
-            if (!lastClicked.isValid())
-                continue;
+            QDateTime lastDone = settings.value(
+                                             QString("studyButtons/%1/lastDone")
+                                                 .arg(btn->objectName())
+                                             ).toDateTime();
 
-            btn->setProperty("lastClicked", lastClicked);
+            if (lastClicked.isValid())
+            {
+                btn->setProperty("lastClicked", lastClicked);
 
-            updateButtonColor(btn, lastClicked);
+                updateButtonColor(btn, lastClicked);
+            }
+
+            if (lastDone.isValid())
+            {
+                btn->setProperty("lastDone", lastDone);
+            }
         }
 
         for (int priority : sortedPriorities)
@@ -583,7 +591,98 @@ bool MainWindow::nativeEvent(
 
             // ui->viewsStack->setCurrentWidget(ui->developWidget);
 
+            QPushButton *selectedButton = nullptr;
+
+            QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+            for (QPushButton *btn : std::as_const(buttons))
+            {
+                if (!btn->property("trackedColorButton").toBool())
+                    continue;
+
+                if (!btn->property("selected").toBool())
+                    continue;
+
+                selectedButton = btn;
+                break;
+            }
+
+            if (selectedButton == nullptr)
+            {
+                QMessageBox::information(
+                    this,
+                    "No selected topic",
+                    "No topic button was clicked yet."
+                    );
+
+                qDebug() << "Global hotkey pressed, but no selected topic exists";
+
+                return true;
+            }
+
+            QDateTime lastClicked =
+                selectedButton->property("lastClicked").toDateTime();
+
+            if (!lastClicked.isValid())
+            {
+                QMessageBox::warning(
+                    this,
+                    "No last clicked time",
+                    QString("Selected topic '%1' has no valid lastClicked time.")
+                        .arg(selectedButton->objectName())
+                    );
+
+                qDebug() << "Global hotkey pressed, but selected topic has no valid lastClicked";
+
+                return true;
+            }
+
+            QDateTime lastDone =
+                QDateTime::currentDateTime();
+
+            selectedButton->setProperty("lastDone", lastDone);
+
+            qint64 elapsedSeconds =
+                lastClicked.secsTo(lastDone);
+
+            if (elapsedSeconds < 0)
+                elapsedSeconds = 0;
+
+            qint64 elapsedHours =
+                elapsedSeconds / 3600;
+
+            qint64 elapsedMinutes =
+                (elapsedSeconds % 3600) / 60;
+
+            qint64 remainingSeconds =
+                elapsedSeconds % 60;
+
+            QString elapsedText =
+                QString("%1h %2m %3s")
+                    .arg(elapsedHours)
+                    .arg(elapsedMinutes)
+                    .arg(remainingSeconds);
+
+            writeSettings();
+
+            QMessageBox::information(
+                this,
+                "Last done saved",
+                QString(
+                    "Topic: %1\n"
+                    "Last opened: %2\n"
+                    "Last done: %3\n"
+                    "Elapsed: %4"
+                    )
+                    .arg(selectedButton->objectName())
+                    .arg(lastClicked.toString("yyyy-MM-dd HH:mm:ss"))
+                    .arg(lastDone.toString("yyyy-MM-dd HH:mm:ss"))
+                    .arg(elapsedText)
+                );
+
             qDebug() << "Global hotkey pressed";
+            qDebug() << "Last done saved for" << selectedButton->objectName();
+            qDebug() << "Elapsed between lastClicked and lastDone:" << elapsedText;
 
             return true;
         }
@@ -867,16 +966,33 @@ void MainWindow::writeSettings()
         QDateTime lastClicked =
             btn->property("lastClicked").toDateTime();
 
-        QString key = QString("studyButtons/%1/lastClicked")
-                          .arg(btn->objectName());
+        QDateTime lastDone =
+            btn->property("lastDone").toDateTime();
+
+        QString lastClickedKey =
+            QString("studyButtons/%1/lastClicked")
+                .arg(btn->objectName());
+
+        QString lastDoneKey =
+            QString("studyButtons/%1/lastDone")
+                .arg(btn->objectName());
 
         if (lastClicked.isValid())
         {
-            settings.setValue(key, lastClicked);
+            settings.setValue(lastClickedKey, lastClicked);
         }
         else
         {
-            settings.remove(key);
+            settings.remove(lastClickedKey);
+        }
+
+        if (lastDone.isValid())
+        {
+            settings.setValue(lastDoneKey, lastDone);
+        }
+        else
+        {
+            settings.remove(lastDoneKey);
         }
     }
 }
