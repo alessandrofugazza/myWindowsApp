@@ -159,235 +159,9 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
-    // Study button data list
-    // TODO reorder this shit and most of all dont make it hard coded
-    QList<StudyButton> buttons = defaultStudyButtons();
 
-    // measure study btns size so they're all the same
-    QFontMetrics metrics(ui->developWidget->font());
 
-    int maxButtonWidth = 0;
-    int maxButtonHeight = 0;
-
-    for (const StudyButton &button : buttons)
-    {
-        QString wrappedText = formatButtonText(button.name);
-
-        QSize textSize = metrics.size(
-            Qt::TextShowMnemonic,
-            wrappedText
-            );
-
-        maxButtonWidth = qMax(maxButtonWidth, textSize.width());
-        maxButtonHeight = qMax(maxButtonHeight, textSize.height());
-    }
-
-    // add padding to btns
-    maxButtonWidth += 34;
-    maxButtonHeight += 20;
-
-    // TODO make it app wide const
-    const int columnGap = 32;
-
-    // create widget containing the dynamically generated btns
-    QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
-    studyButtonsContainer->setObjectName("studyButtonsContainer");
-    // CHECK these values?? where do they come from
-    studyButtonsContainer->setGeometry(20, 20, 1720, 580);
-
-    // Creates a horizontal layout inside the container.
-    // Each priority column will be added horizontally.
-    QHBoxLayout *mainLayout = new QHBoxLayout(studyButtonsContainer);
-
-    // Of horizontal layout, sets spacing, removes margins, and aligns columns to top-left.
-    mainLayout->setSpacing(columnGap);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-    //Creates a set of unique priority values.
-    QSet<int> priorities;
-
-    // Collects all priority numbers from the button list.
-    for (const StudyButton &button : buttons)
-    {
-        priorities.insert(button.priority);
-    }
-
-    // Turns the set into a list.
-    // QUERY why are we doing this?
-    QList<int> sortedPriorities = priorities.values();
-
-    // Sorts priorities from smallest to largest.
-    std::sort(sortedPriorities.begin(), sortedPriorities.end());
-
-    // Loops through each priority number.
-    for (int priority : sortedPriorities)
-    {
-        // Creates a widget for one priority column.
-        QWidget *columnWidget = new QWidget(studyButtonsContainer);
-
-        // Forces the column width to match the button width.
-        columnWidget->setMinimumWidth(maxButtonWidth);
-        columnWidget->setMaximumWidth(maxButtonWidth);
-
-        // Creates a vertical layout for this column.
-        QVBoxLayout *columnLayout = new QVBoxLayout(columnWidget);
-
-        // Sets vertical spacing, removes margins, and centers items horizontally.
-        // TODO spacing should be app wide const
-        columnLayout->setSpacing(10);
-        columnLayout->setContentsMargins(0, 0, 0, 0);
-        columnLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-
-        // Creates the column title label.
-        QLabel *title = new QLabel(
-            QString("Priority %1").arg(priority),
-            columnWidget
-            );
-
-        // Makes the label same width as buttons and centers the text.
-        title->setMinimumWidth(maxButtonWidth);
-        title->setMaximumWidth(maxButtonWidth);
-        title->setAlignment(Qt::AlignCenter);
-
-        columnLayout->addWidget(title);
-
-        // Stores the layout in a map.
-        priorityLayouts.insert(priority, columnLayout);
-
-        mainLayout->addWidget(columnWidget);
-    }
-
-    // Tracks the order of buttons.
-    int studyButtonIndex = 0;
-
-    // Loops over every button definition.
-    for (const StudyButton &button : buttons)
-    {
-        // create each, button, inittially under parent studyButtonsContainer
-        QPushButton *btn = new QPushButton(
-            formatButtonText(button.name),
-            studyButtonsContainer
-            );
-
-        // set to weight semibold
-        QFont font = btn->font();
-        font.setWeight(QFont::DemiBold);
-        btn->setFont(font);
-
-        // QUERY why not convert to camelcase for consitency
-        btn->setObjectName(button.name);
-
-        btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
-        btn->setMaximumSize(maxButtonWidth, maxButtonHeight);
-
-        // Tells layouts not to stretch or shrink the button.
-        // QUERY why is this needed?
-        btn->setSizePolicy(
-            QSizePolicy::Fixed,
-            QSizePolicy::Fixed
-            );
-
-        btn->setProperty("trackedColorButton", true);
-        btn->setProperty("selected", false);
-        btn->setProperty("priority", button.priority);
-        btn->setProperty("appTitle", button.appTitle);
-        btn->setProperty("originalIndex", studyButtonIndex);
-        btn->setProperty("clickCount", 0);
-        btn->setProperty("cumulativeSeconds", 0);
-
-        updateButtonStatsLabels(btn);
-
-        // QUERY why is this increment here? and not at start
-        ++studyButtonIndex;
-
-        priorityLayouts[button.priority]->addWidget(btn);
-
-        // LOGIC FOR WHEN A STUDY BTN IS CLICKED
-        connect(
-            btn,
-            &QPushButton::clicked,
-            this,
-            [this, btn]()
-            {
-                QList<QPushButton*> buttons = findChildren<QPushButton*>();
-
-                for (QPushButton *otherBtn : std::as_const(buttons))
-                {
-                    if (!otherBtn->property("trackedColorButton").toBool())
-                        continue;
-
-                    otherBtn->setProperty("selected", false);
-
-                    updateButtonColor(
-                        otherBtn,
-                        otherBtn->property("lastClicked").toDateTime()
-                        );
-
-                    updateButtonStatsLabels(otherBtn);
-                }
-
-                btn->setProperty("selected", true);
-
-                checkTaskWithChance();
-
-                QDateTime now = QDateTime::currentDateTime();
-
-                // QUERY do all this after it check wether click was valid?
-                btn->setProperty("lastClicked", now);
-
-                progressIsBeingTracked = true;
-
-                int clickCount =
-                    btn->property("clickCount").toInt();
-
-                btn->setProperty("clickCount", clickCount + 1);
-
-                updateButtonColor(btn, now);
-                updateButtonStatsLabels(btn);
-
-                writeSettings();
-
-                int priority = btn->property("priority").toInt();
-
-                QVBoxLayout *columnLayout =
-                    priorityLayouts.value(priority, nullptr);
-
-                if (columnLayout != nullptr)
-                {
-                    columnLayout->removeWidget(btn);
-
-                    int insertIndex = columnLayout->count() - 1;
-
-                    if (insertIndex < 0)
-                        insertIndex = 0;
-
-                    columnLayout->insertWidget(insertIndex, btn);
-                }
-
-                QString appTitle =
-                    btn->property("appTitle").toString();
-
-                QString instanceName =
-                    btn->objectName();
-
-                if (!appTitle.isEmpty())
-                {
-                    // TODO other apps
-                    if (appTitle == "Chrome")
-                    {
-                        activateWindowByTitle(instanceName);
-                    }
-                }
-            }
-            );
-    }
-
-    // Adds empty flexible space at the bottom of every priority column.
-    for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
-    {
-        columnLayout->addStretch();
-    }
+    setupStudyButtons();
 
     {
         QSettings settings;
@@ -439,13 +213,15 @@ MainWindow::MainWindow(QWidget *parent)
             updateButtonStatsLabels(btn);
         }
 
-        for (int priority : sortedPriorities)
+        for (auto it = priorityLayouts.begin();
+             it != priorityLayouts.end();
+             ++it)
         {
-            QVBoxLayout *columnLayout =
-                priorityLayouts.value(priority, nullptr);
+            QVBoxLayout *columnLayout = it.value();
 
             if (!columnLayout)
                 continue;
+
 
             QList<QPushButton*> priorityButtons;
 
@@ -1208,4 +984,236 @@ void MainWindow::onResetTopicsBtnClicked()
     }
 
     writeSettings();
+}
+
+void MainWindow::setupStudyButtons()
+{
+    // Study button data list
+    // TODO reorder this shit and most of all dont make it hard coded
+    QList<StudyButton> buttons = defaultStudyButtons();
+    // measure study btns size so they're all the same
+    QFontMetrics metrics(ui->developWidget->font());
+
+    int maxButtonWidth = 0;
+    int maxButtonHeight = 0;
+
+    for (const StudyButton &button : buttons)
+    {
+        QString wrappedText = formatButtonText(button.name);
+
+        QSize textSize = metrics.size(
+            Qt::TextShowMnemonic,
+            wrappedText
+            );
+
+        maxButtonWidth = qMax(maxButtonWidth, textSize.width());
+        maxButtonHeight = qMax(maxButtonHeight, textSize.height());
+    }
+
+    // add padding to btns
+    maxButtonWidth += 34;
+    maxButtonHeight += 20;
+
+    // TODO make it app wide const
+    const int columnGap = 32;
+
+    // create widget containing the dynamically generated btns
+    QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
+    studyButtonsContainer->setObjectName("studyButtonsContainer");
+    // CHECK these values?? where do they come from
+    studyButtonsContainer->setGeometry(20, 20, 1720, 580);
+
+    // Creates a horizontal layout inside the container.
+    // Each priority column will be added horizontally.
+    QHBoxLayout *mainLayout = new QHBoxLayout(studyButtonsContainer);
+
+    // Of horizontal layout, sets spacing, removes margins, and aligns columns to top-left.
+    mainLayout->setSpacing(columnGap);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+
+    //Creates a set of unique priority values.
+    QSet<int> priorities;
+
+    // Collects all priority numbers from the button list.
+    for (const StudyButton &button : buttons)
+    {
+        priorities.insert(button.priority);
+    }
+
+    // Turns the set into a list.
+    // QUERY why are we doing this?
+    QList<int> sortedPriorities = priorities.values();
+
+    // Sorts priorities from smallest to largest.
+    std::sort(sortedPriorities.begin(), sortedPriorities.end());
+
+    // Loops through each priority number.
+    for (int priority : sortedPriorities)
+    {
+        // Creates a widget for one priority column.
+        QWidget *columnWidget = new QWidget(studyButtonsContainer);
+
+        // Forces the column width to match the button width.
+        columnWidget->setMinimumWidth(maxButtonWidth);
+        columnWidget->setMaximumWidth(maxButtonWidth);
+
+        // Creates a vertical layout for this column.
+        QVBoxLayout *columnLayout = new QVBoxLayout(columnWidget);
+
+        // Sets vertical spacing, removes margins, and centers items horizontally.
+        // TODO spacing should be app wide const
+        columnLayout->setSpacing(10);
+        columnLayout->setContentsMargins(0, 0, 0, 0);
+        columnLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+
+        // Creates the column title label.
+        QLabel *title = new QLabel(
+            QString("Priority %1").arg(priority),
+            columnWidget
+            );
+
+        // Makes the label same width as buttons and centers the text.
+        title->setMinimumWidth(maxButtonWidth);
+        title->setMaximumWidth(maxButtonWidth);
+        title->setAlignment(Qt::AlignCenter);
+
+        columnLayout->addWidget(title);
+
+        // Stores the layout in a map.
+        priorityLayouts.insert(priority, columnLayout);
+
+        mainLayout->addWidget(columnWidget);
+    }
+
+    // Tracks the order of buttons.
+    int studyButtonIndex = 0;
+
+    // Loops over every button definition.
+    for (const StudyButton &button : buttons)
+    {
+        // create each, button, inittially under parent studyButtonsContainer
+        QPushButton *btn = new QPushButton(
+            formatButtonText(button.name),
+            studyButtonsContainer
+            );
+
+        // set to weight semibold
+        QFont font = btn->font();
+        font.setWeight(QFont::DemiBold);
+        btn->setFont(font);
+
+        // QUERY why not convert to camelcase for consitency
+        btn->setObjectName(button.name);
+
+        btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
+        btn->setMaximumSize(maxButtonWidth, maxButtonHeight);
+
+        // Tells layouts not to stretch or shrink the button.
+        // QUERY why is this needed?
+        btn->setSizePolicy(
+            QSizePolicy::Fixed,
+            QSizePolicy::Fixed
+            );
+
+        btn->setProperty("trackedColorButton", true);
+        btn->setProperty("selected", false);
+        btn->setProperty("priority", button.priority);
+        btn->setProperty("appTitle", button.appTitle);
+        btn->setProperty("originalIndex", studyButtonIndex);
+        btn->setProperty("clickCount", 0);
+        btn->setProperty("cumulativeSeconds", 0);
+
+        updateButtonStatsLabels(btn);
+
+        // QUERY why is this increment here? and not at start
+        ++studyButtonIndex;
+
+        priorityLayouts[button.priority]->addWidget(btn);
+
+        // LOGIC FOR WHEN A STUDY BTN IS CLICKED
+        connect(
+            btn,
+            &QPushButton::clicked,
+            this,
+            [this, btn]()
+            {
+                QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+                for (QPushButton *otherBtn : std::as_const(buttons))
+                {
+                    if (!otherBtn->property("trackedColorButton").toBool())
+                        continue;
+
+                    otherBtn->setProperty("selected", false);
+
+                    updateButtonColor(
+                        otherBtn,
+                        otherBtn->property("lastClicked").toDateTime()
+                        );
+
+                    updateButtonStatsLabels(otherBtn);
+                }
+
+                btn->setProperty("selected", true);
+
+                checkTaskWithChance();
+
+                QDateTime now = QDateTime::currentDateTime();
+
+                // QUERY do all this after it check wether click was valid?
+                btn->setProperty("lastClicked", now);
+
+                progressIsBeingTracked = true;
+
+                int clickCount =
+                    btn->property("clickCount").toInt();
+
+                btn->setProperty("clickCount", clickCount + 1);
+
+                updateButtonColor(btn, now);
+                updateButtonStatsLabels(btn);
+
+                writeSettings();
+
+                int priority = btn->property("priority").toInt();
+
+                QVBoxLayout *columnLayout =
+                    priorityLayouts.value(priority, nullptr);
+
+                if (columnLayout != nullptr)
+                {
+                    columnLayout->removeWidget(btn);
+
+                    int insertIndex = columnLayout->count() - 1;
+
+                    if (insertIndex < 0)
+                        insertIndex = 0;
+
+                    columnLayout->insertWidget(insertIndex, btn);
+                }
+
+                QString appTitle =
+                    btn->property("appTitle").toString();
+
+                QString instanceName =
+                    btn->objectName();
+
+                if (!appTitle.isEmpty())
+                {
+                    // TODO other apps
+                    if (appTitle == "Chrome")
+                    {
+                        activateWindowByTitle(instanceName);
+                    }
+                }
+            }
+            );
+    }
+
+    // Adds empty flexible space at the bottom of every priority column.
+    for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
+    {
+        columnLayout->addStretch();
+    }
 }

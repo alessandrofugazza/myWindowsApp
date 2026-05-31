@@ -82,6 +82,7 @@ private:
 
     bool progressIsBeingTracked = false;
 
+    void setupStudyButtons();
 };
 
 #endif // MAINWINDOW_H
