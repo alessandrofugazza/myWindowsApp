@@ -9,6 +9,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("shell");
     QCoreApplication::setApplicationName("MyWindowsApp");
     MainWindow w;
-    w.show();
+    w.showMaximized();
     return QCoreApplication::exec();
 }
