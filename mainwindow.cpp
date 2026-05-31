@@ -163,122 +163,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupStudyButtons();
 
-    {
-        QSettings settings;
-
-        QList<QPushButton*> createdButtons = findChildren<QPushButton*>();
-
-        for (QPushButton *btn : std::as_const(createdButtons))
-        {
-            if (!btn->property("trackedColorButton").toBool())
-                continue;
-
-            QDateTime lastClicked = settings.value(
-                                                QString("studyButtons/%1/lastClicked")
-                                                    .arg(btn->objectName())
-                                                ).toDateTime();
-
-            QDateTime lastDone = settings.value(
-                                             QString("studyButtons/%1/lastDone")
-                                                 .arg(btn->objectName())
-                                             ).toDateTime();
-
-            int clickCount = settings.value(
-                                         QString("studyButtons/%1/clickCount")
-                                             .arg(btn->objectName()),
-                                         0
-                                         ).toInt();
-
-            qint64 cumulativeSeconds = settings.value(
-                                                   QString("studyButtons/%1/cumulativeSeconds")
-                                                       .arg(btn->objectName()),
-                                                   0
-                                                   ).toLongLong();
-
-            btn->setProperty("clickCount", clickCount);
-            btn->setProperty("cumulativeSeconds", cumulativeSeconds);
-
-            if (lastClicked.isValid())
-            {
-                btn->setProperty("lastClicked", lastClicked);
-
-                updateButtonColor(btn, lastClicked);
-            }
-
-            if (lastDone.isValid())
-            {
-                btn->setProperty("lastDone", lastDone);
-            }
-
-            updateButtonStatsLabels(btn);
-        }
-
-        for (auto it = priorityLayouts.begin();
-             it != priorityLayouts.end();
-             ++it)
-        {
-            QVBoxLayout *columnLayout = it.value();
-
-            if (!columnLayout)
-                continue;
-
-
-            QList<QPushButton*> priorityButtons;
-
-            for (int i = 0; i < columnLayout->count(); ++i)
-            {
-                QWidget *widget =
-                    columnLayout->itemAt(i)->widget();
-
-                QPushButton *btn =
-                    qobject_cast<QPushButton*>(widget);
-
-                if (!btn)
-                    continue;
-
-                if (!btn->property("trackedColorButton").toBool())
-                    continue;
-
-                priorityButtons.append(btn);
-            }
-
-            std::sort(
-                priorityButtons.begin(),
-                priorityButtons.end(),
-                [](QPushButton *a, QPushButton *b)
-                {
-                    QDateTime aClicked =
-                        a->property("lastClicked").toDateTime();
-
-                    QDateTime bClicked =
-                        b->property("lastClicked").toDateTime();
-
-                    if (aClicked.isValid() != bClicked.isValid())
-                        return !aClicked.isValid();
-
-                    if (aClicked.isValid() && bClicked.isValid() && aClicked != bClicked)
-                        return aClicked < bClicked;
-
-                    return
-                        a->property("originalIndex").toInt()
-                        <
-                        b->property("originalIndex").toInt();
-                }
-                );
-
-            for (QPushButton *btn : priorityButtons)
-            {
-                columnLayout->removeWidget(btn);
-
-                int insertIndex = columnLayout->count() - 1;
-
-                if (insertIndex < 0)
-                    insertIndex = 0;
-
-                columnLayout->insertWidget(insertIndex, btn);
-            }
-        }
-    }
+    restoreStudyButtonSettings();
 
     // Set pointer cursor on all buttons
     QList<QPushButton*> allButtons = findChildren<QPushButton*>();
@@ -1216,4 +1101,123 @@ void MainWindow::setupStudyButtons()
     {
         columnLayout->addStretch();
     }
+}
+
+void MainWindow::restoreStudyButtonSettings() {
+
+    QSettings settings;
+
+    QList<QPushButton*> createdButtons = findChildren<QPushButton*>();
+
+    for (QPushButton *btn : std::as_const(createdButtons))
+    {
+        if (!btn->property("trackedColorButton").toBool())
+            continue;
+
+        QDateTime lastClicked = settings.value(
+                                            QString("studyButtons/%1/lastClicked")
+                                                .arg(btn->objectName())
+                                            ).toDateTime();
+
+        QDateTime lastDone = settings.value(
+                                         QString("studyButtons/%1/lastDone")
+                                             .arg(btn->objectName())
+                                         ).toDateTime();
+
+        int clickCount = settings.value(
+                                     QString("studyButtons/%1/clickCount")
+                                         .arg(btn->objectName()),
+                                     0
+                                     ).toInt();
+
+        qint64 cumulativeSeconds = settings.value(
+                                               QString("studyButtons/%1/cumulativeSeconds")
+                                                   .arg(btn->objectName()),
+                                               0
+                                               ).toLongLong();
+
+        btn->setProperty("clickCount", clickCount);
+        btn->setProperty("cumulativeSeconds", cumulativeSeconds);
+
+        if (lastClicked.isValid())
+        {
+            btn->setProperty("lastClicked", lastClicked);
+
+            updateButtonColor(btn, lastClicked);
+        }
+
+        if (lastDone.isValid())
+        {
+            btn->setProperty("lastDone", lastDone);
+        }
+
+        updateButtonStatsLabels(btn);
+    }
+
+    for (auto it = priorityLayouts.begin();
+         it != priorityLayouts.end();
+         ++it)
+    {
+        QVBoxLayout *columnLayout = it.value();
+
+        if (!columnLayout)
+            continue;
+
+
+        QList<QPushButton*> priorityButtons;
+
+        for (int i = 0; i < columnLayout->count(); ++i)
+        {
+            QWidget *widget =
+                columnLayout->itemAt(i)->widget();
+
+            QPushButton *btn =
+                qobject_cast<QPushButton*>(widget);
+
+            if (!btn)
+                continue;
+
+            if (!btn->property("trackedColorButton").toBool())
+                continue;
+
+            priorityButtons.append(btn);
+        }
+
+        std::sort(
+            priorityButtons.begin(),
+            priorityButtons.end(),
+            [](QPushButton *a, QPushButton *b)
+            {
+                QDateTime aClicked =
+                    a->property("lastClicked").toDateTime();
+
+                QDateTime bClicked =
+                    b->property("lastClicked").toDateTime();
+
+                if (aClicked.isValid() != bClicked.isValid())
+                    return !aClicked.isValid();
+
+                if (aClicked.isValid() && bClicked.isValid() && aClicked != bClicked)
+                    return aClicked < bClicked;
+
+                return
+                    a->property("originalIndex").toInt()
+                    <
+                    b->property("originalIndex").toInt();
+            }
+            );
+
+        for (QPushButton *btn : priorityButtons)
+        {
+            columnLayout->removeWidget(btn);
+
+            int insertIndex = columnLayout->count() - 1;
+
+            if (insertIndex < 0)
+                insertIndex = 0;
+
+            columnLayout->insertWidget(insertIndex, btn);
+        }
+    }
+
 }
