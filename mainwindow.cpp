@@ -66,6 +66,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     calculateDogOwnerRating();
 
+    // signals and slots logic
+
+    connect(
+        ui->reopenLastTopicBtn,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::onReopenLastTopicBtnClicked
+        );
+
     connect(
         ui->resetTopicsBtn,
         &QPushButton::clicked,
@@ -181,8 +190,6 @@ MainWindow::MainWindow(QWidget *parent)
             ui->viewsStack->setCurrentWidget(ui->optionsView);
         }
         );
-
-
 
     connect(
         ui->actionCoursePracticeView,
