@@ -18,12 +18,12 @@ QList<StudyButton> defaultStudyButtons()
             {"FTO", 1, "Chrome"},
             {"Finance", 1, "Chrome"},
             {"Flipper", 9, "Chrome"},
-            {"GitHub Copilot", 2, "Chrome"},
+            {"GitHub Copilot", 6, "Chrome"},
             {"JavaScript", 5, "Chrome"},
             {"Law", 3, ""},
             {"Learn", 2, "Chrome"},
-            {"Markdown", 2, "Chrome"},
-            {"Obsidian", 2, "Chrome"},
+            {"Markdown", 6, "Chrome"},
+            {"Obsidian", 6, "Chrome"},
             {"Power User", 7, "Chrome"},
             {"Project S", 3, "Chrome"},
             {"Project A", 4, "Chrome"},
@@ -38,7 +38,8 @@ QList<StudyButton> defaultStudyButtons()
             {"Qt Creator", 4, "Qt Creator"},
             {"Chrome Devtools", 5, "Chrome Devtools"},
             {"iOS Development", 2, "Chrome"},
-            {"Industrial Automation", 2, "Chrome"}
+            {"Industrial Automation", 2, "Chrome"},
+            {"GAL", 2, "Chrome"}
 
         };
 }

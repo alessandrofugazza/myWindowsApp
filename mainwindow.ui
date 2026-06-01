@@ -18,10 +18,10 @@
     <item>
      <widget class="QStackedWidget" name="viewsStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="otherView">
-       <widget class="QWidget" name="widget" native="true">
+       <widget class="QWidget" name="otherViewContainer" native="true">
         <property name="geometry">
          <rect>
           <x>40</x>
@@ -104,13 +104,13 @@
         </widget>
        </widget>
       </widget>
-      <widget class="QWidget" name="developView">
+      <widget class="QWidget" name="dogOwnerRatingView">
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QWidget" name="widget_3" native="true">
+         <widget class="QWidget" name="dogOwnerRatingViewContainer" native="true">
           <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
@@ -202,8 +202,9 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="courseDevelopView"/>
       <widget class="QWidget" name="productionView">
-       <widget class="QWidget" name="developWidget" native="true">
+       <widget class="QWidget" name="productionViewContainer" native="true">
         <property name="geometry">
          <rect>
           <x>40</x>
@@ -399,7 +400,7 @@
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
-       <widget class="QWidget" name="widget_2" native="true">
+       <widget class="QWidget" name="optionsViewContainer" native="true">
         <property name="geometry">
          <rect>
           <x>100</x>
@@ -440,7 +441,7 @@
      <x>0</x>
      <y>0</y>
      <width>2231</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSections">
@@ -450,6 +451,7 @@
     <addaction name="actionProductionView"/>
     <addaction name="actionOtherView"/>
     <addaction name="actionDevelopView"/>
+    <addaction name="action_DEV_Course_Practice"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -489,7 +491,12 @@
   </action>
   <action name="actionDevelopView">
    <property name="text">
-    <string>Develop</string>
+    <string>[DEV] Dog Owner Rating</string>
+   </property>
+  </action>
+  <action name="action_DEV_Course_Practice">
+   <property name="text">
+    <string>[DEV] Course Practice</string>
    </property>
   </action>
  </widget>

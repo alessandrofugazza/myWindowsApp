@@ -168,7 +168,7 @@ MainWindow::MainWindow(QWidget *parent)
         this,
         [this]()
         {
-            ui->viewsStack->setCurrentWidget(ui->developView);
+            ui->viewsStack->setCurrentWidget(ui->dogOwnerRatingView);
         }
         );
 
@@ -974,7 +974,7 @@ void MainWindow::setupStudyButtons()
 {
     QList<StudyButton> buttons = defaultStudyButtons();
 
-    QFontMetrics metrics(ui->developWidget->font());
+    QFontMetrics metrics(ui->productionViewContainer->font());
 
     int maxButtonWidth = 0;
     int maxButtonHeight = 0;
@@ -997,7 +997,7 @@ void MainWindow::setupStudyButtons()
 
     const int columnGap = 32;
 
-    QWidget *studyButtonsContainer = new QWidget(ui->developWidget);
+    QWidget *studyButtonsContainer = new QWidget(ui->productionViewContainer);
     studyButtonsContainer->setObjectName("studyButtonsContainer");
     studyButtonsContainer->setGeometry(20, 20, 1720, 580);
 
