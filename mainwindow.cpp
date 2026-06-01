@@ -95,16 +95,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (!RegisterHotKey(
             hwnd,
-            HOTKEY_ID,
+            FINISH_HOTKEY_ID,
             MOD_SHIFT | MOD_ALT,
             'D'
             ))
     {
-        qDebug() << "RegisterHotKey failed. Error:" << GetLastError();
+        qDebug() << "RegisterHotKey for Shift + Alt + D failed. Error:" << GetLastError();
     }
     else
     {
-        qDebug() << "RegisterHotKey succeeded";
+        qDebug() << "RegisterHotKey for Shift + Alt + D succeeded";
+    }
+
+    if (!RegisterHotKey(
+            hwnd,
+            PAUSE_HOTKEY_ID,
+            MOD_SHIFT | MOD_ALT,
+            'F'
+            ))
+    {
+        qDebug() << "RegisterHotKey for Shift + Alt + F failed. Error:" << GetLastError();
+    }
+    else
+    {
+        qDebug() << "RegisterHotKey for Shift + Alt + F succeeded";
     }
 
     ui->viewsStack->setCurrentWidget(ui->productionView);
@@ -221,7 +235,7 @@ MainWindow::~MainWindow()
 
     UnregisterHotKey(
         hwnd,
-        HOTKEY_ID
+        FINISH_HOTKEY_ID
         );
 
     delete ui;
@@ -271,7 +285,7 @@ bool MainWindow::nativeEvent(
     {
         qDebug() << "WM_HOTKEY received";
 
-        if (msg->wParam == HOTKEY_ID)
+        if (msg->wParam == FINISH_HOTKEY_ID)
         {
             qDebug() << "Shift + Alt + D pressed globally";
 

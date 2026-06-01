@@ -89,7 +89,8 @@ private:
     QString lastOpenedTopic;
     bool taskIsTriggered = false;
 
-    static constexpr int HOTKEY_ID = 1;
+    static constexpr int FINISH_HOTKEY_ID = 1;
+    static constexpr int PAUSE_HOTKEY_ID = 1;
 
     QPushButton *selectedStudyButton = nullptr;
 
