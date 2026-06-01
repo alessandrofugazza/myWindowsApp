@@ -18,6 +18,7 @@ qt_add_executable(myWindowsApp
     Data/studybuttonrepository.cpp
     Models/dogownerrating.h
     Models/dogownerrating.cpp
+    rockwidget.h rockwidget.cpp
 
 
 )
