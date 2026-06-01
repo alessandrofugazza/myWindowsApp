@@ -238,6 +238,11 @@ MainWindow::~MainWindow()
         FINISH_HOTKEY_ID
         );
 
+    UnregisterHotKey(
+        hwnd,
+        PAUSE_HOTKEY_ID
+        );
+
     delete ui;
 }
 
