@@ -182,6 +182,19 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
+
+
+    connect(
+        ui->actionCoursePracticeView,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            ui->viewsStack->setCurrentWidget(ui->coursePracticeView);
+        }
+        );
+
+
     setupStudyButtons();
 
     restoreStudyButtonSettings();

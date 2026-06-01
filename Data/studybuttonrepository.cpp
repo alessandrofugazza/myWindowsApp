@@ -7,10 +7,10 @@ QList<StudyButton> defaultStudyButtons()
             {"AHK", 5, "Chrome"},
             {"Anki", 6, "Chrome"},
             {"Automotive", 3, "Chrome"},
-            {"C++", 4, "Chrome"},
+            {"C++", 5, "Chrome"},
             {"CB125R", 1, ""},
             {"Canophilia", 3, "Chrome"},
-            {"Chrome Extensions Development", 3, "Chrome"},
+            {"Chrome Extensions Development", 4, "Chrome"},
             {"CompTIA", 1, "Chrome"},
             {"Data Science", 2, "Chrome"},
             {"Doblo", 1, ""},
@@ -30,8 +30,8 @@ QList<StudyButton> defaultStudyButtons()
             {"Project G", 4, "Chrome"},
             {"Project P", 5, "Chrome"},
             {"Prompt Engineering", 8, "Chrome"},
-            {"Python", 4, "Chrome"},
-            {"Swift", 4, "Chrome"},
+            {"Python", 5, "Chrome"},
+            {"Swift", 5, "Chrome"},
             {"Web Development", 3, "Chrome"},
             {"Windows Development", 2, "Chrome"},
             {"Netlify", 6, "Netlify"},
@@ -39,7 +39,9 @@ QList<StudyButton> defaultStudyButtons()
             {"Chrome Devtools", 5, "Chrome Devtools"},
             {"iOS Development", 2, "Chrome"},
             {"Industrial Automation", 2, "Chrome"},
-            {"GAL", 2, "Chrome"}
+            {"GAL", 2, "Chrome"},
+            {"Reading", 4, "Chrome"},
+            {"VS Code", 4, "Chrome"}
 
         };
 }

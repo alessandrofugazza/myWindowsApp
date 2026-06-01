@@ -202,7 +202,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="courseDevelopView"/>
+      <widget class="QWidget" name="coursePracticeView"/>
       <widget class="QWidget" name="productionView">
        <widget class="QWidget" name="productionViewContainer" native="true">
         <property name="geometry">
@@ -451,7 +451,7 @@
     <addaction name="actionProductionView"/>
     <addaction name="actionOtherView"/>
     <addaction name="actionDevelopView"/>
-    <addaction name="action_DEV_Course_Practice"/>
+    <addaction name="actionCoursePracticeView"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -494,7 +494,7 @@
     <string>[DEV] Dog Owner Rating</string>
    </property>
   </action>
-  <action name="action_DEV_Course_Practice">
+  <action name="actionCoursePracticeView">
    <property name="text">
     <string>[DEV] Course Practice</string>
    </property>
