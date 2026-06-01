@@ -89,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 qDebug() << "progressIsBeingTracked:" << progressIsBeingTracked;
 
+
                 QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
                 for (QPushButton *btn : std::as_const(buttons))
@@ -536,6 +537,13 @@ bool MainWindow::nativeEvent(
         qDebug() << "Global hotkey pressed";
         qDebug() << "Last done saved for" << selectedButton->objectName();
         qDebug() << "Elapsed between lastClicked and lastDone:" << elapsedText;
+        QMessageBox::information(
+            this,
+            "Topic finished",
+            QString("You spent %1 on '%2'.")
+                .arg(elapsedText)
+                .arg(selectedButton->objectName())
+            );
 
         return true;
     }
@@ -669,6 +677,14 @@ bool MainWindow::nativeEvent(
         updateButtonStatsLabels(selectedButton);
 
         writeSettings();
+
+        QMessageBox::information(
+            this,
+            isPaused ? "Topic paused" : "Topic resumed",
+            QString("You have %1 '%2'.")
+                .arg(isPaused ? "paused" : "resumed")
+                .arg(selectedButton->objectName())
+            );
 
         return true;
     }
