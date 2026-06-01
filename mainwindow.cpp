@@ -177,7 +177,7 @@ MainWindow::MainWindow(QWidget *parent)
     HWND hwnd = reinterpret_cast<HWND>(winId());
 
     if (!RegisterHotKey(hwnd, FINISH_HOTKEY_ID, MOD_CONTROL | MOD_ALT | MOD_SHIFT, 'D')
-)
+        )
     {
         qDebug() << "RegisterHotKey for Shift + Alt + D failed. Error:" << GetLastError();
     }
@@ -678,11 +678,14 @@ bool MainWindow::nativeEvent(
 
         writeSettings();
 
+        bool topicIsNowPaused =
+            selectedButton->property("isPaused").toBool();
+
         QMessageBox::information(
             this,
-            isPaused ? "Topic paused" : "Topic resumed",
+            topicIsNowPaused ? "Topic paused" : "Topic resumed",
             QString("You have %1 '%2'.")
-                .arg(isPaused ? "paused" : "resumed")
+                .arg(topicIsNowPaused ? "paused" : "resumed")
                 .arg(selectedButton->objectName())
             );
 
