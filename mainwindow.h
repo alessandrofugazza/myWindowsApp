@@ -90,7 +90,7 @@ private:
     bool taskIsTriggered = false;
 
     static constexpr int FINISH_HOTKEY_ID = 1;
-    static constexpr int PAUSE_HOTKEY_ID = 1;
+    static constexpr int PAUSE_HOTKEY_ID = 2;
 
     QPushButton *selectedStudyButton = nullptr;
 

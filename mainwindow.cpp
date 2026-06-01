@@ -286,130 +286,159 @@ bool MainWindow::nativeEvent(
 
     MSG *msg = static_cast<MSG *>(message);
 
-    if (msg->message == WM_HOTKEY)
+    if (msg->message != WM_HOTKEY)
     {
+        return QMainWindow::nativeEvent(
+            eventType,
+            message,
+            result
+            );
+    }
+
+
         qDebug() << "WM_HOTKEY received";
 
-        if (msg->wParam == FINISH_HOTKEY_ID)
+    switch (msg->wParam)
         {
-            qDebug() << "Shift + Alt + D pressed globally";
+        case FINISH_HOTKEY_ID:
+    {
+        qDebug() << "Shift + Alt + D pressed globally";
 
-            QPushButton *selectedButton = nullptr;
+        QPushButton *selectedButton = nullptr;
 
-            QList<QPushButton*> buttons = findChildren<QPushButton*>();
+        QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
-            for (QPushButton *btn : std::as_const(buttons))
-            {
-                if (!btn->property("trackedColorButton").toBool())
-                    continue;
+        for (QPushButton *btn : std::as_const(buttons))
+        {
+            if (!btn->property("trackedColorButton").toBool())
+                continue;
 
-                if (!btn->property("selected").toBool())
-                    continue;
+            if (!btn->property("selected").toBool())
+                continue;
 
-                selectedButton = btn;
-                break;
-            }
+            selectedButton = btn;
+            break;
+        }
 
-            if (selectedButton == nullptr)
-            {
-                QMessageBox::information(
-                    this,
-                    "No selected topic",
-                    "No topic button was clicked yet."
-                    );
-
-                qDebug() << "Global hotkey pressed, but no selected topic exists";
-
-                return true;
-            }
-
-            QDateTime lastClicked =
-                selectedButton->property("lastClicked").toDateTime();
-
-            if (!lastClicked.isValid())
-            {
-                QMessageBox::warning(
-                    this,
-                    "No last clicked time",
-                    QString("Selected topic '%1' has no valid lastClicked time.")
-                        .arg(selectedButton->objectName())
-                    );
-
-                qDebug() << "Global hotkey pressed, but selected topic has no valid lastClicked";
-
-                return true;
-            }
-
-            QDateTime lastDone =
-                QDateTime::currentDateTime();
-
-            selectedButton->setProperty("lastDone", lastDone);
-
-            qint64 elapsedSeconds =
-                lastClicked.secsTo(lastDone);
-
-            if (elapsedSeconds < 0)
-                elapsedSeconds = 0;
-
-            qint64 cumulativeSeconds =
-                selectedButton->property("cumulativeSeconds").toLongLong();
-
-            cumulativeSeconds += elapsedSeconds;
-
-            selectedButton->setProperty("cumulativeSeconds", cumulativeSeconds);
-
-            qint64 elapsedHours =
-                elapsedSeconds / 3600;
-
-            qint64 elapsedMinutes =
-                (elapsedSeconds % 3600) / 60;
-
-            qint64 remainingSeconds =
-                elapsedSeconds % 60;
-
-            QString elapsedText =
-                QString("%1h %2m %3s")
-                    .arg(elapsedHours)
-                    .arg(elapsedMinutes)
-                    .arg(remainingSeconds);
-
-            selectedButton->setProperty("selected", false);
-
-            progressIsBeingTracked = false;
-
-            updateButtonColor(
-                selectedButton,
-                buttonColorReferenceTime(selectedButton)
-                );
-
-            updateButtonStatsLabels(selectedButton);
-
-            writeSettings();
-
+        if (selectedButton == nullptr)
+        {
             QMessageBox::information(
                 this,
-                "Last done saved",
-                QString(
-                    "Topic: %1\n"
-                    "Last opened: %2\n"
-                    "Last done: %3\n"
-                    "Elapsed: %4\n"
-                    "Total: %5"
-                    )
-                    .arg(selectedButton->objectName())
-                    .arg(lastClicked.toString("yyyy-MM-dd HH:mm:ss"))
-                    .arg(lastDone.toString("yyyy-MM-dd HH:mm:ss"))
-                    .arg(elapsedText)
-                    .arg(formatSecondsAsHoursMinutes(cumulativeSeconds))
+                "No selected topic",
+                "No topic button was clicked yet."
                 );
 
-            qDebug() << "Global hotkey pressed";
-            qDebug() << "Last done saved for" << selectedButton->objectName();
-            qDebug() << "Elapsed between lastClicked and lastDone:" << elapsedText;
+            qDebug() << "Global hotkey pressed, but no selected topic exists";
 
             return true;
         }
+
+        QDateTime lastClicked =
+            selectedButton->property("lastClicked").toDateTime();
+
+        if (!lastClicked.isValid())
+        {
+            QMessageBox::warning(
+                this,
+                "No last clicked time",
+                QString("Selected topic '%1' has no valid lastClicked time.")
+                    .arg(selectedButton->objectName())
+                );
+
+            qDebug() << "Global hotkey pressed, but selected topic has no valid lastClicked";
+
+            return true;
+        }
+
+        QDateTime lastDone =
+            QDateTime::currentDateTime();
+
+        selectedButton->setProperty("lastDone", lastDone);
+
+        qint64 elapsedSeconds =
+            lastClicked.secsTo(lastDone);
+
+        if (elapsedSeconds < 0)
+            elapsedSeconds = 0;
+
+        qint64 cumulativeSeconds =
+            selectedButton->property("cumulativeSeconds").toLongLong();
+
+        cumulativeSeconds += elapsedSeconds;
+
+        selectedButton->setProperty("cumulativeSeconds", cumulativeSeconds);
+
+        qint64 elapsedHours =
+            elapsedSeconds / 3600;
+
+        qint64 elapsedMinutes =
+            (elapsedSeconds % 3600) / 60;
+
+        qint64 remainingSeconds =
+            elapsedSeconds % 60;
+
+        QString elapsedText =
+            QString("%1h %2m %3s")
+                .arg(elapsedHours)
+                .arg(elapsedMinutes)
+                .arg(remainingSeconds);
+
+        selectedButton->setProperty("selected", false);
+
+        progressIsBeingTracked = false;
+
+        updateButtonColor(
+            selectedButton,
+            buttonColorReferenceTime(selectedButton)
+            );
+
+        updateButtonStatsLabels(selectedButton);
+
+        writeSettings();
+
+        QMessageBox::information(
+            this,
+            "Last done saved",
+            QString(
+                "Topic: %1\n"
+                "Last opened: %2\n"
+                "Last done: %3\n"
+                "Elapsed: %4\n"
+                "Total: %5"
+                )
+                .arg(selectedButton->objectName())
+                .arg(lastClicked.toString("yyyy-MM-dd HH:mm:ss"))
+                .arg(lastDone.toString("yyyy-MM-dd HH:mm:ss"))
+                .arg(elapsedText)
+                .arg(formatSecondsAsHoursMinutes(cumulativeSeconds))
+            );
+
+        qDebug() << "Global hotkey pressed";
+        qDebug() << "Last done saved for" << selectedButton->objectName();
+        qDebug() << "Elapsed between lastClicked and lastDone:" << elapsedText;
+
+        return true;
     }
+        case PAUSE_HOTKEY_ID:
+        {
+            qDebug() << "Shift + Alt + F pressed globally";
+
+            // pause/resume logic here
+
+            return true;
+        }
+
+        default:
+        {
+            qDebug() << "Unknown hotkey ID:" << msg->wParam;
+            break;
+        }
+
+
+    }
+
+
+
 
     return QMainWindow::nativeEvent(
         eventType,
