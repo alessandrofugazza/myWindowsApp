@@ -82,6 +82,13 @@ MainWindow::MainWindow(QWidget *parent)
         &MainWindow::onResetTopicsBtnClicked
         );
 
+    connect(
+        ui->taskIsDoneBtn,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::onTaskIsDoneBtnClicked
+        );
+
     connect(ui->debugBtn,
             &QPushButton::clicked,
             this,
@@ -730,12 +737,24 @@ double MainWindow::calculateCurrentTaskChance() const
 
 void MainWindow::checkTaskWithChance()
 {
+    if (taskIsTriggered)
+        return;
+
+    if (!chanceStartTime.isValid())
+    {
+        chanceStartTime = QDateTime::currentDateTime();
+        updateCurrentChanceLabel();
+        writeSettings();
+        return;
+    }
+
     double chance = calculateCurrentTaskChance();
 
-    QDateTime now = QDateTime::currentDateTime();
-
-    qint64 elapsedSeconds =
-        chanceStartTime.secsTo(now);
+    if (chance >= 1.0)
+    {
+        doTaskTriggeredStuff();
+        return;
+    }
 
     double roll = QRandomGenerator::global()->generateDouble();
 
@@ -751,8 +770,13 @@ void MainWindow::checkTaskWithChance()
 
 void MainWindow::doTaskTriggeredStuff()
 {
+    if (taskIsTriggered)
+        return;
+
     bool isTask =
         QRandomGenerator::global()->bounded(2) == 0;
+
+    taskIsTriggered = true;
 
     if (isTask)
     {
@@ -765,14 +789,19 @@ void MainWindow::doTaskTriggeredStuff()
         ui->taskIsDoneBtn->setText("MOVE TOPIC");
     }
 
-    taskIsTriggered = true;
+    ui->chanceProgressBar->setValue(100);
     ui->taskIsDoneBtn->setEnabled(true);
+
+    writeSettings();
 }
 
 void MainWindow::updateCurrentChanceLabel()
 {
     if (taskIsTriggered)
     {
+        if (!ui->taskIsDoneBtn->isEnabled())
+            ui->taskIsDoneBtn->setEnabled(true);
+
         return;
     }
 
@@ -784,7 +813,7 @@ void MainWindow::updateCurrentChanceLabel()
 
     ui->chanceProgressBar->setValue(static_cast<int>(chance * 100));
 
-    if (chance == 1.0)
+    if (chance >= 1.0)
     {
         doTaskTriggeredStuff();
     }
@@ -928,6 +957,29 @@ void MainWindow::readSettings()
                                   false
                                   ).toBool();
 
+    if (taskIsTriggered)
+    {
+        QString taskTriggerLabel = settings.value(
+                                               "taskTrigger/label",
+                                               "Task triggered!"
+                                               ).toString();
+
+        QString taskTriggerButtonText = settings.value(
+                                                    "taskTrigger/buttonText",
+                                                    "TASK COMPLETED"
+                                                    ).toString();
+
+        ui->currentChanceLbl->setText(taskTriggerLabel);
+        ui->chanceProgressBar->setValue(100);
+        ui->taskIsDoneBtn->setText(taskTriggerButtonText);
+        ui->taskIsDoneBtn->setEnabled(true);
+    }
+    else
+    {
+        ui->taskIsDoneBtn->setEnabled(false);
+        ui->taskIsDoneBtn->setText("TASK COMPLETED");
+    }
+
     progressIsBeingTracked = settings.value(
                                          "studyButtons/progressIsBeingTracked",
                                          false
@@ -987,6 +1039,24 @@ void MainWindow::writeSettings()
         "taskIsTriggered",
         taskIsTriggered
         );
+
+    if (taskIsTriggered)
+    {
+        settings.setValue(
+            "taskTrigger/label",
+            ui->currentChanceLbl->text()
+            );
+
+        settings.setValue(
+            "taskTrigger/buttonText",
+            ui->taskIsDoneBtn->text()
+            );
+    }
+    else
+    {
+        settings.remove("taskTrigger/label");
+        settings.remove("taskTrigger/buttonText");
+    }
 
     settings.setValue(
         "trackingStartedAt",
