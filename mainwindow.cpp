@@ -3,6 +3,7 @@
 #include "Helpers/buttonhelpers.h"
 #include "Models/studybutton.h"
 #include "Data/studybuttonrepository.h"
+#include "rockwidget.h"
 
 #include <QAction>
 #include <QCloseEvent>
@@ -41,6 +42,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_amountOfTimesOut = ui->amountOfTimesOutSb->value();
     m_cumulativeTimeOut = ui->cumulativeTimeOutSb->value();
+
+    // course practice
+
+    QVBoxLayout* layout = new QVBoxLayout(ui->coursePracticeView);
+
+    RockWidget* rockWidget = new RockWidget(ui->coursePracticeView);
+    layout->addWidget(rockWidget);
+
 
     connect(
         ui->amountOfTimesOutSb,
