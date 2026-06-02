@@ -9,7 +9,12 @@ class RockWidget : public QWidget
 public:
     explicit RockWidget(QWidget *parent = nullptr);
 
-signals:
+private slots:
+    void buttonClicked();
+
+private:
+    QSize sizeHint() const;
+
 };
 
 #endif // ROCKWIDGET_H
