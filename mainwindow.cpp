@@ -85,6 +85,13 @@ MainWindow::MainWindow(QWidget *parent)
         );
 
     connect(
+        ui->undoBtn,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::onUndoBtnClicked
+        );
+
+    connect(
         ui->resetTopicsBtn,
         &QPushButton::clicked,
         this,
@@ -1917,4 +1924,49 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
             activateWindowByTitle(instanceName);
         }
     }
+}
+
+void MainWindow::onUndoBtnClicked()
+{
+    QPushButton *selectedButton = nullptr;
+
+    QList<QPushButton*> buttons = findChildren<QPushButton*>();
+
+    for (QPushButton *btn : std::as_const(buttons))
+    {
+        if (!btn->property("trackedColorButton").toBool())
+            continue;
+
+        if (!btn->property("selected").toBool())
+            continue;
+
+        selectedButton = btn;
+        break;
+    }
+
+    if (selectedButton == nullptr)
+    {
+        qDebug() << "Undo ignored: no selected topic exists";
+        return;
+    }
+
+    selectedButton->setProperty("selected", false);
+    selectedButton->setProperty("isPaused", false);
+    selectedButton->setProperty("pauseStartedAt", QDateTime());
+    selectedButton->setProperty("pausedSeconds", 0);
+
+    progressIsBeingTracked = false;
+
+    // Intentionally NOT changing:
+    // - lastClicked
+    // - lastDone
+    // - clickCount
+    // - cumulativeSeconds
+    // - button color
+    // - button position/order
+
+    writeSettings();
+
+    qDebug() << "Tracking undone for:"
+             << selectedButton->objectName();
 }

@@ -387,6 +387,19 @@
           </item>
          </layout>
         </widget>
+        <widget class="QPushButton" name="undoBtn">
+         <property name="geometry">
+          <rect>
+           <x>1260</x>
+           <y>690</y>
+           <width>111</width>
+           <height>35</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>UNDO</string>
+         </property>
+        </widget>
         <zorder>layoutWidget</zorder>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
@@ -397,6 +410,7 @@
         <zorder>resetTopicsBtn</zorder>
         <zorder>debugBtn</zorder>
         <zorder>devModeCheckBox</zorder>
+        <zorder>undoBtn</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">

@@ -44,6 +44,7 @@ private slots:
     void onTaskIsDoneBtnClicked();
     void onReopenLastTopicBtnClicked();
     void onResetTopicsBtnClicked();
+    void onUndoBtnClicked();
 
     // develop
 
