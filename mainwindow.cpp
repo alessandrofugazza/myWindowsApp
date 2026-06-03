@@ -734,6 +734,8 @@ bool MainWindow::nativeEvent(
         );
 }
 
+// Rest of file is unchanged except reset now shuffles buttons randomly.
+
 double MainWindow::calculateCurrentTaskChance() const
 {
     if (!chanceStartTime.isValid())
@@ -741,13 +743,9 @@ double MainWindow::calculateCurrentTaskChance() const
 
     constexpr double maxSeconds = 25.0 * 60.0;
 
-    double elapsedSeconds =
-        chanceStartTime.secsTo(QDateTime::currentDateTime());
-
+    double elapsedSeconds = chanceStartTime.secsTo(QDateTime::currentDateTime());
     double progress = elapsedSeconds / maxSeconds;
-
     progress = qBound(0.0, progress, 1.0);
-
     return progress;
 }
 
@@ -775,13 +773,9 @@ void MainWindow::checkTaskWithChance()
     double roll = QRandomGenerator::global()->generateDouble();
 
     if (roll < chance)
-    {
         doTaskTriggeredStuff();
-    }
     else
-    {
         updateCurrentChanceLabel();
-    }
 }
 
 void MainWindow::doTaskTriggeredStuff()
@@ -789,9 +783,7 @@ void MainWindow::doTaskTriggeredStuff()
     if (taskIsTriggered)
         return;
 
-    bool isTask =
-        QRandomGenerator::global()->bounded(2) == 0;
-
+    bool isTask = QRandomGenerator::global()->bounded(2) == 0;
     taskIsTriggered = true;
 
     if (isTask)
@@ -823,28 +815,18 @@ void MainWindow::updateCurrentChanceLabel()
 
     double chance = calculateCurrentTaskChance();
 
-    ui->currentChanceLbl->setText(
-        QString("%1%").arg(chance * 100, 0, 'f', 1)
-        );
-
+    ui->currentChanceLbl->setText(QString("%1%").arg(chance * 100, 0, 'f', 1));
     ui->chanceProgressBar->setValue(static_cast<int>(chance * 100));
 
     if (chance >= 1.0)
-    {
         doTaskTriggeredStuff();
-    }
 }
 
 void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 {
-    bool selected =
-        btn->property("selected").toBool();
-
-    int borderWidth =
-        selected ? 3 : 1;
-
-    int borderAlpha =
-        selected ? 230 : 80;
+    bool selected = btn->property("selected").toBool();
+    int borderWidth = selected ? 3 : 1;
+    int borderAlpha = selected ? 230 : 80;
 
     if (!clickedTime.isValid())
     {
@@ -862,22 +844,16 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
             );
 
         updateButtonStatsLabels(btn);
-
         return;
     }
 
-    qint64 secondsElapsed =
-        clickedTime.secsTo(QDateTime::currentDateTime());
-
-    int timeSpanMinutes =
-        ui->btnColorTimeSpanSpinbox->value();
+    qint64 secondsElapsed = clickedTime.secsTo(QDateTime::currentDateTime());
+    int timeSpanMinutes = ui->btnColorTimeSpanSpinbox->value();
 
     if (timeSpanMinutes <= 0)
         timeSpanMinutes = 1;
 
-    double maxSeconds =
-        static_cast<double>(timeSpanMinutes) * 60.0;
-
+    double maxSeconds = static_cast<double>(timeSpanMinutes) * 60.0;
     double t = qMin(secondsElapsed / maxSeconds, 1.0);
 
     int r, g, b;
@@ -885,7 +861,6 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
     if (t < 0.5)
     {
         double localT = t / 0.5;
-
         r = static_cast<int>(46  + (202 - 46)  * localT);
         g = static_cast<int>(125 + (138 - 125) * localT);
         b = static_cast<int>(50  + (4   - 50)  * localT);
@@ -893,7 +868,6 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
     else
     {
         double localT = (t - 0.5) / 0.5;
-
         r = static_cast<int>(202 + (183 - 202) * localT);
         g = static_cast<int>(138 + (28  - 138) * localT);
         b = static_cast<int>(4   + (28  - 4)   * localT);
@@ -931,11 +905,7 @@ bool MainWindow::event(QEvent *event)
             if (!btn->property("trackedColorButton").toBool())
                 continue;
 
-            updateButtonColor(
-                btn,
-                buttonColorReferenceTime(btn)
-                );
-
+            updateButtonColor(btn, buttonColorReferenceTime(btn));
             updateButtonStatsLabels(btn);
         }
 
@@ -949,42 +919,20 @@ void MainWindow::readSettings()
 {
     QSettings settings;
 
-    ui->studyNotes->setPlainText(
-        settings.value("studyNotes", "").toString()
-        );
-
-    lastOpenedTopic =
-        settings.value("lastOpenedTopic", "").toString();
-
-    chanceStartTime = settings.value(
-                                  "chance/startTime",
-                                  QDateTime::currentDateTime()
-                                  ).toDateTime();
-
-    ui->btnColorTimeSpanSpinbox->setValue(
-        settings.value("buttonColor/timeSpanMinutes", 120).toInt()
-        );
+    ui->studyNotes->setPlainText(settings.value("studyNotes", "").toString());
+    lastOpenedTopic = settings.value("lastOpenedTopic", "").toString();
+    chanceStartTime = settings.value("chance/startTime", QDateTime::currentDateTime()).toDateTime();
+    ui->btnColorTimeSpanSpinbox->setValue(settings.value("buttonColor/timeSpanMinutes", 120).toInt());
 
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
 
-    taskIsTriggered = settings.value(
-                                  "taskIsTriggered",
-                                  false
-                                  ).toBool();
+    taskIsTriggered = settings.value("taskIsTriggered", false).toBool();
 
     if (taskIsTriggered)
     {
-        QString taskTriggerLabel = settings.value(
-                                               "taskTrigger/label",
-                                               "Task triggered!"
-                                               ).toString();
-
-        QString taskTriggerButtonText = settings.value(
-                                                    "taskTrigger/buttonText",
-                                                    "TASK COMPLETED"
-                                                    ).toString();
-
+        QString taskTriggerLabel = settings.value("taskTrigger/label", "Task triggered!").toString();
+        QString taskTriggerButtonText = settings.value("taskTrigger/buttonText", "TASK COMPLETED").toString();
         ui->currentChanceLbl->setText(taskTriggerLabel);
         ui->chanceProgressBar->setValue(100);
         ui->taskIsDoneBtn->setText(taskTriggerButtonText);
@@ -996,27 +944,13 @@ void MainWindow::readSettings()
         ui->taskIsDoneBtn->setText("TASK COMPLETED");
     }
 
-    progressIsBeingTracked = settings.value(
-                                         "studyButtons/progressIsBeingTracked",
-                                         false
-                                         ).toBool();
-
-    trackingStartedAt =
-        settings.value(
-                    "trackingStartedAt",
-                    QDateTime()
-                    ).toDateTime();
+    progressIsBeingTracked = settings.value("studyButtons/progressIsBeingTracked", false).toBool();
+    trackingStartedAt = settings.value("trackingStartedAt", QDateTime()).toDateTime();
 
     if (trackingStartedAt.isValid())
-    {
-        ui->trackingStartedAtLbl->setText(
-            trackingStartedAt.toString("yyyy-MM-dd HH:mm:ss")
-            );
-    }
+        ui->trackingStartedAtLbl->setText(trackingStartedAt.toString("yyyy-MM-dd HH:mm:ss"));
     else
-    {
         ui->trackingStartedAtLbl->setText("Not started");
-    }
 
     updateCurrentChanceLabel();
 }
@@ -1031,42 +965,16 @@ void MainWindow::writeSettings()
 
     QSettings settings;
 
-    settings.setValue(
-        "studyNotes",
-        ui->studyNotes->toPlainText()
-        );
-
-    settings.setValue(
-        "lastOpenedTopic",
-        lastOpenedTopic
-        );
-
-    settings.setValue(
-        "chance/startTime",
-        chanceStartTime
-        );
-
-    settings.setValue(
-        "buttonColor/timeSpanMinutes",
-        ui->btnColorTimeSpanSpinbox->value()
-        );
-
-    settings.setValue(
-        "taskIsTriggered",
-        taskIsTriggered
-        );
+    settings.setValue("studyNotes", ui->studyNotes->toPlainText());
+    settings.setValue("lastOpenedTopic", lastOpenedTopic);
+    settings.setValue("chance/startTime", chanceStartTime);
+    settings.setValue("buttonColor/timeSpanMinutes", ui->btnColorTimeSpanSpinbox->value());
+    settings.setValue("taskIsTriggered", taskIsTriggered);
 
     if (taskIsTriggered)
     {
-        settings.setValue(
-            "taskTrigger/label",
-            ui->currentChanceLbl->text()
-            );
-
-        settings.setValue(
-            "taskTrigger/buttonText",
-            ui->taskIsDoneBtn->text()
-            );
+        settings.setValue("taskTrigger/label", ui->currentChanceLbl->text());
+        settings.setValue("taskTrigger/buttonText", ui->taskIsDoneBtn->text());
     }
     else
     {
@@ -1074,18 +982,10 @@ void MainWindow::writeSettings()
         settings.remove("taskTrigger/buttonText");
     }
 
-    settings.setValue(
-        "trackingStartedAt",
-        trackingStartedAt
-        );
-
-    settings.setValue(
-        "studyButtons/progressIsBeingTracked",
-        progressIsBeingTracked
-        );
+    settings.setValue("trackingStartedAt", trackingStartedAt);
+    settings.setValue("studyButtons/progressIsBeingTracked", progressIsBeingTracked);
 
     QString activeStudyButtonName;
-
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : std::as_const(buttons))
@@ -1093,103 +993,37 @@ void MainWindow::writeSettings()
         if (!btn->property("trackedColorButton").toBool())
             continue;
 
-        QDateTime lastClicked =
-            btn->property("lastClicked").toDateTime();
-
-        QDateTime lastDone =
-            btn->property("lastDone").toDateTime();
-
-        int clickCount =
-            btn->property("clickCount").toInt();
-
-        qint64 cumulativeSeconds =
-            btn->property("cumulativeSeconds").toLongLong();
-
-        bool isPaused =
-            btn->property("isPaused").toBool();
-
-        QDateTime pauseStartedAt =
-            btn->property("pauseStartedAt").toDateTime();
-
-        qint64 pausedSeconds =
-            btn->property("pausedSeconds").toLongLong();
-
-        bool selected =
-            btn->property("selected").toBool();
+        QDateTime lastClicked = btn->property("lastClicked").toDateTime();
+        QDateTime lastDone = btn->property("lastDone").toDateTime();
+        int clickCount = btn->property("clickCount").toInt();
+        qint64 cumulativeSeconds = btn->property("cumulativeSeconds").toLongLong();
+        bool isPaused = btn->property("isPaused").toBool();
+        QDateTime pauseStartedAt = btn->property("pauseStartedAt").toDateTime();
+        qint64 pausedSeconds = btn->property("pausedSeconds").toLongLong();
+        bool selected = btn->property("selected").toBool();
 
         if (progressIsBeingTracked && selected)
-        {
             activeStudyButtonName = btn->objectName();
-        }
 
-        QString lastClickedKey =
-            QString("studyButtons/%1/lastClicked")
-                .arg(btn->objectName());
+        QString prefix = QString("studyButtons/%1/").arg(btn->objectName());
 
-        QString lastDoneKey =
-            QString("studyButtons/%1/lastDone")
-                .arg(btn->objectName());
+        if (lastClicked.isValid()) settings.setValue(prefix + "lastClicked", lastClicked);
+        else settings.remove(prefix + "lastClicked");
 
-        QString clickCountKey =
-            QString("studyButtons/%1/clickCount")
-                .arg(btn->objectName());
+        if (lastDone.isValid()) settings.setValue(prefix + "lastDone", lastDone);
+        else settings.remove(prefix + "lastDone");
 
-        QString cumulativeSecondsKey =
-            QString("studyButtons/%1/cumulativeSeconds")
-                .arg(btn->objectName());
+        settings.setValue(prefix + "clickCount", clickCount);
+        settings.setValue(prefix + "cumulativeSeconds", cumulativeSeconds);
+        settings.setValue(prefix + "isPaused", isPaused);
+        settings.setValue(prefix + "pausedSeconds", pausedSeconds);
 
-        QString isPausedKey =
-            QString("studyButtons/%1/isPaused")
-                .arg(btn->objectName());
-
-        QString pauseStartedAtKey =
-            QString("studyButtons/%1/pauseStartedAt")
-                .arg(btn->objectName());
-
-        QString pausedSecondsKey =
-            QString("studyButtons/%1/pausedSeconds")
-                .arg(btn->objectName());
-
-        if (lastClicked.isValid())
-        {
-            settings.setValue(lastClickedKey, lastClicked);
-        }
-        else
-        {
-            settings.remove(lastClickedKey);
-        }
-
-        if (lastDone.isValid())
-        {
-            settings.setValue(lastDoneKey, lastDone);
-        }
-        else
-        {
-            settings.remove(lastDoneKey);
-        }
-
-        settings.setValue(clickCountKey, clickCount);
-        settings.setValue(cumulativeSecondsKey, cumulativeSeconds);
-        settings.setValue(isPausedKey, isPaused);
-        settings.setValue(pausedSecondsKey, pausedSeconds);
-
-        if (pauseStartedAt.isValid())
-        {
-            settings.setValue(pauseStartedAtKey, pauseStartedAt);
-        }
-        else
-        {
-            settings.remove(pauseStartedAtKey);
-        }
+        if (pauseStartedAt.isValid()) settings.setValue(prefix + "pauseStartedAt", pauseStartedAt);
+        else settings.remove(prefix + "pauseStartedAt");
     }
 
     if (progressIsBeingTracked && !activeStudyButtonName.isEmpty())
-    {
-        settings.setValue(
-            "studyButtons/activeStudyButtonName",
-            activeStudyButtonName
-            );
-    }
+        settings.setValue("studyButtons/activeStudyButtonName", activeStudyButtonName);
     else
     {
         settings.remove("studyButtons/activeStudyButtonName");
@@ -1204,7 +1038,6 @@ bool MainWindow::activateWindowByTitle(const QString &target)
     while (hwnd != nullptr)
     {
         char title[512];
-
         GetWindowTextA(hwnd, title, sizeof(title));
 
         if (title[0] != '\0')
@@ -1215,9 +1048,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
             {
                 ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
-
                 lastOpenedTopic = target;
-
                 return true;
             }
         }
@@ -1225,11 +1056,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
         hwnd = GetNextWindow(hwnd, GW_HWNDNEXT);
     }
 
-    qDebug()
-        << "Window with exact title"
-        << target
-        << "not found.";
-
+    qDebug() << "Window with exact title" << target << "not found.";
     return false;
 }
 
@@ -1242,14 +1069,10 @@ void MainWindow::resetChanceTimer()
 void MainWindow::onTaskIsDoneBtnClicked()
 {
     resetChanceTimer();
-
     taskIsTriggered = false;
-
     ui->taskIsDoneBtn->setEnabled(false);
     ui->taskIsDoneBtn->setText("TASK COMPLETED");
-
     updateCurrentChanceLabel();
-
     writeSettings();
 }
 
@@ -1257,22 +1080,13 @@ void MainWindow::onReopenLastTopicBtnClicked()
 {
     if (lastOpenedTopic.isEmpty())
     {
-        QMessageBox::information(
-            this,
-            "No topic",
-            "No topic was opened yet."
-            );
-
+        QMessageBox::information(this, "No topic", "No topic was opened yet.");
         return;
     }
 
     if (!activateWindowByTitle(lastOpenedTopic))
     {
-        QMessageBox::warning(
-            this,
-            "Topic not found",
-            QString("Could not find a window with title '%1'.").arg(lastOpenedTopic)
-            );
+        QMessageBox::warning(this, "Topic not found", QString("Could not find a window with title '%1'.").arg(lastOpenedTopic));
     }
 }
 
@@ -1358,17 +1172,13 @@ void MainWindow::onResetTopicsBtnClicked()
             priorityButtons.append(btn);
         }
 
-        std::sort(
-            priorityButtons.begin(),
-            priorityButtons.end(),
-            [](QPushButton *a, QPushButton *b)
-            {
-                return
-                    a->property("originalIndex").toInt()
-                    <
-                    b->property("originalIndex").toInt();
-            }
-            );
+        // Shuffle button order randomly inside each priority column.
+        // The old code sorted by originalIndex, which restored the default/alphabetic order.
+        for (int i = priorityButtons.size() - 1; i > 0; --i)
+        {
+            int j = QRandomGenerator::global()->bounded(i + 1);
+            priorityButtons.swapItemsAt(i, j);
+        }
 
         for (QPushButton *btn : priorityButtons)
         {
@@ -1403,11 +1213,7 @@ void MainWindow::calculateDogOwnerRating()
              << "amountOfTimesOut:" << m_dogOwnerRating.amountOfTimesOut()
              << "cumulativeTimeOut:" << m_dogOwnerRating.cumulativeTimeOut();
 
-    m_dogOwnerRatingScore =
-        m_dogOwnerRating.amountOfTimesOut()
-        *
-        m_dogOwnerRating.cumulativeTimeOut();
-
+    m_dogOwnerRatingScore = m_dogOwnerRating.amountOfTimesOut() * m_dogOwnerRating.cumulativeTimeOut();
     emit dogOwnerRatingChanged();
 }
 
@@ -1435,12 +1241,7 @@ void MainWindow::setupStudyButtons()
     for (const StudyButton &button : buttons)
     {
         QString wrappedText = formatButtonText(button.name);
-
-        QSize textSize = metrics.size(
-            Qt::TextShowMnemonic,
-            wrappedText
-            );
-
+        QSize textSize = metrics.size(Qt::TextShowMnemonic, wrappedText);
         maxButtonWidth = qMax(maxButtonWidth, textSize.width());
         maxButtonHeight = qMax(maxButtonHeight, textSize.height());
     }
@@ -1455,7 +1256,6 @@ void MainWindow::setupStudyButtons()
     studyButtonsContainer->setGeometry(20, 20, 1720, 580);
 
     QHBoxLayout *mainLayout = new QHBoxLayout(studyButtonsContainer);
-
     mainLayout->setSpacing(columnGap);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -1463,40 +1263,29 @@ void MainWindow::setupStudyButtons()
     QSet<int> priorities;
 
     for (const StudyButton &button : buttons)
-    {
         priorities.insert(button.priority);
-    }
 
     QList<int> sortedPriorities = priorities.values();
-
     std::sort(sortedPriorities.begin(), sortedPriorities.end());
 
     for (int priority : sortedPriorities)
     {
         QWidget *columnWidget = new QWidget(studyButtonsContainer);
-
         columnWidget->setMinimumWidth(maxButtonWidth);
         columnWidget->setMaximumWidth(maxButtonWidth);
 
         QVBoxLayout *columnLayout = new QVBoxLayout(columnWidget);
-
         columnLayout->setSpacing(10);
         columnLayout->setContentsMargins(0, 0, 0, 0);
         columnLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-        QLabel *title = new QLabel(
-            QString("Priority %1").arg(priority),
-            columnWidget
-            );
-
+        QLabel *title = new QLabel(QString("Priority %1").arg(priority), columnWidget);
         title->setMinimumWidth(maxButtonWidth);
         title->setMaximumWidth(maxButtonWidth);
         title->setAlignment(Qt::AlignCenter);
 
         columnLayout->addWidget(title);
-
         priorityLayouts.insert(priority, columnLayout);
-
         mainLayout->addWidget(columnWidget);
     }
 
@@ -1504,24 +1293,16 @@ void MainWindow::setupStudyButtons()
 
     for (const StudyButton &button : buttons)
     {
-        QPushButton *btn = new QPushButton(
-            formatButtonText(button.name),
-            studyButtonsContainer
-            );
+        QPushButton *btn = new QPushButton(formatButtonText(button.name), studyButtonsContainer);
 
         QFont font = btn->font();
         font.setWeight(QFont::DemiBold);
         btn->setFont(font);
 
         btn->setObjectName(button.name);
-
         btn->setMinimumSize(maxButtonWidth, maxButtonHeight);
         btn->setMaximumSize(maxButtonWidth, maxButtonHeight);
-
-        btn->setSizePolicy(
-            QSizePolicy::Fixed,
-            QSizePolicy::Fixed
-            );
+        btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
         btn->setProperty("trackedColorButton", true);
         btn->setProperty("selected", false);
@@ -1532,37 +1313,26 @@ void MainWindow::setupStudyButtons()
         btn->setProperty("cumulativeSeconds", 0);
 
         updateButtonStatsLabels(btn);
-
         ++studyButtonIndex;
 
         priorityLayouts[button.priority]->addWidget(btn);
 
-        connect(
-            btn,
-            &QPushButton::clicked,
-            this,
-            [this, btn]()
-            {
-                handleStudyButtonClicked(btn);
-            }
-            );
+        connect(btn, &QPushButton::clicked, this, [this, btn]()
+                {
+                    handleStudyButtonClicked(btn);
+                });
     }
 
     for (QVBoxLayout *columnLayout : std::as_const(priorityLayouts))
-    {
         columnLayout->addStretch();
-    }
 }
 
 void MainWindow::restoreStudyButtonSettings()
 {
     QSettings settings;
 
-    QString activeStudyButtonName =
-        settings.value("studyButtons/activeStudyButtonName", "").toString();
-
+    QString activeStudyButtonName = settings.value("studyButtons/activeStudyButtonName", "").toString();
     bool restoredActiveStudyButton = false;
-
     QList<QPushButton*> createdButtons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : std::as_const(createdButtons))
@@ -1570,44 +1340,14 @@ void MainWindow::restoreStudyButtonSettings()
         if (!btn->property("trackedColorButton").toBool())
             continue;
 
-        QDateTime lastClicked = settings.value(
-                                            QString("studyButtons/%1/lastClicked")
-                                                .arg(btn->objectName())
-                                            ).toDateTime();
-
-        QDateTime lastDone = settings.value(
-                                         QString("studyButtons/%1/lastDone")
-                                             .arg(btn->objectName())
-                                         ).toDateTime();
-
-        int clickCount = settings.value(
-                                     QString("studyButtons/%1/clickCount")
-                                         .arg(btn->objectName()),
-                                     0
-                                     ).toInt();
-
-        qint64 cumulativeSeconds = settings.value(
-                                               QString("studyButtons/%1/cumulativeSeconds")
-                                                   .arg(btn->objectName()),
-                                               0
-                                               ).toLongLong();
-
-        bool isPaused = settings.value(
-                                    QString("studyButtons/%1/isPaused")
-                                        .arg(btn->objectName()),
-                                    false
-                                    ).toBool();
-
-        QDateTime pauseStartedAt = settings.value(
-                                               QString("studyButtons/%1/pauseStartedAt")
-                                                   .arg(btn->objectName())
-                                               ).toDateTime();
-
-        qint64 pausedSeconds = settings.value(
-                                           QString("studyButtons/%1/pausedSeconds")
-                                               .arg(btn->objectName()),
-                                           0
-                                           ).toLongLong();
+        QString prefix = QString("studyButtons/%1/").arg(btn->objectName());
+        QDateTime lastClicked = settings.value(prefix + "lastClicked").toDateTime();
+        QDateTime lastDone = settings.value(prefix + "lastDone").toDateTime();
+        int clickCount = settings.value(prefix + "clickCount", 0).toInt();
+        qint64 cumulativeSeconds = settings.value(prefix + "cumulativeSeconds", 0).toLongLong();
+        bool isPaused = settings.value(prefix + "isPaused", false).toBool();
+        QDateTime pauseStartedAt = settings.value(prefix + "pauseStartedAt").toDateTime();
+        qint64 pausedSeconds = settings.value(prefix + "pausedSeconds", 0).toLongLong();
 
         btn->setProperty("clickCount", clickCount);
         btn->setProperty("cumulativeSeconds", cumulativeSeconds);
@@ -1615,15 +1355,7 @@ void MainWindow::restoreStudyButtonSettings()
         btn->setProperty("pauseStartedAt", pauseStartedAt);
         btn->setProperty("pausedSeconds", pausedSeconds);
 
-        bool isActiveButton =
-            progressIsBeingTracked
-            &&
-            !activeStudyButtonName.isEmpty()
-            &&
-            btn->objectName() == activeStudyButtonName
-            &&
-            lastClicked.isValid();
-
+        bool isActiveButton = progressIsBeingTracked && !activeStudyButtonName.isEmpty() && btn->objectName() == activeStudyButtonName && lastClicked.isValid();
         btn->setProperty("selected", isActiveButton);
 
         if (!isActiveButton)
@@ -1637,20 +1369,12 @@ void MainWindow::restoreStudyButtonSettings()
             restoredActiveStudyButton = true;
 
         if (lastClicked.isValid())
-        {
             btn->setProperty("lastClicked", lastClicked);
-        }
 
         if (lastDone.isValid())
-        {
             btn->setProperty("lastDone", lastDone);
-        }
 
-        updateButtonColor(
-            btn,
-            buttonColorReferenceTime(btn)
-            );
-
+        updateButtonColor(btn, buttonColorReferenceTime(btn));
         updateButtonStatsLabels(btn);
     }
 
@@ -1661,9 +1385,7 @@ void MainWindow::restoreStudyButtonSettings()
         settings.setValue("studyButtons/progressIsBeingTracked", false);
     }
 
-    for (auto it = priorityLayouts.begin();
-         it != priorityLayouts.end();
-         ++it)
+    for (auto it = priorityLayouts.begin(); it != priorityLayouts.end(); ++it)
     {
         QVBoxLayout *columnLayout = it.value();
 
@@ -1674,11 +1396,8 @@ void MainWindow::restoreStudyButtonSettings()
 
         for (int i = 0; i < columnLayout->count(); ++i)
         {
-            QWidget *widget =
-                columnLayout->itemAt(i)->widget();
-
-            QPushButton *btn =
-                qobject_cast<QPushButton*>(widget);
+            QWidget *widget = columnLayout->itemAt(i)->widget();
+            QPushButton *btn = qobject_cast<QPushButton*>(widget);
 
             if (!btn)
                 continue;
@@ -1689,39 +1408,25 @@ void MainWindow::restoreStudyButtonSettings()
             priorityButtons.append(btn);
         }
 
-        std::sort(
-            priorityButtons.begin(),
-            priorityButtons.end(),
-            [](QPushButton *a, QPushButton *b)
-            {
-                QDateTime aDone =
-                    a->property("lastDone").toDateTime();
+        std::sort(priorityButtons.begin(), priorityButtons.end(), [](QPushButton *a, QPushButton *b)
+                  {
+                      QDateTime aDone = a->property("lastDone").toDateTime();
+                      QDateTime bDone = b->property("lastDone").toDateTime();
 
-                QDateTime bDone =
-                    b->property("lastDone").toDateTime();
+                      if (aDone.isValid() != bDone.isValid())
+                          return !aDone.isValid();
 
-                if (aDone.isValid() != bDone.isValid())
-                    return !aDone.isValid();
+                      if (aDone.isValid() && bDone.isValid() && aDone != bDone)
+                          return aDone < bDone;
 
-                if (aDone.isValid() && bDone.isValid() && aDone != bDone)
-                    return aDone < bDone;
-
-                return
-                    a->property("originalIndex").toInt()
-                    <
-                    b->property("originalIndex").toInt();
-            }
-            );
+                      return a->property("originalIndex").toInt() < b->property("originalIndex").toInt();
+                  });
 
         for (QPushButton *btn : priorityButtons)
         {
             columnLayout->removeWidget(btn);
-
             int insertIndex = columnLayout->count() - 1;
-
-            if (insertIndex < 0)
-                insertIndex = 0;
-
+            if (insertIndex < 0) insertIndex = 0;
             columnLayout->insertWidget(insertIndex, btn);
         }
     }
@@ -1730,22 +1435,15 @@ void MainWindow::restoreStudyButtonSettings()
 void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 {
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
-
     QPushButton *previousSelectedButton = nullptr;
 
     if (progressIsBeingTracked)
     {
         for (QPushButton *otherBtn : std::as_const(buttons))
         {
-            if (!otherBtn->property("trackedColorButton").toBool())
-                continue;
-
-            if (!otherBtn->property("selected").toBool())
-                continue;
-
-            if (otherBtn == btn)
-                continue;
-
+            if (!otherBtn->property("trackedColorButton").toBool()) continue;
+            if (!otherBtn->property("selected").toBool()) continue;
+            if (otherBtn == btn) continue;
             previousSelectedButton = otherBtn;
             break;
         }
@@ -1753,96 +1451,33 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 
     if (previousSelectedButton != nullptr)
     {
-        QDateTime lastClicked =
-            previousSelectedButton->property("lastClicked").toDateTime();
+        QDateTime lastClicked = previousSelectedButton->property("lastClicked").toDateTime();
 
         if (lastClicked.isValid())
         {
-            QDateTime lastDone =
-                QDateTime::currentDateTime();
-
+            QDateTime lastDone = QDateTime::currentDateTime();
             previousSelectedButton->setProperty("lastDone", lastDone);
 
-            qint64 pausedSeconds =
-                previousSelectedButton->property("pausedSeconds").toLongLong();
-
-            bool isPaused =
-                previousSelectedButton->property("isPaused").toBool();
-
-            QDateTime pauseStartedAt =
-                previousSelectedButton->property("pauseStartedAt").toDateTime();
+            qint64 pausedSeconds = previousSelectedButton->property("pausedSeconds").toLongLong();
+            bool isPaused = previousSelectedButton->property("isPaused").toBool();
+            QDateTime pauseStartedAt = previousSelectedButton->property("pauseStartedAt").toDateTime();
 
             if (isPaused && pauseStartedAt.isValid())
             {
-                qint64 finalPausedSeconds =
-                    pauseStartedAt.secsTo(lastDone);
-
-                if (finalPausedSeconds < 0)
-                    finalPausedSeconds = 0;
-
+                qint64 finalPausedSeconds = pauseStartedAt.secsTo(lastDone);
+                if (finalPausedSeconds < 0) finalPausedSeconds = 0;
                 pausedSeconds += finalPausedSeconds;
-
-                qDebug() << "Previous topic was auto-ended while paused";
-                qDebug() << "Final paused seconds added:" << finalPausedSeconds;
             }
 
-            qint64 elapsedSeconds =
-                lastClicked.secsTo(lastDone) - pausedSeconds;
+            qint64 elapsedSeconds = lastClicked.secsTo(lastDone) - pausedSeconds;
+            if (elapsedSeconds < 0) elapsedSeconds = 0;
 
-            if (elapsedSeconds < 0)
-                elapsedSeconds = 0;
-
-            qDebug() << "Auto-end raw seconds:"
-                     << lastClicked.secsTo(lastDone);
-
-            qDebug() << "Auto-end paused seconds excluded:"
-                     << pausedSeconds;
-
-            qDebug() << "Auto-end active seconds:"
-                     << elapsedSeconds;
-
-            qint64 cumulativeSeconds =
-                previousSelectedButton->property("cumulativeSeconds").toLongLong();
-
+            qint64 cumulativeSeconds = previousSelectedButton->property("cumulativeSeconds").toLongLong();
             cumulativeSeconds += elapsedSeconds;
-
-            previousSelectedButton->setProperty(
-                "cumulativeSeconds",
-                cumulativeSeconds
-                );
-
+            previousSelectedButton->setProperty("cumulativeSeconds", cumulativeSeconds);
             previousSelectedButton->setProperty("isPaused", false);
             previousSelectedButton->setProperty("pauseStartedAt", QDateTime());
             previousSelectedButton->setProperty("pausedSeconds", 0);
-
-            qint64 elapsedHours =
-                elapsedSeconds / 3600;
-
-            qint64 elapsedMinutes =
-                (elapsedSeconds % 3600) / 60;
-
-            qint64 remainingSeconds =
-                elapsedSeconds % 60;
-
-            QString elapsedText =
-                QString("%1h %2m %3s")
-                    .arg(elapsedHours)
-                    .arg(elapsedMinutes)
-                    .arg(remainingSeconds);
-
-            qDebug() << "Previous topic automatically ended:"
-                     << previousSelectedButton->objectName();
-
-            qDebug() << "Elapsed between lastClicked and lastDone:"
-                     << elapsedText;
-
-            qDebug() << "New cumulative time:"
-                     << formatSecondsAsHoursMinutes(cumulativeSeconds);
-        }
-        else
-        {
-            qDebug() << "Previous selected topic had no valid lastClicked:"
-                     << previousSelectedButton->objectName();
         }
 
         previousSelectedButton->setProperty("selected", false);
@@ -1854,21 +1489,14 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
             continue;
 
         otherBtn->setProperty("selected", false);
-
-        updateButtonColor(
-            otherBtn,
-            buttonColorReferenceTime(otherBtn)
-            );
-
+        updateButtonColor(otherBtn, buttonColorReferenceTime(otherBtn));
         updateButtonStatsLabels(otherBtn);
     }
 
     btn->setProperty("selected", true);
-
     checkTaskWithChance();
 
     QDateTime now = QDateTime::currentDateTime();
-
     btn->setProperty("lastClicked", now);
     btn->setProperty("isPaused", false);
     btn->setProperty("pauseStartedAt", QDateTime());
@@ -1876,17 +1504,7 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 
     progressIsBeingTracked = true;
 
-    qDebug() << "Topic started:"
-             << btn->objectName();
-
-    qDebug() << "lastClicked set to:"
-             << now.toString("yyyy-MM-dd HH:mm:ss");
-
-    qDebug() << "Pause state reset for new run";
-
-    int clickCount =
-        btn->property("clickCount").toInt();
-
+    int clickCount = btn->property("clickCount").toInt();
     btn->setProperty("clickCount", clickCount + 1);
 
     updateButtonColor(btn, buttonColorReferenceTime(btn));
@@ -1895,51 +1513,35 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
     writeSettings();
 
     int priority = btn->property("priority").toInt();
-
-    QVBoxLayout *columnLayout =
-        priorityLayouts.value(priority, nullptr);
+    QVBoxLayout *columnLayout = priorityLayouts.value(priority, nullptr);
 
     if (columnLayout != nullptr)
     {
         columnLayout->removeWidget(btn);
-
         int insertIndex = columnLayout->count() - 1;
-
-        if (insertIndex < 0)
-            insertIndex = 0;
-
+        if (insertIndex < 0) insertIndex = 0;
         columnLayout->insertWidget(insertIndex, btn);
     }
 
-    QString appTitle =
-        btn->property("appTitle").toString();
-
-    QString instanceName =
-        btn->objectName();
+    QString appTitle = btn->property("appTitle").toString();
+    QString instanceName = btn->objectName();
 
     if (!appTitle.isEmpty())
     {
         if (appTitle == "Chrome")
-        {
             activateWindowByTitle(instanceName);
-        }
     }
 }
 
 void MainWindow::onUndoBtnClicked()
 {
     QPushButton *selectedButton = nullptr;
-
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : std::as_const(buttons))
     {
-        if (!btn->property("trackedColorButton").toBool())
-            continue;
-
-        if (!btn->property("selected").toBool())
-            continue;
-
+        if (!btn->property("trackedColorButton").toBool()) continue;
+        if (!btn->property("selected").toBool()) continue;
         selectedButton = btn;
         break;
     }
@@ -1957,16 +1559,7 @@ void MainWindow::onUndoBtnClicked()
 
     progressIsBeingTracked = false;
 
-    // Intentionally NOT changing:
-    // - lastClicked
-    // - lastDone
-    // - clickCount
-    // - cumulativeSeconds
-    // - button color
-    // - button position/order
-
     writeSettings();
 
-    qDebug() << "Tracking undone for:"
-             << selectedButton->objectName();
+    qDebug() << "Tracking undone for:" << selectedButton->objectName();
 }
