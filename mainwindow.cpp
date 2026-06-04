@@ -38,18 +38,22 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // develop
-
-    m_amountOfTimesOut = ui->amountOfTimesOutSb->value();
-    m_cumulativeTimeOut = ui->cumulativeTimeOutSb->value();
-
-    // course practice
+    // *****************************************************************************************************************
+    // DEV / COURSE PRACTICE
+    // *****************************************************************************************************************
 
     QVBoxLayout* layout = new QVBoxLayout(ui->coursePracticeView);
 
     RockWidget* rockWidget = new RockWidget(ui->coursePracticeView);
     layout->addWidget(rockWidget);
 
+
+    // *****************************************************************************************************************
+    // FEATURE / DOG OWNER RATING
+    // *****************************************************************************************************************
+
+    m_amountOfTimesOut = ui->amountOfTimesOutSb->value();
+    m_cumulativeTimeOut = ui->cumulativeTimeOutSb->value();
 
     connect(
         ui->amountOfTimesOutSb,
@@ -75,7 +79,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     calculateDogOwnerRating();
 
-    // signals and slots logic
+
+    // *****************************************************************************************************************
+    // SIGNALS AND SLOTS CONNECTIONS
+    // *****************************************************************************************************************
 
     connect(
         ui->reopenLastTopicBtn,
@@ -112,9 +119,9 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 qDebug() << "progressIsBeingTracked:" << progressIsBeingTracked;
 
-
                 QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
+                // loops through study btns to find the one being tracked and selected (if any), then prints debug info about it
                 for (QPushButton *btn : std::as_const(buttons))
                 {
                     if (!btn->property("trackedColorButton").toBool())
@@ -197,6 +204,10 @@ MainWindow::MainWindow(QWidget *parent)
             }
             );
 
+    // *****************************************************************************************************************
+    // HOTKEYS REGISTRATION
+    // *****************************************************************************************************************
+
     HWND hwnd = reinterpret_cast<HWND>(winId());
 
     if (!RegisterHotKey(hwnd, FINISH_HOTKEY_ID, MOD_CONTROL | MOD_ALT | MOD_SHIFT, 'D')
@@ -204,27 +215,42 @@ MainWindow::MainWindow(QWidget *parent)
     {
         qDebug() << "RegisterHotKey for Shift + Alt + D failed. Error:" << GetLastError();
     }
-    else
-    {
-        qDebug() << "RegisterHotKey for Shift + Alt + D succeeded";
-    }
+    // else
+    // {
+    //     qDebug() << "RegisterHotKey for Shift + Alt + D succeeded";
+    // }
 
     if (!RegisterHotKey(hwnd, PAUSE_HOTKEY_ID, MOD_CONTROL | MOD_ALT | MOD_SHIFT, 'F'))
     {
         qDebug() << "RegisterHotKey for Shift + Alt + F failed. Error:" << GetLastError();
     }
-    else
-    {
-        qDebug() << "RegisterHotKey for Shift + Alt + F succeeded";
-    }
+    // else
+    // {
+    //     qDebug() << "RegisterHotKey for Shift + Alt + F succeeded";
+    // }
 
+
+    // *****************************************************************************************************************
+    // INITIAL UI STATE
+    // *****************************************************************************************************************
+
+    //Shows the production view first.
     ui->viewsStack->setCurrentWidget(ui->productionView);
 
+    // Sets temporary label text before settings are loaded.
+    // CHECK do this for other settings?
     ui->currentChanceLbl->setText("settings not read yet");
     ui->trackingStartedAtLbl->setText("Not started");
 
+    // CHECK why here and not before? right after setup
     readSettings();
 
+
+    // *****************************************************************************************************************
+    // SETTINGS LOGIC
+    // *****************************************************************************************************************
+
+    // setting that determins timespan for buttons
     connect(
         ui->btnColorTimeSpanSpinbox,
         QOverload<int>::of(&QSpinBox::valueChanged),
@@ -238,6 +264,7 @@ MainWindow::MainWindow(QWidget *parent)
                 if (!btn->property("trackedColorButton").toBool())
                     continue;
 
+                // CHECK why are these two being run here?
                 updateButtonColor(
                     btn,
                     buttonColorReferenceTime(btn)
@@ -246,9 +273,15 @@ MainWindow::MainWindow(QWidget *parent)
                 updateButtonStatsLabels(btn);
             }
 
+            // CHECK why writing entire settings everytime instead of updating just the single value?
             writeSettings();
         }
         );
+
+
+    // *****************************************************************************************************************
+    // TRAY ICON
+    // *****************************************************************************************************************
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
@@ -261,6 +294,10 @@ MainWindow::MainWindow(QWidget *parent)
         this,
         &MainWindow::trayIconActivated
         );
+
+    // *****************************************************************************************************************
+    // NAVIGATION
+    // *****************************************************************************************************************
 
     connect(
         ui->actionOtherView,
@@ -312,10 +349,11 @@ MainWindow::MainWindow(QWidget *parent)
         }
         );
 
-
     setupStudyButtons();
 
     restoreStudyButtonSettings();
+
+    // set up cursor pointer for all buttons
 
     QList<QPushButton*> allButtons = findChildren<QPushButton*>();
 
@@ -325,7 +363,10 @@ MainWindow::MainWindow(QWidget *parent)
     }
 }
 
+// *****************************************************************************************************************
 // DESTRUCTOR
+// *****************************************************************************************************************
+
 MainWindow::~MainWindow()
 {
     HWND hwnd = reinterpret_cast<HWND>(winId());
@@ -343,6 +384,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// *****************************************************************************************************************
+// FUNCTIONS
+// *****************************************************************************************************************
+
+// This function returns a time reference used to decide the button color.
 QDateTime MainWindow::buttonColorReferenceTime(QPushButton *btn) const
 {
     if (btn == nullptr)
@@ -351,6 +397,8 @@ QDateTime MainWindow::buttonColorReferenceTime(QPushButton *btn) const
     bool selected =
         btn->property("selected").toBool();
 
+    // special logic for a btn that's currently active
+    // CHECK why are we doing this though? if it's active just color it the greenest
     if (progressIsBeingTracked && selected)
     {
         QDateTime lastClicked =
@@ -1076,6 +1124,13 @@ void MainWindow::onTaskIsDoneBtnClicked()
     writeSettings();
 }
 
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    writeSettings();
+    QMainWindow::closeEvent(event);
+}
+
 void MainWindow::onReopenLastTopicBtnClicked()
 {
     if (lastOpenedTopic.isEmpty())
@@ -1088,12 +1143,6 @@ void MainWindow::onReopenLastTopicBtnClicked()
     {
         QMessageBox::warning(this, "Topic not found", QString("Could not find a window with title '%1'.").arg(lastOpenedTopic));
     }
-}
-
-void MainWindow::closeEvent(QCloseEvent *event)
-{
-    writeSettings();
-    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::onResetTopicsBtnClicked()
