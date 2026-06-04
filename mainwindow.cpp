@@ -495,7 +495,7 @@ bool MainWindow::nativeEvent(
         QDateTime lastClicked =
             selectedButton->property("lastClicked").toDateTime();
 
-        // safeguard
+        // safety check
         if (!lastClicked.isValid())
         {
             QMessageBox::warning(
@@ -616,7 +616,8 @@ bool MainWindow::nativeEvent(
     }
     case PAUSE_HOTKEY_ID:
     {
-        qDebug() << "Shift + Alt + F pressed globally";
+        // for comments  of first part see prev hotkey
+        // qDebug() << "Shift + Alt + F pressed globally";
 
         QPushButton *selectedButton = nullptr;
 
@@ -663,31 +664,36 @@ bool MainWindow::nativeEvent(
         bool isPaused =
             selectedButton->property("isPaused").toBool();
 
+        // pause/unpause logic
         if (!isPaused)
         {
             selectedButton->setProperty("isPaused", true);
             selectedButton->setProperty("pauseStartedAt", now);
 
+            // CHECK is all of this necessary if not for debug? safe for the else branch
+
+            // Read already accumulated pause time.
             qint64 pausedSeconds =
                 selectedButton->property("pausedSeconds").toLongLong();
 
+            // Calculate how much active time has happened so far.
             qint64 activeSecondsSoFar =
                 lastClicked.secsTo(now) - pausedSeconds;
 
             if (activeSecondsSoFar < 0)
                 activeSecondsSoFar = 0;
 
-            qDebug() << "Topic paused:"
-                     << selectedButton->objectName();
+            // qDebug() << "Topic paused:"
+            //          << selectedButton->objectName();
 
-            qDebug() << "Pause started at:"
-                     << now.toString("yyyy-MM-dd HH:mm:ss");
+            // qDebug() << "Pause started at:"
+            //          << now.toString("yyyy-MM-dd HH:mm:ss");
 
-            qDebug() << "Active seconds before pause:"
-                     << activeSecondsSoFar;
+            // qDebug() << "Active seconds before pause:"
+            //          << activeSecondsSoFar;
 
-            qDebug() << "Paused seconds already stored:"
-                     << pausedSeconds;
+            // qDebug() << "Paused seconds already stored:"
+            //          << pausedSeconds;
         }
         else
         {
@@ -720,30 +726,35 @@ bool MainWindow::nativeEvent(
             if (activeSecondsSoFar < 0)
                 activeSecondsSoFar = 0;
 
-            qDebug() << "Topic resumed:"
-                     << selectedButton->objectName();
+            // qDebug() << "Topic resumed:"
+            //          << selectedButton->objectName();
 
-            qDebug() << "Pause ended at:"
-                     << now.toString("yyyy-MM-dd HH:mm:ss");
+            // qDebug() << "Pause ended at:"
+            //          << now.toString("yyyy-MM-dd HH:mm:ss");
 
-            qDebug() << "Paused seconds added:"
-                     << pausedSecondsToAdd;
+            // qDebug() << "Paused seconds added:"
+            //          << pausedSecondsToAdd;
 
-            qDebug() << "Total paused seconds for this run:"
-                     << pausedSeconds;
+            // qDebug() << "Total paused seconds for this run:"
+            //          << pausedSeconds;
 
-            qDebug() << "Active seconds so far, excluding pauses:"
-                     << activeSecondsSoFar;
+            // qDebug() << "Active seconds so far, excluding pauses:"
+            //          << activeSecondsSoFar;
         }
 
+        // CHECK is this really necessary? btn is still active anyway
         updateButtonColor(
             selectedButton,
             buttonColorReferenceTime(selectedButton)
             );
 
+        // Refresh UI and save state.
+
         updateButtonStatsLabels(selectedButton);
 
         writeSettings();
+
+        // Reads final pause state after toggling.
 
         bool topicIsNowPaused =
             selectedButton->property("isPaused").toBool();
@@ -769,8 +780,6 @@ bool MainWindow::nativeEvent(
     }
 
 
-
-
     return QMainWindow::nativeEvent(
         eventType,
         message,
@@ -778,13 +787,18 @@ bool MainWindow::nativeEvent(
         );
 }
 
-// Rest of file is unchanged except reset now shuffles buttons randomly.
 
+// *****************************************************************************************************************
+// TASK CHANCE
+// *****************************************************************************************************************
+
+// This function calculates the current chance of triggering the task based on the elapsed time since chanceStartTime. 0 to 1.
 double MainWindow::calculateCurrentTaskChance() const
 {
     if (!chanceStartTime.isValid())
         return 0.0;
 
+    // IMPROVE make this a const or a setting
     constexpr double maxSeconds = 25.0 * 60.0;
 
     double elapsedSeconds = chanceStartTime.secsTo(QDateTime::currentDateTime());
@@ -793,6 +807,7 @@ double MainWindow::calculateCurrentTaskChance() const
     return progress;
 }
 
+// This function checks if the task should be triggered based on the current chance and updates the UI accordingly. It is called when the main window is activated and when the chance timer is reset.
 void MainWindow::checkTaskWithChance()
 {
     if (taskIsTriggered)
@@ -822,6 +837,7 @@ void MainWindow::checkTaskWithChance()
         updateCurrentChanceLabel();
 }
 
+// This function updates the UI to reflect that the task has been triggered, including setting the appropriate label text, enabling the task completion button, and saving the state to settings.
 void MainWindow::doTaskTriggeredStuff()
 {
     if (taskIsTriggered)
@@ -847,6 +863,7 @@ void MainWindow::doTaskTriggeredStuff()
     writeSettings();
 }
 
+// This function updates the current chance label and progress bar based on the calculated chance. If the task is already triggered, it ensures the task completion button is enabled.
 void MainWindow::updateCurrentChanceLabel()
 {
     if (taskIsTriggered)
@@ -866,6 +883,7 @@ void MainWindow::updateCurrentChanceLabel()
         doTaskTriggeredStuff();
 }
 
+// This function updates the color of a study topic button based on the elapsed time since its reference time (either lastDone or current time if it's active). The color transitions from green to red as more time passes, with a configurable timespan. If the button has no valid reference time, it uses a default style. It also updates the button's stats labels after changing the color.
 void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 {
     bool selected = btn->property("selected").toBool();
@@ -937,6 +955,10 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 
     updateButtonStatsLabels(btn);
 }
+
+// This overridden event handler checks for the WindowActivate event, which occurs when the main window becomes active. When this event is detected, it iterates through all tracked study topic buttons, updates their colors based on their reference times, and refreshes their stats labels. It also updates the current chance label for the task. After handling the event, it calls the base class implementation to ensure normal event processing continues.
+
+// HERE
 
 bool MainWindow::event(QEvent *event)
 {
