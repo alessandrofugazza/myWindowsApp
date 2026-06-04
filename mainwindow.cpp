@@ -397,40 +397,10 @@ QDateTime MainWindow::buttonColorReferenceTime(QPushButton *btn) const
     bool selected =
         btn->property("selected").toBool();
 
-    // special logic for a btn that's currently active
-    // CHECK why are we doing this though? if it's active just color it the greenest
+    // return current time if btn is active, otherwise return lastDone time
     if (progressIsBeingTracked && selected)
     {
-        QDateTime lastClicked =
-            btn->property("lastClicked").toDateTime();
-
-        if (!lastClicked.isValid())
-            return QDateTime();
-
-        qint64 pausedSeconds =
-            btn->property("pausedSeconds").toLongLong();
-
-        bool isPaused =
-            btn->property("isPaused").toBool();
-
-        QDateTime pauseStartedAt =
-            btn->property("pauseStartedAt").toDateTime();
-
-        QDateTime effectiveEnd =
-            QDateTime::currentDateTime();
-
-        if (isPaused && pauseStartedAt.isValid())
-        {
-            effectiveEnd = pauseStartedAt;
-        }
-
-        qint64 activeElapsedSeconds =
-            lastClicked.secsTo(effectiveEnd) - pausedSeconds;
-
-        if (activeElapsedSeconds < 0)
-            activeElapsedSeconds = 0;
-
-        return QDateTime::currentDateTime().addSecs(-activeElapsedSeconds);
+        return QDateTime::currentDateTime();
     }
 
     return btn->property("lastDone").toDateTime();
