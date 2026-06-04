@@ -41,6 +41,7 @@ QList<StudyButton> defaultStudyButtons()
             {"Python", 5, "Chrome"},
             {"Qt Creator", 6, "Qt Creator"},
             {"Reading", 5, "Chrome"},
+            {"Stream Deck", 1, "Chrome"},
             {"Swift", 5, "Chrome"},
             {"VS Code", 6, "Chrome"},
             {"Web Development", 3, "Chrome"},
