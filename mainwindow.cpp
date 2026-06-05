@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <utility>
 #include <QMessageBox>
+#include <QStatusBar>
 
 #include <windows.h>
 #include "Models/dogownerrating.h"
@@ -610,6 +611,12 @@ bool MainWindow::nativeEvent(
             QString("You spent %1 on '%2'.")
                 .arg(elapsedText)
                 .arg(selectedButton->objectName())
+            );
+
+        statusBar() -> showMessage(
+            QString("Finished '%1' in %2")
+                .arg(selectedButton->objectName())
+                .arg(elapsedText)
             );
 
         return true;
@@ -1304,6 +1311,8 @@ void MainWindow::onResetTopicsBtnClicked()
 
     settings.remove("studyButtons/activeStudyButtonName");
     settings.setValue("studyButtons/progressIsBeingTracked", false);
+
+    statusBar()->showMessage("Topics reset");
 
     writeSettings();
 }
