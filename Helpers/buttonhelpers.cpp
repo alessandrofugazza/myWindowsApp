@@ -63,7 +63,7 @@ void updateButtonStatsLabels(QPushButton *btn)
         clickCountLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
         clickCountLabel->setStyleSheet(
             "font-size: 8px;"
-            "font-weight: 500;"
+            "font-weight: 700;"
             "color: rgba(255,255,255,190);"
             "background: transparent;"
             );
@@ -77,7 +77,7 @@ void updateButtonStatsLabels(QPushButton *btn)
         cumulativeTimeLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         cumulativeTimeLabel->setStyleSheet(
             "font-size: 8px;"
-            "font-weight: 500;"
+            "font-weight: 700;"
             "color: rgba(255,255,255,190);"
             "background: transparent;"
             );
