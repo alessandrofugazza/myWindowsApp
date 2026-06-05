@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+    // CHECK poosibly missing Qsize sizehint?
 
 protected:
     bool event(QEvent *event) override;
@@ -57,6 +58,7 @@ signals:
     void dogOwnerRatingChanged();
 
 private:
+    // CHECK maybe missing this? QAction * quitAction;
     Ui::MainWindow *ui;
 
     QTimer timer;

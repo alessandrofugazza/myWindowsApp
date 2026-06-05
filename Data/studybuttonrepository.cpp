@@ -4,7 +4,6 @@ QList<StudyButton> defaultStudyButtons()
 {
     return
         {
-
             {"AHK", 7, "Chrome"},
             {"Anki", 7, "Chrome"},
             {"Automotive", 4, "Chrome"},
@@ -46,15 +45,5 @@ QList<StudyButton> defaultStudyButtons()
             {"VS Code", 6, "Chrome"},
             {"Web Development", 1, "Chrome"},
             {"Windows Development", 2, "Chrome"},
-
-
-
-
-
-
-
-
-
-
         };
 }
