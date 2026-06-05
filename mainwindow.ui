@@ -235,8 +235,8 @@
          </property>
          <property name="geometry">
           <rect>
-           <x>660</x>
-           <y>720</y>
+           <x>610</x>
+           <y>710</y>
            <width>241</width>
            <height>71</height>
           </rect>
@@ -289,7 +289,7 @@
         <widget class="QPushButton" name="reopenLastTopicBtn">
          <property name="geometry">
           <rect>
-           <x>1010</x>
+           <x>1100</x>
            <y>730</y>
            <width>141</width>
            <height>51</height>
@@ -400,6 +400,38 @@
           <string>UNDO</string>
          </property>
         </widget>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>910</x>
+           <y>710</y>
+           <width>109</width>
+           <height>67</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Total today:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="totalTodayLbl">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <zorder>layoutWidget</zorder>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
@@ -411,6 +443,8 @@
         <zorder>debugBtn</zorder>
         <zorder>devModeCheckBox</zorder>
         <zorder>undoBtn</zorder>
+        <zorder>label_8</zorder>
+        <zorder>totalTodayLbl</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
@@ -455,7 +489,7 @@
      <x>0</x>
      <y>0</y>
      <width>2231</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSections">

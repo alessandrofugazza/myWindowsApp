@@ -997,6 +997,11 @@ void MainWindow::readSettings()
     // CHECK why are we doing logic here? instead of just reading, and handle logic to function so it is reusable
 
     ui->studyNotes->setPlainText(settings.value("studyNotes", "").toString());
+    ui->totalTodayLbl->setText(
+        QString::number(
+            settings.value("totalToday", 0).toInt()
+            )
+        );
     lastOpenedTopic = settings.value("lastOpenedTopic", "").toString();
     chanceStartTime = settings.value("chance/startTime", QDateTime::currentDateTime()).toDateTime();
     ui->btnColorTimeSpanSpinbox->setValue(settings.value("buttonColor/timeSpanMinutes", 120).toInt());
@@ -1043,6 +1048,10 @@ void MainWindow::writeSettings()
     QSettings settings;
 
     settings.setValue("studyNotes", ui->studyNotes->toPlainText());
+    settings.setValue(
+        "totalToday",
+        ui->totalTodayLbl->text().toInt()
+        );
     settings.setValue("lastOpenedTopic", lastOpenedTopic);
     settings.setValue("chance/startTime", chanceStartTime);
     settings.setValue("buttonColor/timeSpanMinutes", ui->btnColorTimeSpanSpinbox->value());
@@ -1153,6 +1162,13 @@ void MainWindow::resetChanceTimer()
 
 void MainWindow::onTaskIsDoneBtnClicked()
 {
+    int totalToday =
+        ui->totalTodayLbl->text().toInt();
+
+    ui->totalTodayLbl->setText(
+        QString::number(totalToday + 1)
+        );
+
     resetChanceTimer();
     taskIsTriggered = false;
     ui->taskIsDoneBtn->setEnabled(false);
@@ -1201,6 +1217,8 @@ void MainWindow::onResetTopicsBtnClicked()
     ui->trackingStartedAtLbl->setText(
         trackingStartedAt.toString("yyyy-MM-dd HH:mm:ss")
         );
+
+    ui->totalTodayLbl->setText("0");
 
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
