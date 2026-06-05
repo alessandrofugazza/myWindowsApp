@@ -883,6 +883,11 @@ void MainWindow::updateCurrentChanceLabel()
         doTaskTriggeredStuff();
 }
 
+
+// *****************************************************************************************************************
+// BTN UPDATE
+// *****************************************************************************************************************
+
 // This function updates the color of a study topic button based on the elapsed time since its reference time (either lastDone or current time if it's active). The color transitions from green to red as more time passes, with a configurable timespan. If the button has no valid reference time, it uses a default style. It also updates the button's stats labels after changing the color.
 void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
 {
@@ -956,9 +961,7 @@ void MainWindow::updateButtonColor(QPushButton *btn, QDateTime clickedTime)
     updateButtonStatsLabels(btn);
 }
 
-// This overridden event handler checks for the WindowActivate event, which occurs when the main window becomes active. When this event is detected, it iterates through all tracked study topic buttons, updates their colors based on their reference times, and refreshes their stats labels. It also updates the current chance label for the task. After handling the event, it calls the base class implementation to ensure normal event processing continues.
-
-// HERE
+// Updates everything in GUI if app is activated
 
 bool MainWindow::event(QEvent *event)
 {
@@ -978,12 +981,20 @@ bool MainWindow::event(QEvent *event)
         updateCurrentChanceLabel();
     }
 
+    // Passes the event to the normal Qt event handler.
     return QMainWindow::event(event);
 }
+
+
+// *****************************************************************************************************************
+// SETTINGS READ/WRITE
+// *****************************************************************************************************************
 
 void MainWindow::readSettings()
 {
     QSettings settings;
+
+    // CHECK why are we doing logic here? instead of just reading, and handle logic to function so it is reusable
 
     ui->studyNotes->setPlainText(settings.value("studyNotes", "").toString());
     lastOpenedTopic = settings.value("lastOpenedTopic", "").toString();
@@ -1071,8 +1082,11 @@ void MainWindow::writeSettings()
         if (progressIsBeingTracked && selected)
             activeStudyButtonName = btn->objectName();
 
+        // Creates a settings path for this button.
         QString prefix = QString("studyButtons/%1/").arg(btn->objectName());
 
+        // Save lastClicked only if valid.
+        // Otherwise remove old saved value.
         if (lastClicked.isValid()) settings.setValue(prefix + "lastClicked", lastClicked);
         else settings.remove(prefix + "lastClicked");
 
@@ -1096,6 +1110,11 @@ void MainWindow::writeSettings()
         settings.setValue("studyButtons/progressIsBeingTracked", false);
     }
 }
+
+
+// *****************************************************************************************************************
+// click btn, reset, reopen last, etc
+// *****************************************************************************************************************
 
 bool MainWindow::activateWindowByTitle(const QString &target)
 {
@@ -1240,7 +1259,6 @@ void MainWindow::onResetTopicsBtnClicked()
         }
 
         // Shuffle button order randomly inside each priority column.
-        // The old code sorted by originalIndex, which restored the default/alphabetic order.
         for (int i = priorityButtons.size() - 1; i > 0; --i)
         {
             int j = QRandomGenerator::global()->bounded(i + 1);
@@ -1272,7 +1290,9 @@ void MainWindow::onResetTopicsBtnClicked()
     writeSettings();
 }
 
-// develop
+// *****************************************************************************************************************
+// DEVELOP - DOG OWNER RATING
+// *****************************************************************************************************************
 
 void MainWindow::calculateDogOwnerRating()
 {
@@ -1295,6 +1315,10 @@ void MainWindow::cumulativeTimeOutChanged(int cumulativeTimeOut)
     m_dogOwnerRating.setCumulativeTimeOut(cumulativeTimeOut);
     calculateDogOwnerRating();
 }
+
+// *****************************************************************************************************************
+// STUDY BTNS SETUP
+// *****************************************************************************************************************
 
 void MainWindow::setupStudyButtons()
 {
