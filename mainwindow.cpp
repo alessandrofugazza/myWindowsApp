@@ -604,6 +604,12 @@ bool MainWindow::nativeEvent(
         // qDebug() << "Last done saved for" << selectedButton->objectName();
         // qDebug() << "Elapsed between lastClicked and lastDone:" << elapsedText;
 
+        statusBar() -> showMessage(
+            QString("Finished '%1' in %2")
+                .arg(selectedButton->objectName())
+                .arg(elapsedText)
+            );
+
         // notification for user
         QMessageBox::information(
             this,
@@ -613,11 +619,7 @@ bool MainWindow::nativeEvent(
                 .arg(selectedButton->objectName())
             );
 
-        statusBar() -> showMessage(
-            QString("Finished '%1' in %2")
-                .arg(selectedButton->objectName())
-                .arg(elapsedText)
-            );
+
 
         return true;
     }
@@ -806,7 +808,10 @@ double MainWindow::calculateCurrentTaskChance() const
         return 0.0;
 
     // IMPROVE make this a const or a setting
-    constexpr double maxSeconds = 25.0 * 60.0;
+    double maxSeconds =
+        static_cast<double>(
+            currentTaskIntervalMinutes
+            ) * 60.0;
 
     double elapsedSeconds = chanceStartTime.secsTo(QDateTime::currentDateTime());
     double progress = elapsedSeconds / maxSeconds;
@@ -1003,6 +1008,12 @@ void MainWindow::readSettings()
 
     // CHECK why are we doing logic here? instead of just reading, and handle logic to function so it is reusable
 
+    currentTaskIntervalMinutes =
+        settings.value(
+                    "taskIntervalMinutes",
+                    25
+                    ).toInt();
+
     ui->studyNotes->setPlainText(settings.value("studyNotes", "").toString());
     ui->totalTodayLbl->setText(
         QString::number(
@@ -1012,6 +1023,7 @@ void MainWindow::readSettings()
     lastOpenedTopic = settings.value("lastOpenedTopic", "").toString();
     chanceStartTime = settings.value("chance/startTime", QDateTime::currentDateTime()).toDateTime();
     ui->btnColorTimeSpanSpinbox->setValue(settings.value("buttonColor/timeSpanMinutes", 120).toInt());
+    statusBar()->showMessage(settings.value("statusBar/message", "").toString());
 
     if (!chanceStartTime.isValid())
         chanceStartTime = QDateTime::currentDateTime();
@@ -1046,6 +1058,7 @@ void MainWindow::readSettings()
 
 void MainWindow::writeSettings()
 {
+
     if (ui->devModeCheckBox->isChecked())
     {
         qDebug() << "DEV MODE: writeSettings skipped";
@@ -1053,6 +1066,11 @@ void MainWindow::writeSettings()
     }
 
     QSettings settings;
+
+    settings.setValue(
+        "taskIntervalMinutes",
+        currentTaskIntervalMinutes
+        );
 
     settings.setValue("studyNotes", ui->studyNotes->toPlainText());
     settings.setValue(
@@ -1062,6 +1080,7 @@ void MainWindow::writeSettings()
     settings.setValue("lastOpenedTopic", lastOpenedTopic);
     settings.setValue("chance/startTime", chanceStartTime);
     settings.setValue("buttonColor/timeSpanMinutes", ui->btnColorTimeSpanSpinbox->value());
+    settings.setValue("statusBar/message", statusBar()->currentMessage());
     settings.setValue("taskIsTriggered", taskIsTriggered);
 
     if (taskIsTriggered)
@@ -1181,6 +1200,7 @@ void MainWindow::onTaskIsDoneBtnClicked()
     ui->taskIsDoneBtn->setEnabled(false);
     ui->taskIsDoneBtn->setText("TASK COMPLETED");
     updateCurrentChanceLabel();
+    ++currentTaskIntervalMinutes;
     writeSettings();
 }
 
@@ -1208,13 +1228,23 @@ void MainWindow::onReopenLastTopicBtnClicked()
 void MainWindow::onResetTopicsBtnClicked()
 {
     QSettings settings;
+    // IMPROVE hacky shit right here
+    bool devMode =
+        ui->devModeCheckBox->isChecked();
 
-    if (QMessageBox::question(
-            this,
-            "Reset topics",
-            "Reset all topic statistics and ordering?"
-            )
-        != QMessageBox::Yes)
+    QMessageBox confirmationBox;
+    confirmationBox.setWindowTitle("Reset topics");
+    confirmationBox.setText("Reset all topic statistics and ordering?");
+    confirmationBox.setStandardButtons(
+        QMessageBox::Ok |
+        QMessageBox::Cancel
+        );
+
+    confirmationBox.setDefaultButton(
+        QMessageBox::Ok
+        );
+
+    if (confirmationBox.exec() != QMessageBox::Ok)
     {
         return;
     }
@@ -1226,6 +1256,8 @@ void MainWindow::onResetTopicsBtnClicked()
         );
 
     ui->totalTodayLbl->setText("0");
+    currentTaskIntervalMinutes = 25;
+    resetChanceTimer();
 
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
@@ -1252,10 +1284,13 @@ void MainWindow::onResetTopicsBtnClicked()
 
         updateButtonStatsLabels(btn);
 
-        settings.remove(
-            QString("studyButtons/%1")
-                .arg(btn->objectName())
-            );
+        if (!devMode)
+        {
+            settings.remove(
+                QString("studyButtons/%1")
+                    .arg(btn->objectName())
+                );
+        }
     }
 
     for (auto it = priorityLayouts.begin();
@@ -1309,8 +1344,11 @@ void MainWindow::onResetTopicsBtnClicked()
 
     progressIsBeingTracked = false;
 
-    settings.remove("studyButtons/activeStudyButtonName");
-    settings.setValue("studyButtons/progressIsBeingTracked", false);
+    if (!devMode)
+    {
+        settings.remove("studyButtons/activeStudyButtonName");
+        settings.setValue("studyButtons/progressIsBeingTracked", false);
+    }
 
     statusBar()->showMessage("Topics reset");
 
@@ -1499,8 +1537,13 @@ void MainWindow::restoreStudyButtonSettings()
     if (progressIsBeingTracked && !restoredActiveStudyButton)
     {
         progressIsBeingTracked = false;
-        settings.remove("studyButtons/activeStudyButtonName");
-        settings.setValue("studyButtons/progressIsBeingTracked", false);
+
+        // IMPROVE hacky shit again!
+        if (!ui->devModeCheckBox->isChecked())
+        {
+            settings.remove("studyButtons/activeStudyButtonName");
+            settings.setValue("studyButtons/progressIsBeingTracked", false);
+        }
     }
 
     for (auto it = priorityLayouts.begin(); it != priorityLayouts.end(); ++it)

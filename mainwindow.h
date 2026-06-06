@@ -116,6 +116,8 @@ private:
     int m_cumulativeTimeOut;
     // bool m_didTraining;
 
+    int currentTaskIntervalMinutes = 25;
+
 
 };
 
