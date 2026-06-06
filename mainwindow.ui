@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2231</width>
-    <height>1215</height>
+    <width>2434</width>
+    <height>1348</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -197,8 +197,8 @@
          <rect>
           <x>40</x>
           <y>30</y>
-          <width>2071</width>
-          <height>1081</height>
+          <width>2241</width>
+          <height>1181</height>
          </rect>
         </property>
         <widget class="QTextEdit" name="studyNotes">
@@ -300,8 +300,8 @@
         <widget class="QProgressBar" name="chanceProgressBar">
          <property name="geometry">
           <rect>
-           <x>50</x>
-           <y>840</y>
+           <x>40</x>
+           <y>870</y>
            <width>1981</width>
            <height>31</height>
           </rect>
@@ -433,6 +433,77 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>1860</x>
+           <y>670</y>
+           <width>321</width>
+           <height>161</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Shit Done Today</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Task Done: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="taskDoneAmountSb"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <item>
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Workout (mm)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="workoutMinutesSb"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>TOTAL</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="shitDoneTotalLbl">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
         <zorder>layoutWidget</zorder>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
@@ -447,6 +518,13 @@
         <zorder>label_8</zorder>
         <zorder>totalTodayLbl</zorder>
         <zorder>casualModeCb</zorder>
+        <zorder>label_9</zorder>
+        <zorder>taskDoneAmountSb</zorder>
+        <zorder>label_10</zorder>
+        <zorder>label_11</zorder>
+        <zorder>workoutMinutesSb</zorder>
+        <zorder>label_12</zorder>
+        <zorder>shitDoneTotalLbl</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
@@ -490,7 +568,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2231</width>
+     <width>2434</width>
      <height>29</height>
     </rect>
    </property>

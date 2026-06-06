@@ -254,6 +254,63 @@ MainWindow::MainWindow(QWidget *parent)
     // CHECK why here and not before? right after setup
     readSettings();
 
+    auto calculateShitDoneTotalScore = [this]()
+    {
+        int tasksDone =
+            ui->taskDoneAmountSb->value();
+
+        int workoutMinutes =
+            ui->workoutMinutesSb->value();
+
+        double taskScore =
+            std::min(
+                tasksDone / 8.0,
+                1.0
+                );
+
+        double workoutScore =
+            std::min(
+                workoutMinutes / 45.0,
+                1.0
+                );
+
+        int finalScore =
+            static_cast<int>(
+                (
+                    taskScore * 0.70 +
+                    workoutScore * 0.30
+                    ) * 100.0 + 0.5
+                );
+
+        ui->shitDoneTotalLbl->setText(
+            QString::number(finalScore)
+            );
+
+        writeSettings();
+    };
+
+    connect(
+        ui->taskDoneAmountSb,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        [calculateShitDoneTotalScore](int)
+        {
+            calculateShitDoneTotalScore();
+        }
+        );
+
+    connect(
+        ui->workoutMinutesSb,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        [calculateShitDoneTotalScore](int)
+        {
+            calculateShitDoneTotalScore();
+        }
+        );
+
+    calculateShitDoneTotalScore();
+
 
     // *****************************************************************************************************************
     // SETTINGS LOGIC
@@ -1028,6 +1085,21 @@ void MainWindow::readSettings()
             settings.value("totalToday", 0).toInt()
             )
         );
+
+    ui->taskDoneAmountSb->setValue(
+        settings.value(
+                    "shitDone/taskDoneAmount",
+                    ui->taskDoneAmountSb->value()
+                    ).toInt()
+        );
+
+    ui->workoutMinutesSb->setValue(
+        settings.value(
+                    "shitDone/workoutMinutes",
+                    ui->workoutMinutesSb->value()
+                    ).toInt()
+        );
+
     lastOpenedTopic = settings.value("lastOpenedTopic", "").toString();
     chanceStartTime = settings.value("chance/startTime", QDateTime::currentDateTime()).toDateTime();
     ui->btnColorTimeSpanSpinbox->setValue(settings.value("buttonColor/timeSpanMinutes", 120).toInt());
@@ -1085,6 +1157,22 @@ void MainWindow::writeSettings()
         "totalToday",
         ui->totalTodayLbl->text().toInt()
         );
+
+    settings.setValue(
+        "shitDone/taskDoneAmount",
+        ui->taskDoneAmountSb->value()
+        );
+
+    settings.setValue(
+        "shitDone/workoutMinutes",
+        ui->workoutMinutesSb->value()
+        );
+
+    settings.setValue(
+        "shitDone/score",
+        ui->shitDoneTotalLbl->text().toInt()
+        );
+
     settings.setValue("lastOpenedTopic", lastOpenedTopic);
     settings.setValue("chance/startTime", chanceStartTime);
     settings.setValue("buttonColor/timeSpanMinutes", ui->btnColorTimeSpanSpinbox->value());
@@ -1203,6 +1291,10 @@ void MainWindow::onTaskIsDoneBtnClicked()
         QString::number(totalToday + 1)
         );
 
+    ui->taskDoneAmountSb->setValue(
+        ui->taskDoneAmountSb->value() + 1
+        );
+
     resetChanceTimer();
     taskIsTriggered = false;
     ui->taskIsDoneBtn->setEnabled(false);
@@ -1265,6 +1357,8 @@ void MainWindow::onResetTopicsBtnClicked()
         );
 
     ui->totalTodayLbl->setText("0");
+    ui->taskDoneAmountSb->setValue(0);
+    ui->workoutMinutesSb->setValue(0);
     currentTaskIntervalMinutes = 25;
     resetChanceTimer();
 
