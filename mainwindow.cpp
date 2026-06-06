@@ -1630,6 +1630,20 @@ void MainWindow::restoreStudyButtonSettings()
 
 void MainWindow::handleStudyButtonClicked(QPushButton *btn)
 {
+    if (ui->casualModeCb->isChecked())
+    {
+        QString appTitle = btn->property("appTitle").toString();
+        QString instanceName = btn->objectName();
+
+        if (!appTitle.isEmpty())
+        {
+            if (appTitle == "Chrome")
+                activateWindowByTitle(instanceName);
+        }
+
+        return;
+    }
+
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
     QPushButton *previousSelectedButton = nullptr;
 

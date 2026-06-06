@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="viewsStack">
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="otherView">
        <widget class="QWidget" name="otherViewContainer" native="true">
@@ -336,19 +336,6 @@
           <string>debug</string>
          </property>
         </widget>
-        <widget class="QCheckBox" name="devModeCheckBox">
-         <property name="geometry">
-          <rect>
-           <x>1640</x>
-           <y>760</y>
-           <width>141</width>
-           <height>29</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Dev mode</string>
-         </property>
-        </widget>
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
@@ -420,6 +407,32 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>1640</x>
+           <y>720</y>
+           <width>139</width>
+           <height>69</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QCheckBox" name="casualModeCb">
+            <property name="text">
+             <string>Casual Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="devModeCheckBox">
+            <property name="text">
+             <string>Dev mode</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <zorder>layoutWidget</zorder>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
@@ -433,6 +446,7 @@
         <zorder>undoBtn</zorder>
         <zorder>label_8</zorder>
         <zorder>totalTodayLbl</zorder>
+        <zorder>casualModeCb</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
