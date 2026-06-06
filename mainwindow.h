@@ -52,6 +52,7 @@ private slots:
     void calculateDogOwnerRating();
     void amountOfTimesOutChanged(int amountOfTimesOut);
     void cumulativeTimeOutChanged(int cumulativeTimeOut);
+    void trainingSessionsAmountChanged(int trainingSessionsAmount);
     // void didTrainingChanged(bool didTraining);
 
 signals:
@@ -114,6 +115,7 @@ private:
     double m_dogOwnerRatingScore;
     int m_amountOfTimesOut;
     int m_cumulativeTimeOut;
+    int m_trainingSessionsAmount;
     // bool m_didTraining;
 
     int currentTaskIntervalMinutes = 25;

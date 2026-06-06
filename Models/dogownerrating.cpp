@@ -17,3 +17,13 @@ void DogOwnerRating::setCumulativeTimeOut(int cumulativeTime)
         emit cumulativeTimeOutChanged();
     }
 }
+
+void DogOwnerRating::setTrainingSessionsAmount(int sessionsAmount)
+{
+    if (m_trainingSessionsAmount != sessionsAmount)
+    {
+        m_trainingSessionsAmount = sessionsAmount;
+        emit trainingSessionsAmountChanged();
+    }
+}
+

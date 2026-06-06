@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="viewsStack">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="otherView">
        <widget class="QWidget" name="otherViewContainer" native="true">
@@ -111,88 +111,76 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QWidget" name="dogOwnerRatingViewContainer" native="true">
-          <widget class="QWidget" name="layoutWidget">
+          <widget class="QWidget" name="">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Rating: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="dogOwnerRatingScoreLbl">
+              <property name="styleSheet">
+               <string notr="true">color: rgb(255, 0, 0);</string>
+              </property>
+              <property name="text">
+               <string>100</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="">
            <property name="geometry">
             <rect>
-             <x>14</x>
-             <y>30</y>
-             <width>601</width>
-             <height>231</height>
+             <x>16</x>
+             <y>68</y>
+             <width>451</width>
+             <height>131</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="label_5">
                 <property name="text">
-                 <string>Rating: </string>
+                 <string>Cumulative time (m) : </string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="dogOwnerRatingScoreLbl">
-                <property name="styleSheet">
-                 <string notr="true">color: rgb(255, 0, 0);</string>
-                </property>
-                <property name="text">
-                 <string>100</string>
-                </property>
-               </widget>
+               <widget class="QSpinBox" name="cumulativeTimeOutSb"/>
               </item>
              </layout>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_6">
-                  <item>
-                   <widget class="QLabel" name="label_6">
-                    <property name="text">
-                     <string>Amount: </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="amountOfTimesOutSb"/>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
-                  <item>
-                   <widget class="QLabel" name="label_5">
-                    <property name="text">
-                     <string>Cumulative time (m) : </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="cumulativeTimeOutSb"/>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Amount of times out: </string>
+                </property>
+               </widget>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_7">
-                <item>
-                 <widget class="QLabel" name="label_7">
-                  <property name="text">
-                   <string>Training: </string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="didTrainingCb">
-                  <property name="text">
-                   <string>CheckBox</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QSpinBox" name="amountOfTimesOutSb"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Training amount: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="trainingSessionsAmountSb"/>
               </item>
              </layout>
             </item>

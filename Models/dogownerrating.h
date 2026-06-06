@@ -12,14 +12,18 @@ public:
     void setAmountOfTimesOut(int timesOut);
     int cumulativeTimeOut() const { return m_cumulativeTimeOut; }
     void setCumulativeTimeOut(int timesOut);
+    int trainingSessionsAmount() const { return m_trainingSessionsAmount; }
+    void setTrainingSessionsAmount(int sessionsAmount);
 
 signals:
     void amountOfTimesOutChanged();
     void cumulativeTimeOutChanged();
+    void trainingSessionsAmountChanged();
 
 private:
     int m_amountOfTimesOut = 0;
     int m_cumulativeTimeOut = 0;
+    int m_trainingSessionsAmount = 0;
 };
 
 

@@ -29,6 +29,7 @@
 #include <QMessageBox>
 #include <QStatusBar>
 
+#define NOMINMAX
 #include <windows.h>
 #include "Models/dogownerrating.h"
 
@@ -68,6 +69,13 @@ MainWindow::MainWindow(QWidget *parent)
         &QSpinBox::valueChanged,
         this,
         &MainWindow::cumulativeTimeOutChanged
+        );
+
+    connect(
+        ui->trainingSessionsAmountSb,
+        &QSpinBox::valueChanged,
+        this,
+        &MainWindow::trainingSessionsAmountChanged
         );
 
     connect(this, &MainWindow::dogOwnerRatingChanged, this, [this]()
@@ -1235,6 +1243,7 @@ void MainWindow::onResetTopicsBtnClicked()
     QMessageBox confirmationBox;
     confirmationBox.setWindowTitle("Reset topics");
     confirmationBox.setText("Reset all topic statistics and ordering?");
+    confirmationBox.setIcon(QMessageBox::Warning);
     confirmationBox.setStandardButtons(
         QMessageBox::Ok |
         QMessageBox::Cancel
@@ -1361,11 +1370,31 @@ void MainWindow::onResetTopicsBtnClicked()
 
 void MainWindow::calculateDogOwnerRating()
 {
-    qDebug() << "Calculating dog owner rating with:"
-             << "amountOfTimesOut:" << m_dogOwnerRating.amountOfTimesOut()
-             << "cumulativeTimeOut:" << m_dogOwnerRating.cumulativeTimeOut();
+    double walksScore =
+        std::min(
+            m_dogOwnerRating.amountOfTimesOut() / 3.0,
+            1.0
+            );
 
-    m_dogOwnerRatingScore = m_dogOwnerRating.amountOfTimesOut() * m_dogOwnerRating.cumulativeTimeOut();
+    double timeScore =
+        std::min(
+            m_dogOwnerRating.cumulativeTimeOut() / 120.0,
+            1.0
+            );
+
+    double trainingScore =
+        std::min(
+            m_dogOwnerRating.trainingSessionsAmount() / 2.0,
+            1.0
+            );
+
+    double finalScore =
+        (
+            walksScore * 0.4 +
+            timeScore * 0.4 +
+            trainingScore * 0.2
+            ) * 100.0;
+    m_dogOwnerRatingScore = finalScore;
     emit dogOwnerRatingChanged();
 }
 
@@ -1378,6 +1407,12 @@ void MainWindow::amountOfTimesOutChanged(int amountOfTimesOut)
 void MainWindow::cumulativeTimeOutChanged(int cumulativeTimeOut)
 {
     m_dogOwnerRating.setCumulativeTimeOut(cumulativeTimeOut);
+    calculateDogOwnerRating();
+}
+
+void MainWindow::trainingSessionsAmountChanged(int trainingSessionsAmount)
+{
+    m_dogOwnerRating.setTrainingSessionsAmount(trainingSessionsAmount);
     calculateDogOwnerRating();
 }
 
