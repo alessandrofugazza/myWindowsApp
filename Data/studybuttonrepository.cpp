@@ -22,6 +22,7 @@ QList<StudyButton> defaultStudyButtons()
             {"Finance", 1, "Chrome"},
             {"Flipper", 9, "Chrome"},
             {"GitHub Copilot", 6, "Chrome"},
+            {"Gradio", 3, "Chrome"},
             {"Industrial Automation", 4, "Chrome"},
             {"iOS Development", 3, "Chrome"},
             {"JavaScript", 5, "Chrome"},
