@@ -663,7 +663,7 @@ bool MainWindow::nativeEvent(
 
         updateButtonStatsLabels(selectedButton);
 
-        writeSettings();
+        checkTaskWithChance();
 
         // qDebug() << "Global hotkey pressed";
         // qDebug() << "Last done saved for" << selectedButton->objectName();
@@ -674,6 +674,8 @@ bool MainWindow::nativeEvent(
                 .arg(selectedButton->objectName())
                 .arg(elapsedText)
             );
+
+        writeSettings();
 
         // notification for user
         QMessageBox::information(
@@ -768,6 +770,11 @@ bool MainWindow::nativeEvent(
 
             // qDebug() << "Paused seconds already stored:"
             //          << pausedSeconds;
+
+            statusBar() -> showMessage(
+                QString("'%1' is paused.")
+                    .arg(selectedButton->objectName())
+                );
         }
         else
         {
@@ -814,6 +821,11 @@ bool MainWindow::nativeEvent(
 
             // qDebug() << "Active seconds so far, excluding pauses:"
             //          << activeSecondsSoFar;
+
+            statusBar() -> showMessage(
+                QString("'%1' is resumed.")
+                    .arg(selectedButton->objectName())
+                );
         }
 
         // CHECK is this really necessary? btn is still active anyway
@@ -1798,7 +1810,7 @@ void MainWindow::handleStudyButtonClicked(QPushButton *btn)
     }
 
     btn->setProperty("selected", true);
-    checkTaskWithChance();
+    // checkTaskWithChance();
 
     QDateTime now = QDateTime::currentDateTime();
     btn->setProperty("lastClicked", now);
