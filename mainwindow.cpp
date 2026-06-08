@@ -251,8 +251,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->currentChanceLbl->setText("settings not read yet");
     ui->trackingStartedAtLbl->setText("Not started");
 
+    setupStudyButtons();
+
     // CHECK why here and not before? right after setup
     readSettings();
+
+    restoreStudyButtonSettings();
 
     auto calculateShitDoneTotalScore = [this]()
     {
@@ -414,10 +418,6 @@ MainWindow::MainWindow(QWidget *parent)
             ui->viewsStack->setCurrentWidget(ui->coursePracticeView);
         }
         );
-
-    setupStudyButtons();
-
-    restoreStudyButtonSettings();
 
     // set up cursor pointer for all buttons
 
@@ -1206,12 +1206,15 @@ void MainWindow::writeSettings()
     settings.setValue("studyButtons/progressIsBeingTracked", progressIsBeingTracked);
 
     QString activeStudyButtonName;
+    bool hasTrackedStudyButtons = false;
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
 
     for (QPushButton *btn : std::as_const(buttons))
     {
         if (!btn->property("trackedColorButton").toBool())
             continue;
+
+        hasTrackedStudyButtons = true;
 
         QDateTime lastClicked = btn->property("lastClicked").toDateTime();
         QDateTime lastDone = btn->property("lastDone").toDateTime();
@@ -1244,6 +1247,9 @@ void MainWindow::writeSettings()
         if (pauseStartedAt.isValid()) settings.setValue(prefix + "pauseStartedAt", pauseStartedAt);
         else settings.remove(prefix + "pauseStartedAt");
     }
+
+    if (!hasTrackedStudyButtons)
+        return;
 
     if (progressIsBeingTracked && !activeStudyButtonName.isEmpty())
         settings.setValue("studyButtons/activeStudyButtonName", activeStudyButtonName);
@@ -1347,7 +1353,7 @@ void MainWindow::onResetTopicsBtnClicked()
     QMessageBox confirmationBox;
     confirmationBox.setWindowTitle("Reset topics");
     confirmationBox.setText("Reset all topic statistics and ordering?");
-    confirmationBox.setIcon(QMessageBox::Warning);
+    confirmationBox.setIcon(QMessageBox::Question);
     confirmationBox.setStandardButtons(
         QMessageBox::Ok |
         QMessageBox::Cancel
