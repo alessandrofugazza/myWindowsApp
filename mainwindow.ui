@@ -111,7 +111,15 @@
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QWidget" name="dogOwnerRatingViewContainer" native="true">
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>100</width>
+             <height>30</height>
+            </rect>
+           </property>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
              <widget class="QLabel" name="label">
@@ -132,7 +140,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>16</x>
@@ -375,7 +383,7 @@
           <string>UNDO</string>
          </property>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>910</x>
@@ -407,7 +415,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>1640</x>
@@ -433,7 +441,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>1860</x>
@@ -504,6 +512,35 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>1750</x>
+           <y>960</y>
+           <width>137</width>
+           <height>22</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Minutes:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="currentTaskMinutesLbl">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <zorder>layoutWidget</zorder>
+        <zorder>layoutWidget</zorder>
+        <zorder>layoutWidget</zorder>
         <zorder>layoutWidget</zorder>
         <zorder>studyNotes</zorder>
         <zorder>layoutWidget</zorder>
@@ -513,18 +550,9 @@
         <zorder>chanceProgressBar</zorder>
         <zorder>resetTopicsBtn</zorder>
         <zorder>debugBtn</zorder>
-        <zorder>devModeCheckBox</zorder>
         <zorder>undoBtn</zorder>
-        <zorder>label_8</zorder>
-        <zorder>totalTodayLbl</zorder>
-        <zorder>casualModeCb</zorder>
-        <zorder>label_9</zorder>
-        <zorder>taskDoneAmountSb</zorder>
-        <zorder>label_10</zorder>
-        <zorder>label_11</zorder>
-        <zorder>workoutMinutesSb</zorder>
-        <zorder>label_12</zorder>
-        <zorder>shitDoneTotalLbl</zorder>
+        <zorder>label_13</zorder>
+        <zorder>currentTaskMinutesLbl</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="optionsView">
@@ -569,7 +597,7 @@
      <x>0</x>
      <y>0</y>
      <width>2434</width>
-     <height>29</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSections">

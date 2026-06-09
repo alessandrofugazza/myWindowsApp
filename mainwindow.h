@@ -96,6 +96,9 @@ private:
     static constexpr int FINISH_HOTKEY_ID = 1;
     static constexpr int PAUSE_HOTKEY_ID = 2;
 
+    // POLISH silly logic
+    static constexpr int baseTaskMinutes = 20;
+
     QPushButton *selectedStudyButton = nullptr;
 
     bool progressIsBeingTracked = false;
@@ -118,7 +121,9 @@ private:
     int m_trainingSessionsAmount;
     // bool m_didTraining;
 
-    int currentTaskIntervalMinutes = 25;
+    int currentTaskIntervalMinutes = baseTaskMinutes;
+
+
 
 
 };

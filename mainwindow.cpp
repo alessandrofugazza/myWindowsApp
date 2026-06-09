@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::dogOwnerRatingChanged, this, [this]()
             {
-                qDebug() << "RECEIVING Dog owner rating changed. New score:" << m_dogOwnerRatingScore;
+                // qDebug() << "RECEIVING Dog owner rating changed. New score:" << m_dogOwnerRatingScore;
                 ui->dogOwnerRatingScoreLbl->setText(
                     QString::number(m_dogOwnerRatingScore)
                     );
@@ -126,6 +126,16 @@ MainWindow::MainWindow(QWidget *parent)
             this,
             [this]()
             {
+                qDebug() << "current minutes for task chance:" << currentTaskIntervalMinutes;
+                qDebug() << "base minutes for task chance:" << baseTaskMinutes;
+
+                chanceStartTime =
+                    QDateTime::currentDateTime().addSecs(
+                        -(currentTaskIntervalMinutes * 60)
+                        );
+
+                doTaskTriggeredStuff();
+
                 qDebug() << "progressIsBeingTracked:" << progressIsBeingTracked;
 
                 QList<QPushButton*> buttons = findChildren<QPushButton*>();
@@ -890,6 +900,8 @@ double MainWindow::calculateCurrentTaskChance() const
             currentTaskIntervalMinutes
             ) * 60.0;
 
+    qDebug() << maxSeconds;
+
     double elapsedSeconds = chanceStartTime.secsTo(QDateTime::currentDateTime());
     double progress = elapsedSeconds / maxSeconds;
     progress = qBound(0.0, progress, 1.0);
@@ -1088,8 +1100,12 @@ void MainWindow::readSettings()
     currentTaskIntervalMinutes =
         settings.value(
                     "taskIntervalMinutes",
-                    25
+                    baseTaskMinutes
                     ).toInt();
+
+    ui->currentTaskMinutesLbl->setText(
+        QString("%1").arg(currentTaskIntervalMinutes)
+        );
 
     ui->studyNotes->setPlainText(settings.value("studyNotes", "").toString());
     ui->totalTodayLbl->setText(
@@ -1318,7 +1334,10 @@ void MainWindow::onTaskIsDoneBtnClicked()
     ui->taskIsDoneBtn->setEnabled(false);
     ui->taskIsDoneBtn->setText("TASK COMPLETED");
     updateCurrentChanceLabel();
-    ++currentTaskIntervalMinutes;
+    currentTaskIntervalMinutes+=5;
+    ui->currentTaskMinutesLbl->setText(
+        QString("%1").arg(currentTaskIntervalMinutes)
+        );
     writeSettings();
 }
 
@@ -1377,7 +1396,7 @@ void MainWindow::onResetTopicsBtnClicked()
     ui->totalTodayLbl->setText("0");
     ui->taskDoneAmountSb->setValue(0);
     ui->workoutMinutesSb->setValue(0);
-    currentTaskIntervalMinutes = 25;
+    currentTaskIntervalMinutes = baseTaskMinutes;
     resetChanceTimer();
 
     QList<QPushButton*> buttons = findChildren<QPushButton*>();

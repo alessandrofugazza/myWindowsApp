@@ -10,7 +10,7 @@ RockWidget::RockWidget(QWidget *parent)
 
     QLabel *label = new QLabel("This is the Rock Widget", this);
 
-    qDebug("RockWidget created");
+    // qDebug("RockWidget created");
 }
 
 void RockWidget::buttonClicked()
