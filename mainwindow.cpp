@@ -1296,6 +1296,7 @@ bool MainWindow::activateWindowByTitle(const QString &target)
 
             if (t == target)
             {
+                qDebug() << "Found window with exact title:" << target;
                 ShowWindow(hwnd, SW_MAXIMIZE);
                 SetForegroundWindow(hwnd);
                 lastOpenedTopic = target;
