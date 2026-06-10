@@ -1,1 +1,6 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/icons">
+        <file>rsc/img/favicon.ico</file>
+        <file>rsc/img/apple-touch-icon.png</file>
+    </qresource>
+</RCC>

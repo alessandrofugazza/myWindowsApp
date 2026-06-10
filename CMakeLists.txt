@@ -5,6 +5,8 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 
 qt_standard_project_setup()
 
+set(CMAKE_AUTORCC ON)
+
 qt_add_executable(myWindowsApp
     WIN32 MACOSX_BUNDLE
     main.cpp

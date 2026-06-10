@@ -363,8 +363,18 @@ MainWindow::MainWindow(QWidget *parent)
     // TRAY ICON
     // *****************************************************************************************************************
 
+    // trayIcon = new QSystemTrayIcon(this);
+    // trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
+    // trayIcon->setIcon(QIcon(":/icons/favicon.ico"));
+    // trayIcon->setToolTip("My Windows App");
+    // trayIcon->show();
+
+    QIcon icon(":/icons/rsc/img/favicon.ico");
+
+    // qDebug() << "isNull:" << icon.isNull();
+
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/qt-project.org/windows/cursors/images/openhandcursor_32.png"));
+    trayIcon->setIcon(icon);
     trayIcon->setToolTip("My Windows App");
     trayIcon->show();
 
